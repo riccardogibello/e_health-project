@@ -5,11 +5,11 @@ import database_handling_functions
 def find_available_categories():
     categories = play_scraper.categories()
 
-    for key, category in categories.items():
+    for first_key, category in categories.items():
         data = []
-        for key, cateogry_datum in category.items():
-            if key != 'url':
-                data.append(cateogry_datum)
+        for second_key, category_datum in category.items():
+            if second_key != 'url':
+                data.append(category_datum)
         query = (
             "INSERT INTO CATEGORY(category_name, category_id)"
             "VALUES (%s, %s)"

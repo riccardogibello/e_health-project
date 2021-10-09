@@ -3,23 +3,6 @@ CREATE DATABASE  IF NOT EXISTS `projectdatabase`;
 
 USE `projectdatabase`;
 
-
-
---
--- Table structure for table `user`
---
-
-DROP TABLE IF EXISTS `user`;
-
-CREATE TABLE `user` (
-  `userid` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) NOT NULL,
-  `surname` varchar(45) NOT NULL,
-  `username` varchar(45) NOT NULL,
-  `password` varchar(45) NOT NULL,
-  PRIMARY KEY (`userid`)
-) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 DROP TABLE IF EXISTS `app`;
 
 CREATE TABLE `app` (
