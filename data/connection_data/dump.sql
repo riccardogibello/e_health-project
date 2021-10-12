@@ -7,19 +7,13 @@ DROP TABLE IF EXISTS `app`;
 
 CREATE TABLE `app` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `app` varchar(100),
+  `app_id` varchar(100),
+  `app` varchar(150),
   `category` varchar(45),
-  `rating` varchar(10),
-  `reviews` varchar(10),
-  `size` varchar(10),
-  `installs` varchar(15),
-  `type` varchar(45),
-  `price` varchar(10),
+  `rating` varchar(45),
+  `reviews` varchar(45),
   `content_rating` varchar(45),
   `genres` varchar(45),
-  `last_updated` varchar(45),
-  `current_ver` varchar(45),
-  `android_ver` varchar(45),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

@@ -32,7 +32,6 @@ def insert_tuple(tuple_data, query):
         # Rolling back in case of error
         conn.rollback()
 
-    print("Data inserted")
     # Closing the connection
     conn.close()
 
@@ -57,6 +56,5 @@ class DatabaseHandler:
             for datum in data:
                 fo.write(datum + '\n')
 
-        sanitized_data = []
         for datum in data:
             self.__connection_data.append(re.sub('\n', '', datum, flags=re.IGNORECASE))
