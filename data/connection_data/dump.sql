@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS `app`;
 CREATE TABLE `app` (
   `id` int NOT NULL AUTO_INCREMENT,
   `app_id` varchar(100),
-  `app` varchar(150),
+  `app` varchar(200),
   `category` varchar(45),
   `rating` varchar(45),
   `reviews` varchar(45),

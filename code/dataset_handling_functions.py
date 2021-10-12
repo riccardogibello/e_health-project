@@ -1,6 +1,7 @@
 import pandas as pd
 import play_scraper
 from database_handling_functions import *
+from concurrent.futures import ThreadPoolExecutor
 
 
 def find_app_id(old_app_title):
@@ -38,7 +39,7 @@ class OldDatasetHandler:
         # pd.set_option('display.width', None)
         # pd.set_option('display.max_colwidth', None)
 
-        self.dataframe = pd.read_csv('./data/input_data/googleplaystore.csv')
+        self.dataframe = pd.read_csv('./data/input_data/old_googleplaystore.csv')
 
         # print(df.loc[[i], ['App']])   # here an object is still extracted, containing the index
         # of the element, the column name and the value stored in the column
@@ -48,9 +49,23 @@ class OldDatasetHandler:
         # print(df.loc[i])
 
     def load_old_dataset_into_db(self):
+        batch_size = self.dataframe.size * 0.5 // 1
+        n_threads_max = self.dataframe.size // batch_size + 1
+        offset = 0
+        # now call the function to extract and process data from the dataset, passing as argument the batch size
+        # and the offset to find the starting position
+        with ThreadPoolExecutor(max_workers=n_threads_max) as executor:
+            while offset < self.dataframe.size:
+                executor.submit(self.load_batch_into_db, offset, batch_size)
+                offset = offset + batch_size
+
+    def load_batch_into_db(self, offset, batch_size):
         columns = ['App', 'Category', 'Rating', 'Reviews', 'Content Rating', 'Genres']
         interesting_categories = ['MEDICAL', 'EDUCATION', 'FAMILY', 'GAME_EDUCATIONAL']
-        for i in range(self.dataframe.size):
+        if offset + batch_size > self.dataframe.size:
+            offset = self.dataframe.size
+
+        for i in range(int(offset), int(offset + batch_size), 1):
             details = extract_details(self.dataframe, i, columns, interesting_categories)
 
             # if the category is not of interest, the previous method will give back an empty list of details
@@ -63,4 +78,5 @@ class OldDatasetHandler:
             )
 
             insert_tuple(details, insert_stmt)
+
 
