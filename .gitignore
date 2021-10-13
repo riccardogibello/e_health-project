@@ -1,3 +1,4 @@
 /.idea
 /venv
 /data/connection_data/data.txt
+/code/__pycache__
