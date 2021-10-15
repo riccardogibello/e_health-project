@@ -2,7 +2,7 @@ import pandas
 
 from settings import KAGGLE_KEY_COLUMNS, SERIOUS_GAMES_CATEGORIES_LIST, MAX_DATASET_THREADS, DEBUG
 from concurrent.futures import ThreadPoolExecutor
-from database_handling_functions import insert_tuple
+from DatabaseManager import do_query
 
 
 class DatasetManager:
@@ -36,10 +36,10 @@ class DatasetManager:
         values = [data_frame_row['App Name'], data_frame_row['Category'], data_frame_row['App Id']]
 
         insert_stmt = (
-            "INSERT INTO APP(app, category, app_id)"
+            "INSERT INTO APP(app_name, category, app_id)"
             "VALUES (%s, %s, %s)"
         )
 
-        insert_tuple(values, insert_stmt)
+        do_query(values, insert_stmt)
 
     # conversion of old database to new to be created

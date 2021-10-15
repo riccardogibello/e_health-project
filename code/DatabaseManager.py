@@ -16,16 +16,18 @@ def create_connection():
         user=sanitized_data[0], password=sanitized_data[1], host=sanitized_data[2], database=sanitized_data[3])
 
 
-def insert_tuple(tuple_data, query):
+def do_query(tuple_data, query):
     # establishing the connection
     conn = create_connection()
 
     # Creating a cursor object using the cursor() method
     cursor = conn.cursor()
+    result = []
 
     try:
         # Executing the SQL command
         cursor.execute(query, tuple_data)
+        result = cursor.fetchall()
         # Commit your changes in the database
         conn.commit()
     except EnvironmentError:
@@ -34,9 +36,15 @@ def insert_tuple(tuple_data, query):
 
     # Closing the connection
     conn.close()
+    return result
 
 
-class DatabaseHandler:
+def clear_database_data():
+    do_query('', 'TRUNCATE TABLE category')
+    do_query('', 'TRUNCATE TABLE app')
+
+
+class DatabaseManager:
     __connection_data = []
 
     def get_connection_data(self):

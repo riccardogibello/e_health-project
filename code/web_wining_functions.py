@@ -1,5 +1,5 @@
 import play_scraper
-import database_handling_functions
+import DatabaseManager
 
 
 def find_available_categories():
@@ -14,4 +14,4 @@ def find_available_categories():
             "INSERT INTO CATEGORY(category_name, category_id)"
             "VALUES (%s, %s)"
         )
-        database_handling_functions.insert_tuple(data, query)
+        DatabaseManager.do_query(data, query)
