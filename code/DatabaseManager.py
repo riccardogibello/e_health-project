@@ -44,6 +44,22 @@ def clear_database_data():
     do_query('', 'TRUNCATE TABLE app')
 
 
+def insert_id_into_database(app_id):
+    id_query = (
+        "INSERT IGNORE INTO APP(app_id)"
+        "VALUES (%s)"
+    )
+    values = (app_id, )
+
+    do_query(values, id_query)
+
+def delete_app_from_database(app_id):
+    delete_query = (
+        "DELETE FROM APP WHERE app_id = %s"
+    )
+    do_query((app_id, ), delete_query)
+
+
 class DatabaseManager:
     __connection_data = []
 

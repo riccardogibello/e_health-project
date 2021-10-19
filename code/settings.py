@@ -24,8 +24,11 @@ KAGGLE_KEY_COLUMNS = ['App Id', 'Category', 'App Name']
 KAGGLE_DATASET_PATH = 'data/input_data/kaggle_playstore_apps_new.csv'
 
 # PERFORMANCE
-MAX_DATASET_THREADS = 50
+MAX_DATASET_THREADS = 32
+MAX_RETRIEVE_APP_DATA_THREADS = 20
+MAX_FILTER_THREADS = 32
 
 # DEBUG
 DEBUG = True
+apps = 211968
 

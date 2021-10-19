@@ -5,10 +5,11 @@ USE `projectdatabase`;
 
 DROP TABLE IF EXISTS `app`;
 CREATE TABLE `app` (
-  `app_id` varchar(100) NOT NULL,
+  `app_id` varchar(100) UNIQUE NOT NULL,
   `app_name` varchar(200),
-  `description` varchar(2000),
+  `description` varchar(4500),
   `category` varchar(45),
+  `score` varchar(45),
   `rating` varchar(45),
   `reviews` varchar(45),
   `content_rating` varchar(45),
