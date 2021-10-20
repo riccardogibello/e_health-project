@@ -38,6 +38,7 @@ class DatasetManager:
 
         if DEBUG:
             print(f'Data from dataset {self.__dataset_file} loaded successfully')
+        self.__apps_list = None
 
     def store_app_data(self, app_index):
         data_frame_row = self.__apps_list.loc[app_index]

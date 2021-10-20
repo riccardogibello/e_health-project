@@ -1,4 +1,5 @@
 import google_play_scraper.exceptions
+import mysql
 
 from DatabaseManager import do_query, delete_app_from_database
 from Application import Application
@@ -11,15 +12,23 @@ class DataMiner:
     __apps_id_list = None
 
     def __init__(self):
-        print(f'Data Miner started in thread : {threading.currentThread()}')
+        if DEBUG:
+            print(f'Data Miner started in thread : {threading.currentThread()}')
         self.execution = True
         self.__retrieve_incomplete_data()
 
     def __retrieve_incomplete_data(self):
         query = (
-            "SELECT * FROM app WHERE description IS NULL"
+            "SELECT * FROM app WHERE description IS NULL LIMIT 1000"
         )
-        self.__apps_id_list = do_query('', query)
+        try:
+            self.__apps_id_list = do_query((), query)
+        except mysql.connector.errors.DatabaseError:
+            self.__apps_id_list = None
+            return
+        if len(self.__apps_id_list) == 0:
+            self.execution = False
+            print('Data Mining completed')
 
     def __get_app_data(self, app_id):
         try:
@@ -37,9 +46,9 @@ class DataMiner:
                     app_id = application[0]
                     self.__apps_id_list.remove(application)
                     executor.submit(self.load_app_into_database, app_id)
+                self.__apps_id_list = []
 
     def load_app_into_database(self, app_id):
-
         application = self.__get_app_data(app_id)
         if not application:
             return
@@ -47,15 +56,7 @@ class DataMiner:
         update_query = (
             "UPDATE APP SET description = %s, app_name = %s, category = %s, rating = %s, score = %s, genres = %s WHERE app_id = %s"
         )
-        lun = 4000
-        if len(application.description) > lun:
-            fp = open('MAX_LENGHT', 'r')
-            lun = int(fp.readline())
-            if len(application.description > lun):
-                fp.close()
-                fp = open('MAX_LENGHT', 'w')
-                fp.write(f'{len(application.description)}')
-            fp.close()
+
         query_values = [application.description,
                         application.title,
                         application.category,
@@ -65,7 +66,7 @@ class DataMiner:
                         application.app_id]
 
         do_query(tuple_data=query_values, query=update_query)
-        print(f'Filled info for :{application.app_id}. Similar apps founded: {len(application.similar_apps)}')
+        application = None
 
     def shutdown(self):
         self.execution = False

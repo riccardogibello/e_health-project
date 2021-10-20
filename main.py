@@ -6,6 +6,7 @@ from settings import KAGGLE_DATASET_PATH
 from DataMiner import DataMiner
 from word_mining_functions import *
 from threading import Thread
+import multiprocessing
 
 
 def launch_DataMiner():
@@ -29,27 +30,27 @@ if __name__ == '__main__':
     databaseManager = DatabaseManager()
     databaseManager.setup_connection_data()
 
-    dataset_thread = Thread(target=launch_DatasetManager)
-    database_filter_thread = Thread(target=launch_DatabaseFilter)
-    data_miner_thread = Thread(target=launch_DataMiner)
+    #dataset_thread = Thread(target=launch_DatasetManager)
+    database_filter_thread = multiprocessing.Process(name='Filter', target=launch_DatabaseFilter)
+    data_miner_thread = Thread(name='Miner', target=launch_DataMiner)
 
-    dataset_thread.start()
+    #dataset_thread.start()
     database_filter_thread.start()
     data_miner_thread.start()
 
-    web_mining_functions.find_available_categories()
+    #web_mining_functions.find_available_categories()
 
-    oldDatasetHandler = OldDatasetManager()
-    oldDatasetHandler.load_old_dataset_into_db()
+    #oldDatasetHandler = OldDatasetManager()
+    #oldDatasetHandler.load_old_dataset_into_db()
 
     end = time.time()
     print("The time of execution of above program is :", end - start)
 
-    filenames_pages_serious_games = {'wikipage': 'https://en.wikipedia.org/wiki/Serious_game',
-                                     'paper': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5222787/pdf/fpsyt-07-00215.pdf'}
-    for filename, path in filenames_pages_serious_games.items():
-        find_serious_games_words(filename, path)
+    #filenames_pages_serious_games = {'wikipage': 'https://en.wikipedia.org/wiki/Serious_game',
+                                    # 'paper': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5222787/pdf/fpsyt-07-00215.pdf'}
+    #for filename, path in filenames_pages_serious_games.items():
+        #find_serious_games_words(filename, path)
 
     data_miner_thread.join()
-    dataset_thread.join()
+    #dataset_thread.join()
     database_filter_thread.join()
