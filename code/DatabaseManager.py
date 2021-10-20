@@ -31,6 +31,7 @@ def do_query(tuple_data, query):
         # Commit your changes in the database
         conn.commit()
     except EnvironmentError:
+        print('LOL')
         # Rolling back in case of error
         conn.rollback()
 
@@ -44,20 +45,45 @@ def clear_database_data():
     do_query('', 'TRUNCATE TABLE app')
 
 
-def insert_id_into_database(app_id):
+def insert_id_into_preliminary_db(app_id, from_dataset_flag=False):
     id_query = (
-        "INSERT IGNORE INTO APP(app_id)"
-        "VALUES (%s)"
+        "INSERT IGNORE INTO PRELIMINARY(app_id, from_dataset)"
+        "VALUES (%s, %s)"
     )
-    values = (app_id, )
 
-    do_query(values, id_query)
+    do_query((app_id, from_dataset_flag), id_query)
+
 
 def delete_app_from_database(app_id):
     delete_query = (
         "DELETE FROM APP WHERE app_id = %s"
     )
-    do_query((app_id, ), delete_query)
+    do_query((app_id,), delete_query)
+
+
+def update_status_preliminary(app_id):
+    update_query = (
+        "UPDATE PRELIMINARY SET preliminary.check=TRUE WHERE app_id = %s"
+    )
+    do_query((app_id,), update_query)
+
+
+def insert_app_into_db(application):
+    insert_query = (
+        "INSERT INTO APP(app_id, app_name, description, category, score, rating, category_id, developer_id)"
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+    )
+
+    query_values = (application.app_id,
+                    application.title,
+                    application.description,
+                    application.category,
+                    application.score,
+                    application.ratings,
+                    application.genre_id,
+                    application.developer_id)
+
+    do_query(tuple_data=query_values, query=insert_query)
 
 
 class DatabaseManager:

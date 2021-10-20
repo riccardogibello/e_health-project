@@ -1,72 +1,97 @@
+import time
+
 import google_play_scraper.exceptions
 import mysql
 
-from DatabaseManager import do_query, delete_app_from_database
+from DatabaseManager import insert_app_into_db, insert_id_into_preliminary_db as insert_preliminary, \
+    update_status_preliminary
+from DatasetManager import is_english
+from DatabaseManager import do_query
 from Application import Application
 from concurrent.futures import ThreadPoolExecutor
-from settings import MAX_RETRIEVE_APP_DATA_THREADS, SERIOUS_GAMES_CATEGORIES_LIST, DEBUG
+from settings import MAX_RETRIEVE_APP_DATA_THREADS, SERIOUS_GAMES_CATEGORIES_LIST, DEBUG, MAX_CONNECTION_ATTEMPTS
 import threading
 
 
 class DataMiner:
-    __apps_id_list = None
+    __apps_id_list = []
 
     def __init__(self):
         if DEBUG:
-            print(f'Data Miner started in thread : {threading.currentThread()}')
-        self.execution = True
+            print(f'{threading.currentThread()}  || Data Miner : Started')
+        self.__running = True
+        start_attempts = 0
+        self.__failed_connections = 0
         self.__retrieve_incomplete_data()
+        while (not len(self.__apps_id_list)) and start_attempts < 5:
+            start_attempts *= 1
+            time.sleep(30)
+            self.__retrieve_incomplete_data()
+
+    def __reset_connection_counter(self):
+        self.__failed_connections = 0
+
+    def __increment_connection_counter(self):
+        self.__failed_connections += 1
 
     def __retrieve_incomplete_data(self):
+        # Looks in the preliminary table for checked apps has not been checked yet
+        # and save their IDs in self.__apps_id_list
         query = (
-            "SELECT * FROM app WHERE description IS NULL LIMIT 1000"
+            "SELECT app_id, from_dataset FROM preliminary WHERE preliminary.`check` IS FALSE"
         )
         try:
             self.__apps_id_list = do_query((), query)
-        except mysql.connector.errors.DatabaseError:
-            self.__apps_id_list = None
-            return
-        if len(self.__apps_id_list) == 0:
-            self.execution = False
-            print('Data Mining completed')
+            self.__reset_connection_counter()
 
-    def __get_app_data(self, app_id):
+        except mysql.connector.errors.DatabaseError:
+            self.__increment_connection_counter()
+            if self.__failed_connections >= MAX_CONNECTION_ATTEMPTS:
+                self.__running = False
+                if DEBUG:
+                    print(f'{threading.currentThread()}  || Data Miner : Database communication error!!\n'
+                          f'TOO MANY ATTEMPTS FAILED - Execution terminated')
+                return
+            if DEBUG:
+                print(f'{threading.currentThread()}  || Data Miner : Database communication error - '
+                      f'retry in 30 seconds')
+            return
+
+    @staticmethod
+    def __get_app_data(app_id):
         try:
             application = Application(app_id, True)
         except google_play_scraper.exceptions.NotFoundError:
-            delete_app_from_database(app_id)
+            update_status_preliminary(app_id)
             application = None
+            if DEBUG:
+                print(f'{threading.currentThread()}  || Data Miner : APP {app_id} not found')
+
         return application
 
     def fill_database(self):
         with ThreadPoolExecutor(max_workers=MAX_RETRIEVE_APP_DATA_THREADS) as executor:
-            while self.execution:
+            while self.__running:
                 self.__retrieve_incomplete_data()
+                if not len(self.__apps_id_list):
+                    self.__running = False
+                    if DEBUG:
+                        print(f'{threading.currentThread()}  || Data Miner : No new app found - Execution terminated')
+
                 for application in self.__apps_id_list:
-                    app_id = application[0]
                     self.__apps_id_list.remove(application)
-                    executor.submit(self.load_app_into_database, app_id)
+                    executor.submit(self.load_app_into_database, application[0], application[1])
+
                 self.__apps_id_list = []
 
-    def load_app_into_database(self, app_id):
+    def load_app_into_database(self, app_id, from_dataset):
         application = self.__get_app_data(app_id)
-        if not application:
-            return
-
-        update_query = (
-            "UPDATE APP SET description = %s, app_name = %s, category = %s, rating = %s, score = %s, genres = %s WHERE app_id = %s"
-        )
-
-        query_values = [application.description,
-                        application.title,
-                        application.category,
-                        application.ratings,
-                        application.score,
-                        application.genre_id,
-                        application.app_id]
-
-        do_query(tuple_data=query_values, query=update_query)
-        application = None
+        if application and (application.category in SERIOUS_GAMES_CATEGORIES_LIST) \
+                and (is_english(application.description)) and (from_dataset or is_english(application.title)):
+            insert_app_into_db(application)
+            for similar_id in application.similar_apps:
+                insert_preliminary(similar_id)
+        update_status_preliminary(app_id)
 
     def shutdown(self):
-        self.execution = False
+        self.__running = False

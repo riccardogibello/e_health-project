@@ -9,10 +9,10 @@ CREATE TABLE `app` (
   `app_name` varchar(200),
   `description` varchar(4500),
   `category` varchar(30),
-  `score` varchar(45),
-  `rating` varchar(45),
-  `category_id` varchar(45),
-  `developer_id` varchar(50),
+  `score` integer,
+  `rating` integer,
+  `category_id` varchar(60),
+  `developer_id` varchar(60),
   PRIMARY KEY (`app_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -20,6 +20,7 @@ DROP TABLE IF EXISTS `preliminary`;
 CREATE TABLE `preliminary` (
     `app_id` varchar(100) UNIQUE NOT NULL,
     `check` boolean DEFAULT false,
+    `from_dataset` boolean DEFAULT false,
     PRIMARY KEY (`app_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

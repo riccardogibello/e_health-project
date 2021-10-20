@@ -1,3 +1,5 @@
+import time
+
 import langid
 import pandas
 import threading
@@ -26,13 +28,10 @@ class DatasetManager:
         self.__dataset_file = dataset_file
         self.read_file()
 
-        if DEBUG:
-            print(f'{threading.currentThread()}  || Dataset Manager : Reading of \'{self.__dataset_file}\' completed')
-
     def load_apps_into_db(self, filter_categories=SERIOUS_GAMES_CATEGORIES_LIST):
         # Method used to load in the database data of the application
         # Insertion of data in the db is made using multithreading in order to improve performance
-
+        start_time = time.time()
         if DEBUG:
             print(f'{threading.currentThread()}  || Dataset Manager : Loading data from {self.__dataset_file}')
 
@@ -42,9 +41,10 @@ class DatasetManager:
             for app_index in range(len(self.__apps_list)):
                 if self.__apps_list.loc[app_index, 'Category'] in filter_categories:
                     executor.submit(self.__store_app_data, self.__apps_list.loc[app_index])
-
+        end_time = time.time()
         if DEBUG:
-            print(f'{threading.currentThread()}  || Dataset Manager : Data from {self.__dataset_file} loaded')
+            print(f'{threading.currentThread()}  || Dataset Manager : Data from {self.__dataset_file} loaded '
+                  f'in {round(end_time - start_time, 1)} s')
 
     def __delete_column(self, column_name):
         # Method deleting from DataFrame app list a given column
@@ -68,14 +68,19 @@ class DatasetManager:
         if not is_english(data_frame_row['App Name']):
             return
 
-        insert_preliminary_id(data_frame_row['App Id'])
+        insert_preliminary_id(data_frame_row['App Id'], from_dataset_flag=True)
 
     def read_file(self):
         # Reads the file and stores in memory DataFrame object
-
+        start_time = time.time()
         if DEBUG:
             print(f'{threading.currentThread()}  || Dataset Manager : Reading dataset file')
         self.__apps_list = pandas.read_csv(self.__dataset_file)
+        end_time = time.time()
+        if DEBUG:
+            print(
+                f'{threading.currentThread()}  || Dataset Manager : Reading of \'{self.__dataset_file}\' '
+                f'completed in {round(end_time - start_time, 1)} s')
 
     def shutdown(self):
         # Explicitly delete the reference to DataFrame object in order to free memory

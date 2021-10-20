@@ -1,5 +1,6 @@
 from google_play_scraper import app
-from DatabaseManager import insert_id_into_database, do_query
+from DatabaseManager import do_query
+
 
 class Application:
     title = None
@@ -56,7 +57,8 @@ class Application:
     url = None
 
     def __init__(self, application_id, online):
-        # online is a boolean parameter. If True it will load data from Play Store, if False data will be loaded from local database.
+        # online is a boolean parameter.
+        # If True it will load data from Play Store, if False data will be loaded from local database.
         if online:
             result = app(application_id)
             self.title = result.get('title')
@@ -109,8 +111,7 @@ class Application:
             self.more_by_developer = result.get('moreByDeveloper')
             self.app_id = result.get('appId')
             self.url = result.get('url')
-            for similar_app in self.similar_apps:
-                insert_id_into_database(similar_app)
+
         else:
             get_query = (
                 "SELECT * FROM APP WHERE app_id = %s"
@@ -118,12 +119,3 @@ class Application:
             result_tuple = do_query((application_id,), get_query)
             self.app_id = application_id
             self.title = result_tuple[1]
-
-
-
-
-
-
-
-
-
