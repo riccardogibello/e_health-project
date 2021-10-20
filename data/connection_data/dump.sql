@@ -8,13 +8,19 @@ CREATE TABLE `app` (
   `app_id` varchar(100) UNIQUE NOT NULL,
   `app_name` varchar(200),
   `description` varchar(4500),
-  `category` varchar(45),
+  `category` varchar(30),
   `score` varchar(45),
   `rating` varchar(45),
-  `reviews` varchar(45),
-  `content_rating` varchar(45),
-  `genres` varchar(45),
+  `category_id` varchar(45),
+  `developer_id` varchar(50),
   PRIMARY KEY (`app_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `preliminary`;
+CREATE TABLE `preliminary` (
+    `app_id` varchar(100) UNIQUE NOT NULL,
+    `check` boolean DEFAULT false,
+    PRIMARY KEY (`app_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `category`;
