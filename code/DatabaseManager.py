@@ -70,8 +70,9 @@ def update_status_preliminary(app_id):
 
 def insert_app_into_db(application):
     insert_query = (
-        "INSERT INTO APP(app_id, app_name, description, category, score, rating, category_id, developer_id)"
-        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+        "INSERT INTO APP(app_id, app_name, description, category, score, rating, category_id, developer_id, "
+        "teacher_approved) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s, %s)"
     )
 
     query_values = (application.app_id,
@@ -81,7 +82,9 @@ def insert_app_into_db(application):
                     application.score,
                     application.ratings,
                     application.genre_id,
-                    application.developer_id)
+                    application.developer_id,
+                    application.is_teacher_approved
+                    )
 
     do_query(tuple_data=query_values, query=insert_query)
 

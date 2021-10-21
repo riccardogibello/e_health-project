@@ -13,6 +13,7 @@ CREATE TABLE `app` (
   `rating` integer,
   `category_id` varchar(60),
   `developer_id` varchar(60),
+  `teacher_approved` boolean DEFAULT false,
   PRIMARY KEY (`app_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -36,5 +37,12 @@ DROP TABLE IF EXISTS `review`;
 CREATE TABLE `review` (
   `app_id` varchar(100) NOT NULL,
   `review` varchar(1000),
+  PRIMARY KEY (`app_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `discarded_app`;
+CREATE TABLE `discarded_app` (
+  `app_id` varchar(100) UNIQUE NOT NULL,
+  `description` varchar(4500),
   PRIMARY KEY (`app_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

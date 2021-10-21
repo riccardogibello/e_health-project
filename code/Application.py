@@ -55,6 +55,7 @@ class Application:
     more_by_developer = None
     app_id = None
     url = None
+    is_teacher_approved = False
 
     def __init__(self, application_id, online):
         # online is a boolean parameter.

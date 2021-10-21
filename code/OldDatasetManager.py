@@ -1,5 +1,4 @@
 import time
-
 import pandas as pd
 import play_scraper
 from DatabaseManager import *
@@ -82,7 +81,7 @@ class OldDatasetManager:
         # self.load_app_reviews_into_db()
 
     def load_app_batch_into_db(self, offset, batch_size, threads_status):
-        columns = ['App', 'Category', 'Rating', 'Reviews', 'Content Rating', 'Genres']
+        columns = ['App', 'Category']
         interesting_categories = ['MEDICAL', 'EDUCATION', 'FAMILY', 'GAME_EDUCATIONAL']
         if offset + batch_size > self.applications.size:
             offset = self.applications.size
@@ -96,11 +95,11 @@ class OldDatasetManager:
                 continue
 
             insert_stmt = (
-                "INSERT INTO APP(app_name, category, rating, reviews, content_rating, genres, app_id)"
-                "VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                "INSERT INTO preliminary(app_id, `check`, from_dataset)"
+                "VALUES (%s, False, True)"
             )
 
-            do_query(details, insert_stmt)
+            do_query(details[2], insert_stmt)
         threads_status.pop()
 
 

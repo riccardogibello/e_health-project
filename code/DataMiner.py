@@ -1,8 +1,7 @@
 import time
-
 import google_play_scraper.exceptions
 import mysql
-
+from bs4 import BeautifulSoup
 from DatabaseManager import insert_app_into_db, insert_id_into_preliminary_db as insert_preliminary, \
     update_status_preliminary
 from DatasetManager import is_english
@@ -11,6 +10,24 @@ from Application import Application
 from concurrent.futures import ThreadPoolExecutor
 from settings import MAX_RETRIEVE_APP_DATA_THREADS, SERIOUS_GAMES_CATEGORIES_LIST, DEBUG, MAX_CONNECTION_ATTEMPTS
 import threading
+from web_mining_functions import find_web_page
+
+
+def is_teacher_approved_app(app_id):
+    """
+    This method checks if a specific app is tagged on the play store as 'teacher approved'
+    by requesting directly the HTML page to the play store web application. The check
+    is done by querying on the HTML page an element with class 'T75of LgkPtd'. If present
+    it means that the application is approved by teachers and doctors.
+    """
+    path = 'https://play.google.com/store/apps/details?id='
+    page = find_web_page(path + app_id)
+    soup = BeautifulSoup(page, 'html.parser')
+    approved_tag = soup.find_all("a", class_="T75of LgkPtd")
+    if approved_tag:
+        return True
+    else:
+        return False
 
 
 class DataMiner:
@@ -88,6 +105,8 @@ class DataMiner:
         application = self.__get_app_data(app_id)
         if application and (application.category in SERIOUS_GAMES_CATEGORIES_LIST) \
                 and (is_english(application.description)) and (from_dataset or is_english(application.title)):
+            if is_teacher_approved_app(application.app_id):
+                application.is_teacher_approved = True
             insert_app_into_db(application)
             for similar_id in application.similar_apps:
                 insert_preliminary(similar_id)

@@ -1,5 +1,6 @@
 import web_mining_functions
 from DatasetManager import DatasetManager
+from MNBayesClassifier import MNBayesClassifier
 from OldDatasetManager import *
 
 from settings import KAGGLE_DATASET_PATH
@@ -31,18 +32,22 @@ if __name__ == '__main__':
     dataset_thread.start()
     data_miner_thread.start()
 
-    # web_mining_functions.find_available_categories()
+    web_mining_functions.find_available_categories()
 
-    # oldDatasetHandler = OldDatasetManager()
-    # oldDatasetHandler.load_old_dataset_into_db()
+    oldDatasetHandler = OldDatasetManager()
+    oldDatasetHandler.load_old_dataset_into_db()
 
-    # filenames_pages_serious_games = {'wikipage': 'https://en.wikipedia.org/wiki/Serious_game',
-    # 'paper': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5222787/pdf/fpsyt-07-00215.pdf'}
-    # for filename, path in filenames_pages_serious_games.items():
-    # find_serious_games_words(filename, path)
+    word_miner = WordsMiner()
+    filenames_pages_serious_games = {'wikipage': 'https://en.wikipedia.org/wiki/Serious_game',
+    'paper': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5222787/pdf/fpsyt-07-00215.pdf'}
+    for filename, path in filenames_pages_serious_games.items():
+        word_miner.find_serious_games_words(filename, path)
 
     data_miner_thread.join()
     dataset_thread.join()
+
+    print("Entered classification")
+    classifier = MNBayesClassifier(word_miner)
 
     end = time.time()
     print("The time of execution of above program is :", end - start)
