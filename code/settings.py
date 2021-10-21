@@ -1,3 +1,5 @@
+import multiprocessing
+
 SERIOUS_GAMES_CATEGORIES_LIST = ['Adventure',
                                  'Racing',
                                  'Puzzle',
@@ -24,9 +26,8 @@ KAGGLE_KEY_COLUMNS = ['App Id', 'Category', 'App Name']
 KAGGLE_DATASET_PATH = 'data/input_data/kaggle_playstore_apps_new.csv'
 
 # PERFORMANCE
-MAX_DATASET_THREADS = 16
-MAX_RETRIEVE_APP_DATA_THREADS = 32
-MAX_FILTER_THREADS = 10
+MAX_DATASET_THREADS = multiprocessing.cpu_count()
+MAX_RETRIEVE_APP_DATA_THREADS = multiprocessing.cpu_count()*4
 
 # DEBUG
 DEBUG = True

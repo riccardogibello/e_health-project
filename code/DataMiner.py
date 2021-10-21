@@ -63,13 +63,8 @@ class DataMiner:
 
         except mysql.connector.errors.DatabaseError:
             self.__increment_connection_counter()
-            if self.__failed_connections >= MAX_CONNECTION_ATTEMPTS:
-                self.__running = False
-                if DEBUG:
-                    print(f'{threading.currentThread()}  || Data Miner : Database communication error!!\n'
-                          f'TOO MANY ATTEMPTS FAILED - Execution terminated')
-                return
-            if DEBUG:
+
+            if DEBUG and self.__failed_connections < 5:
                 print(f'{threading.currentThread()}  || Data Miner : Database communication error - '
                       f'retry in 30 seconds')
             return
@@ -87,19 +82,25 @@ class DataMiner:
         return application
 
     def fill_database(self):
-        with ThreadPoolExecutor(max_workers=MAX_RETRIEVE_APP_DATA_THREADS) as executor:
-            while self.__running:
-                self.__retrieve_incomplete_data()
-                if not len(self.__apps_id_list):
-                    self.__running = False
+        while self.__running:
+            self.__retrieve_incomplete_data()
+            if not len(self.__apps_id_list):
+                self.__running = False
+                if self.__failed_connections >= MAX_CONNECTION_ATTEMPTS:
+                    if DEBUG:
+                        print(f'{threading.currentThread()} || Data Miner : Database communication error!!\n'
+                              f'TOO MANY ATTEMPTS FAILED - Execution terminated')
+                    return
+                else:
                     if DEBUG:
                         print(f'{threading.currentThread()}  || Data Miner : No new app found - Execution terminated')
 
+            with ThreadPoolExecutor(max_workers=MAX_RETRIEVE_APP_DATA_THREADS) as executor:
                 for application in self.__apps_id_list:
                     self.__apps_id_list.remove(application)
                     executor.submit(self.load_app_into_database, application[0], application[1])
 
-                self.__apps_id_list = []
+            self.__apps_id_list = []
 
     def load_app_into_database(self, app_id, from_dataset):
         application = self.__get_app_data(app_id)
