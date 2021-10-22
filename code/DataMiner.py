@@ -34,7 +34,6 @@ class DataMiner:
     __apps_id_list = []
 
     def __init__(self):
-        '''
         if DEBUG:
             print(f'{threading.currentThread()}  || Data Miner : Started')
         self.__running = True
@@ -44,7 +43,7 @@ class DataMiner:
         while (not len(self.__apps_id_list)) and start_attempts < 5:
             start_attempts *= 1
             time.sleep(30)
-            self.__retrieve_incomplete_data()'''
+            self.__retrieve_incomplete_data()
 
     def __reset_connection_counter(self):
         self.__failed_connections = 0
@@ -61,6 +60,10 @@ class DataMiner:
         try:
             self.__apps_id_list = do_query((), query)
             self.__reset_connection_counter()
+            if not len(self.__apps_id_list):
+                self.__running = False
+                if DEBUG:
+                    print(f'{threading.currentThread()}  || Data Miner : No new app found - Execution terminated')
 
         except mysql.connector.errors.DatabaseError:
             self.__increment_connection_counter()
@@ -68,6 +71,7 @@ class DataMiner:
             if DEBUG and self.__failed_connections < 5:
                 print(f'{threading.currentThread()}  || Data Miner : Database communication error - '
                       f'retry in 30 seconds')
+                time.sleep(30)
             return
 
     @staticmethod

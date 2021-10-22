@@ -61,6 +61,13 @@ def delete_app_from_database(app_id):
     do_query((app_id,), delete_query)
 
 
+def get_apps_from_preliminary():
+    get_query = (
+        "SELECT app_id FROM preliminary"
+    )
+    return do_query((), get_query)
+
+
 def update_status_preliminary(app_id):
     update_query = (
         "UPDATE PRELIMINARY SET preliminary.check=TRUE WHERE app_id = %s"

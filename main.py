@@ -26,7 +26,7 @@ if __name__ == '__main__':
     databaseManager = DatabaseManager()
     databaseManager.setup_connection_data()
 
-    dataset_thread = Thread(name='Kaggle_Dataset', target=launch_DatasetManager)
+    dataset_thread = multiprocessing.Process(name='Kaggle_Dataset', target=launch_DatasetManager)
     data_miner_thread = multiprocessing.Process(name='Miner', target=launch_DataMiner)
 
     dataset_thread.start()
@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
     word_miner = WordsMiner()
     filenames_pages_serious_games = {'wikipage': 'https://en.wikipedia.org/wiki/Serious_game',
-    'paper': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5222787/pdf/fpsyt-07-00215.pdf'}
+                                     'paper': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5222787/pdf/fpsyt-07-00215.pdf'}
     for filename, path in filenames_pages_serious_games.items():
         word_miner.find_serious_games_words(filename, path)
 
