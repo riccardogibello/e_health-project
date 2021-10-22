@@ -96,10 +96,9 @@ class OldDatasetManager:
 
             insert_stmt = (
                 "INSERT INTO preliminary(app_id, `check`, from_dataset)"
-                "VALUES (%s, False, True)"
+                "VALUES (%s, %s, %s)"
             )
-
-            do_query(details[2], insert_stmt)
+            do_query((details[2],False, True), insert_stmt)
         threads_status.pop()
 
 

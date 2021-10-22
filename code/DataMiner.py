@@ -30,18 +30,31 @@ def is_teacher_approved_app(app_id):
         return False
 
 
+def get_app_data(app_id):
+    try:
+        application = Application(app_id, True)
+    except google_play_scraper.exceptions.NotFoundError:
+        update_status_preliminary(app_id)
+        application = None
+        if DEBUG:
+            print(f'{threading.currentThread()}  || Data Miner : APP {app_id} not found')
+
+    return application
+
+
 class DataMiner:
     __apps_id_list = []
 
     def __init__(self):
+        threading.currentThread().name = 'Data Miner'
         if DEBUG:
             print(f'{threading.currentThread()}  || Data Miner : Started')
         self.__running = True
         start_attempts = 0
         self.__failed_connections = 0
-        self.__retrieve_incomplete_data()
+        self.__retrieve_incomplete_data(True)
         while (not len(self.__apps_id_list)) and start_attempts < 5:
-            start_attempts *= 1
+            start_attempts += 1
             time.sleep(30)
             self.__retrieve_incomplete_data()
 
@@ -51,7 +64,7 @@ class DataMiner:
     def __increment_connection_counter(self):
         self.__failed_connections += 1
 
-    def __retrieve_incomplete_data(self):
+    def __retrieve_incomplete_data(self, start=False):
         # Looks in the preliminary table for checked apps has not been checked yet
         # and save their IDs in self.__apps_id_list
         query = (
@@ -61,54 +74,40 @@ class DataMiner:
             self.__apps_id_list = do_query((), query)
             self.__reset_connection_counter()
             if not len(self.__apps_id_list):
-                self.__running = False
-                if DEBUG:
-                    print(f'{threading.currentThread()}  || Data Miner : No new app found - Execution terminated')
+                if not start:
+                    self.__running = False
+                    if DEBUG:
+                        print(f'{threading.currentThread()}  || Data Miner : No new app found - Execution terminated')
 
         except mysql.connector.errors.DatabaseError:
             self.__increment_connection_counter()
-
-            if DEBUG and self.__failed_connections < 5:
-                print(f'{threading.currentThread()}  || Data Miner : Database communication error - '
-                      f'retry in 30 seconds')
+            if self.__failed_connections < 5:
+                if DEBUG:
+                    print(f'{threading.currentThread()} || Data Miner : Database communication error!! - '
+                          f'Retry in 30 seconds')
                 time.sleep(30)
-            return
-
-    @staticmethod
-    def __get_app_data(app_id):
-        try:
-            application = Application(app_id, True)
-        except google_play_scraper.exceptions.NotFoundError:
-            update_status_preliminary(app_id)
-            application = None
-            if DEBUG:
-                print(f'{threading.currentThread()}  || Data Miner : APP {app_id} not found')
-
-        return application
+                return
+            elif self.__failed_connections >= 5:
+                self.__running = False
+                if DEBUG:
+                    print(f'{threading.currentThread()} || Data Miner : Database communication error!!\n'
+                          f'TOO MANY ATTEMPTS FAILED - Execution terminated')
 
     def fill_database(self):
         while self.__running:
             self.__retrieve_incomplete_data()
-            if not len(self.__apps_id_list):
-                self.__running = False
-                if self.__failed_connections >= MAX_CONNECTION_ATTEMPTS:
-                    if DEBUG:
-                        print(f'{threading.currentThread()} || Data Miner : Database communication error!!\n'
-                              f'TOO MANY ATTEMPTS FAILED - Execution terminated')
-                    return
-                else:
-                    if DEBUG:
-                        print(f'{threading.currentThread()}  || Data Miner : No new app found - Execution terminated')
+            if not self.__running:
+                return
 
             with ThreadPoolExecutor(max_workers=MAX_RETRIEVE_APP_DATA_THREADS) as executor:
                 for application in self.__apps_id_list:
                     self.__apps_id_list.remove(application)
                     executor.submit(self.load_app_into_database, application[0], application[1])
-
             self.__apps_id_list = []
 
-    def load_app_into_database(self, app_id, from_dataset):
-        application = self.__get_app_data(app_id)
+    @staticmethod
+    def load_app_into_database(app_id, from_dataset):
+        application = get_app_data(app_id)
         if application and (application.category in SERIOUS_GAMES_CATEGORIES_LIST) \
                 and (is_english(application.description)) and (from_dataset or is_english(application.title)):
             if is_teacher_approved_app(application.app_id):
