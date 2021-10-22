@@ -23,7 +23,7 @@ def is_teacher_approved_app(app_id):
     path = 'https://play.google.com/store/apps/details?id='
     page = find_web_page(path + app_id)
     soup = BeautifulSoup(page, 'html.parser')
-    approved_tag = soup.find_all("a", class_="T75of LgkPtd")
+    approved_tag = soup.find_all("img", class_="T75of LgkPtd")
     if approved_tag:
         return True
     else:
@@ -34,6 +34,7 @@ class DataMiner:
     __apps_id_list = []
 
     def __init__(self):
+        '''
         if DEBUG:
             print(f'{threading.currentThread()}  || Data Miner : Started')
         self.__running = True
@@ -43,7 +44,7 @@ class DataMiner:
         while (not len(self.__apps_id_list)) and start_attempts < 5:
             start_attempts *= 1
             time.sleep(30)
-            self.__retrieve_incomplete_data()
+            self.__retrieve_incomplete_data()'''
 
     def __reset_connection_counter(self):
         self.__failed_connections = 0
