@@ -9,12 +9,36 @@ CREATE TABLE `app` (
   `app_name` varchar(200),
   `description` varchar(4500),
   `category` varchar(30),
-  `score` integer,
+  `score` float,
   `rating` integer,
   `category_id` varchar(60),
   `developer_id` varchar(60),
   `teacher_approved` boolean DEFAULT false,
   PRIMARY KEY (`app_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `app_features`;
+CREATE TABLE `app_features` (
+  `app_id` varchar(100) UNIQUE NOT NULL,
+  `serious_words_count` int DEFAULT 0,
+  `teacher_approved` boolean DEFAULT false,
+  `score` float,
+  `rating` integer
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `app_word_occurrences`;
+CREATE TABLE `app_word_occurrences` (
+  `app_id` varchar(100) UNIQUE NOT NULL,
+  `app_name` varchar(200),
+  `word` varchar(200),
+  `occurrences` int
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `labeled_app`;
+CREATE TABLE `labeled_app` (
+  `app_id` varchar(100) UNIQUE NOT NULL,
+  `machine_classified` boolean,
+  `human_classified` boolean
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `preliminary`;

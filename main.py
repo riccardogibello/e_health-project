@@ -1,24 +1,37 @@
 import web_mining_functions
 from DatasetManager import DatasetManager
+from FeatureExtractor import FeatureExtractor
 from MNBayesClassifier import MNBayesClassifier
 from OldDatasetManager import *
-
 from settings import KAGGLE_DATASET_PATH
 from DataMiner import DataMiner
-from word_mining_functions import *
-from threading import Thread
+from WordsMiner import *
 import multiprocessing
 
+word_miner = WordsMiner({'wikipage': 'https://en.wikipedia.org/wiki/Serious_game',
+                         'paper_1': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5222787/pdf/fpsyt-07'
+                                    '-00215.pdf',
+                         'paper_2': 'https://www.hindawi.com/journals/ijcgt/2014/787968/'})
 
-def launch_DataMiner():
+
+def launch_data_miner():
     miner = DataMiner()
     # miner.shutdown()
     miner.fill_database()
 
 
-def launch_DatasetManager():
-    dataset_manager = DatasetManager(KAGGLE_DATASET_PATH)
-    dataset_manager.load_apps_into_db()
+def launch_new_dataset_manager():
+    new_dataset_manager = DatasetManager(KAGGLE_DATASET_PATH)
+    new_dataset_manager.load_apps_into_db()
+
+
+def launch_old_dataset_manager():
+    old_dataset_manager = OldDatasetManager()
+    old_dataset_manager.load_old_dataset_into_db()
+
+
+def launch_words_miner():
+    word_miner.find_serious_games_words()
 
 
 if __name__ == '__main__':
@@ -26,27 +39,28 @@ if __name__ == '__main__':
     databaseManager = DatabaseManager()
     databaseManager.setup_connection_data()
 
-    dataset_thread = multiprocessing.Process(name='Kaggle_Dataset', target=launch_DatasetManager)
-    data_miner_thread = multiprocessing.Process(name='Miner', target=launch_DataMiner)
-
-    dataset_thread.start()
-    data_miner_thread.start()
+    word_miner_thread = multiprocessing.Process(name='Words_Miner', target=launch_words_miner)
+    word_miner_thread.start()
 
     web_mining_functions.find_available_categories()
 
-    oldDatasetHandler = OldDatasetManager()
-    oldDatasetHandler.load_old_dataset_into_db()
+    old_dataset_thread = multiprocessing.Process(name='Old_Dataset', target=launch_old_dataset_manager)
+    old_dataset_thread.start()
 
-    word_miner = WordsMiner()
-    filenames_pages_serious_games = {'wikipage': 'https://en.wikipedia.org/wiki/Serious_game',
-                                     'paper': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5222787/pdf/fpsyt-07-00215.pdf'}
-    for filename, path in filenames_pages_serious_games.items():
-        word_miner.find_serious_games_words(filename, path)
+    new_dataset_thread = multiprocessing.Process(name='Kaggle_Dataset', target=launch_new_dataset_manager)
+    new_dataset_thread.start()
 
+    data_miner_thread = multiprocessing.Process(name='Miner', target=launch_data_miner)
+    data_miner_thread.start()
+
+    word_miner_thread.join()
+    old_dataset_thread.join()
+    new_dataset_thread.join()
     data_miner_thread.join()
-    dataset_thread.join()
 
-    print("Entered classification")
+    feature_extractor = FeatureExtractor(word_miner.global_occurrences.keys())
+    feature_extractor.compute_features()
+
     classifier = MNBayesClassifier(word_miner)
 
     end = time.time()

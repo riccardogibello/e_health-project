@@ -8,6 +8,7 @@ from DatabaseManager import *
 
 
 def find_available_categories():
+    clear_table('category')
     categories = play_scraper.categories()
 
     for first_key, category in categories.items():

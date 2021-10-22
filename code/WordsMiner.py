@@ -32,7 +32,9 @@ def split_text(text):
     word_punctuation_tokenizer = WordPunctTokenizer()
     words = []
     for sentence in sentences:
-        words.append(word_punctuation_tokenizer.tokenize(sentence))
+        constituent_words = word_punctuation_tokenizer.tokenize(sentence)
+        for word in constituent_words:
+            words.append(word)
 
     # Lastly, if possible, lemmatize the word given, that is, try to find the root of the word in the WordNet
     # dictionary.
@@ -56,7 +58,24 @@ def sanitize_text(text):
     return text
 
 
+def save_occurrence_word_to_file(filepath, word_occurrence_dict):
+    fp = open(filepath, 'w')
+    occurrence_word_dict = {}
+    for word, occurrence in word_occurrence_dict.items():
+        words = occurrence_word_dict.get(occurrence)
+        if words is not None:
+            words.append(word)
+            occurrence_word_dict.__setitem__(occurrence, words)
+        else:
+            occurrence_word_dict.__setitem__(occurrence, [word])
+
+    for occurrence in sorted(occurrence_word_dict.keys()):
+        for word in occurrence_word_dict.get(occurrence):
+            fp.write(str(occurrence) + ' -> ' + word + '\n')
+
+
 class WordsMiner:
+    pages = {}
     mined_pages = {}
     """ Dictionary containing as key all the filenames related to the pages that have been analysed to extract
     words of serious games. Each key has a dictionary in which are stored (word, # of occurrences found). """
@@ -64,43 +83,48 @@ class WordsMiner:
     """Dictionary containing as key all the words found during the analysis of different pages on the web and as 
     value the number of occurrences of such words. """
 
-    def find_serious_games_words(self, filename, path):
+    def __init__(self, dictionary_of_pages):
+        self.pages = dictionary_of_pages
+
+    def find_serious_games_words(self):
         """
         This method, given a web path, finds the occurrences of each word contained into it. The result is stored
         into both the field 'mined_pages' and in the file with the given 'filename' (in the form of
         (word, # of occurrences))
         """
+        for filename, path in self.pages.items():
+            if '.pdf' in path:
+                text = find_pdf_from_web_page(path)
+            else:
+                text = find_text_from_web_page(path)
 
-        if '.pdf' in path:
-            text = find_pdf_from_web_page(path)
-        else:
-            text = find_text_from_web_page(path)
+            text = sanitize_text(text)
+            words = split_text(text)  # the method returns a list of words found in the text
 
-        text = sanitize_text(text)
-        words = split_text(text)  # the method returns a list of words found in the text
+            occurrence_word_dictionary = count_occurrences(words)  # return value -> { key = word, value = #occurrence }
+            occurrences = sorted(
+                occurrence_word_dictionary)  # a list of the keys is returned, ordered in alphabetical order
+            new_occurrences_ordered = {}
+            for occurrence in occurrences:
+                # here the dictionary has the same structure as before, but it has the occurrences ordered in ascending
+                # alphabetical order.
+                # { key = word, value = #occurrence }
+                new_occurrences_ordered.__setitem__(occurrence, occurrence_word_dictionary.get(occurrence))
 
-        occurrence_word_dictionary = count_occurrences(words)  # return value -> { key = word, value = #occurrence }
-        occurrences = sorted(
-            occurrence_word_dictionary)  # a list of the keys is returned, ordered in alphabetical order
-        new_occurrences_ordered = {}
-        for occurrence in occurrences:
-            # here the dictionary has the same structure as before, but it has the occurrences ordered in ascending
-            # alphabetical order.
-            # { key = word, value = #occurrence }
-            new_occurrences_ordered.__setitem__(occurrence, occurrence_word_dictionary.get(occurrence))
+            save_occurrence_word_to_file('./data/output_data/' + filename + '.txt', new_occurrences_ordered)
 
-        fp = open('./data/output_data/' + filename + '.txt', 'w')
-        for occ, n_occ in new_occurrences_ordered.items():
-            fp.write(occ + '     ' + str(n_occ) + '\n')
-
-        # save the words found for later statistics
-        self.mined_pages.__setitem__(filename, new_occurrences_ordered)
+            # save the words found for later statistics
+            self.mined_pages.__setitem__(filename, new_occurrences_ordered)
 
     def compute_global_occurrences(self):
         """"
         This method computes the aggregated occurrences of every word, related to serious games, that is found
         with the previous methods by searching on the web.
         """
+
+        # TODO : have to set a sanitization process, in which useless words are eliminated (such as 'the', ...)
+        #  and words mistakenly tokenized (because of formatting problems of the text)
+
         for filename in self.mined_pages.keys():
             local_occurrences = self.mined_pages.get(filename)
             for word in local_occurrences.keys():

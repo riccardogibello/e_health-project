@@ -40,9 +40,8 @@ def do_query(tuple_data, query):
     return result
 
 
-def clear_database_data():
-    do_query('', 'TRUNCATE TABLE category')
-    do_query('', 'TRUNCATE TABLE app')
+def clear_table(table_name):
+    do_query('', 'TRUNCATE TABLE ' + table_name)
 
 
 def insert_id_into_preliminary_db(app_id, from_dataset_flag=False):

@@ -2,7 +2,7 @@ from nltk import WordNetLemmatizer, PunktSentenceTokenizer, WordPunctTokenizer
 from nltk.corpus import stopwords
 
 from DatabaseManager import do_query
-from word_mining_functions import WordsMiner
+from WordsMiner import WordsMiner
 
 
 def count_labelings(evaluations):
