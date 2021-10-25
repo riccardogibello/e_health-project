@@ -1,4 +1,4 @@
-SELECT '# serious games' , count(*) FROM app_features WHERE is_serious_game = 1
+SELECT '# serious games' , count(*) FROM labeled_app WHERE human_classified = 1
 UNION
 SELECT '# training apps', count(*) FROM app_features
 UNION

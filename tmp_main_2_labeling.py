@@ -31,6 +31,7 @@ def label_apps():
     end = int(input("Insert the ending value of your interval:\n"))
     end = end + 1
     url = "https://play.google.com/store/apps/details?id="
+    end_url = '&hl=en&gl=US'
 
     query = "SELECT * FROM app_features"
     list_app_features = do_query('', query)
@@ -40,7 +41,7 @@ def label_apps():
         app_features = list_app_features[i]
 
         # Open url in a new page (“tab”) of the default browser, if possible
-        thread = Thread(target=browse, args=[url + str(app_features[0]), 75])
+        thread = Thread(target=browse, args=[url + str(app_features[0] + end_url), 75])
         thread.start()
 
         print(' =========================== FEATURES OF ' + str(app_features[0]) + ' ===========================\n')
@@ -55,11 +56,11 @@ def label_apps():
             f_out.write(str(i))
             exit()
         if int(is_serious) == 0:
-            query = "UPDATE app_features SET is_serious_game = False WHERE app_id = %s"
-            do_query([str(app_features[0])], query)
+            query = "INSERT INTO labeled_app(app_id, human_classified)  VALUES (%s, %s)"
+            do_query([str(app_features[0]), True], query)
         if int(is_serious) == 1:
-            query = "UPDATE app_features SET is_serious_game = True WHERE app_id = %s"
-            do_query([str(app_features[0])], query)
+            query = "INSERT INTO labeled_app(app_id, human_classified)  VALUES (%s, %s)"
+            do_query([str(app_features[0]), False], query)
 
         last_analyzed_index = last_analyzed_index + 1
 

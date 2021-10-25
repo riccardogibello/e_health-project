@@ -22,9 +22,7 @@ CREATE TABLE `app_features` (
   `serious_words_count` int DEFAULT 0,
   `teacher_approved` boolean DEFAULT false,
   `score` float,
-  `rating` integer,
-  `is_serious_game` boolean DEFAULT false,
-  `machine_classification` boolean DEFAULT false
+  `rating` integer
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `app_word_occurrences`;
