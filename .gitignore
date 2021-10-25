@@ -3,3 +3,5 @@
 /data/connection_data/data.txt
 /code/__pycache__
 /data/input_data/kaggle_playstore_apps_new.csv
+/data/input_data/dump_database.csv
+/data/input_data/last_analyzed.txt

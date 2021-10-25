@@ -58,7 +58,15 @@ if __name__ == '__main__':
     new_dataset_thread.join()
     data_miner_thread.join()
 
-    feature_extractor = FeatureExtractor(word_miner.global_occurrences.keys())
+    # feature_extractor = FeatureExtractor(word_miner.global_occurrences.keys())
+    words = ["strong educational potential", "educational-related needs", "teaching material",
+             "serious purpose scenario", "real life cases",
+             "training", "education", "learning games", "increase awareness", "stimulate", "train", "inform", "teach",
+             "influence",
+             "edugames", "rules", "games for education", "transmit educational knowledge", "cognitive performance",
+             "brain training",
+             "educational multiplayer online game", "problem solving strategies"]
+    feature_extractor = FeatureExtractor(words)
     feature_extractor.compute_features()
 
     classifier = MNBayesClassifier(word_miner)

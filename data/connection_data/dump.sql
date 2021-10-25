@@ -1,4 +1,3 @@
-
 CREATE DATABASE  IF NOT EXISTS `projectdatabase`;
 
 USE `projectdatabase`;
@@ -23,15 +22,18 @@ CREATE TABLE `app_features` (
   `serious_words_count` int DEFAULT 0,
   `teacher_approved` boolean DEFAULT false,
   `score` float,
-  `rating` integer
+  `rating` integer,
+  `is_serious_game` boolean DEFAULT false,
+  `machine_classification` boolean DEFAULT false
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `app_word_occurrences`;
 CREATE TABLE `app_word_occurrences` (
-  `app_id` varchar(100) UNIQUE NOT NULL,
+  `app_id` varchar(100) NOT NULL,
   `app_name` varchar(200),
   `word` varchar(200),
-  `occurrences` int
+  `occurrences` int,
+  PRIMARY KEY (`app_id`, `word`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `labeled_app`;
