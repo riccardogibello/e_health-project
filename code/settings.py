@@ -26,11 +26,11 @@ KAGGLE_DATASET_PATH = 'data/input_data/kaggle_playstore_apps_new.csv'
 
 # PERFORMANCE
 MAX_DATASET_THREADS = min(multiprocessing.cpu_count(), 10)
-MAX_RETRIEVE_APP_DATA_THREADS = multiprocessing.cpu_count()*8
+MAX_RETRIEVE_APP_DATA_THREADS = multiprocessing.cpu_count()
 
 # DEBUG
 DEBUG = True
-DATASET_DEBUG = False
+DATASET_DEBUG = True
 
 # DATABASE SETTINGS
 MAX_CONNECTION_ATTEMPTS = 20

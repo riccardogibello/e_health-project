@@ -53,6 +53,13 @@ def insert_id_into_preliminary_db(app_id, from_dataset_flag=False):
     do_query((app_id, from_dataset_flag), id_query)
 
 
+def delete_id_from_preliminary_db(app_id):
+    remove_query = (
+        "DELETE FROM preliminary WHERE app_id = %s"
+    )
+    do_query((app_id,), remove_query)
+
+
 def delete_app_from_database(app_id):
     delete_query = (
         "DELETE FROM APP WHERE app_id = %s"
@@ -76,7 +83,7 @@ def update_status_preliminary(app_id):
 
 def insert_app_into_db(application):
     insert_query = (
-        "INSERT INTO APP(app_id, app_name, description, category, score, rating, category_id, developer_id, "
+        "INSERT IGNORE INTO APP(app_id, app_name, description, category, score, rating, category_id, developer_id, "
         "teacher_approved) "
         "VALUES (%s,%s,%s,%s,%s,%s,%s,%s, %s)"
     )

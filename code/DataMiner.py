@@ -3,7 +3,7 @@ import google_play_scraper.exceptions
 import mysql
 from bs4 import BeautifulSoup
 from DatabaseManager import insert_app_into_db, insert_id_into_preliminary_db as insert_preliminary, \
-    update_status_preliminary
+    update_status_preliminary, delete_id_from_preliminary_db
 from DatasetManager import is_english
 from DatabaseManager import do_query
 from Application import Application
@@ -21,20 +21,19 @@ def is_teacher_approved_app(app_id):
     it means that the application is approved by teachers and doctors.
     """
     path = 'https://play.google.com/store/apps/details?id='
-    page = find_web_page(path + app_id)
+    page = find_web_page(path + app_id + '&hl=en&gl=US')
     soup = BeautifulSoup(page, 'html.parser')
     approved_tag = soup.find_all("img", class_="T75of LgkPtd")
     if approved_tag:
         return True
-    else:
-        return False
+    return False
 
 
 def get_app_data(app_id):
     try:
         application = Application(app_id, True)
     except google_play_scraper.exceptions.NotFoundError:
-        update_status_preliminary(app_id)
+        delete_id_from_preliminary_db(app_id)
         application = None
         if DEBUG:
             print(f'{threading.currentThread()}  || Data Miner : APP {app_id} not found')
@@ -105,16 +104,19 @@ class DataMiner:
                     executor.submit(self.load_app_into_database, application[0], application[1])
             self.__apps_id_list = []
 
-    @staticmethod
-    def load_app_into_database(app_id, from_dataset):
+    def load_app_into_database(self, app_id, from_dataset):
         application = get_app_data(app_id)
-        if application and (application.category in SERIOUS_GAMES_CATEGORIES_LIST) \
+        if not application:
+            return
+        if (application.category in SERIOUS_GAMES_CATEGORIES_LIST) \
                 and (is_english(application.description)) and (from_dataset or is_english(application.title)):
-            if is_teacher_approved_app(application.app_id):
-                application.is_teacher_approved = True
-            insert_app_into_db(application)
+
+            application.is_teacher_approved = is_teacher_approved_app(app_id)
+            update_status_preliminary(application.app_id)
+
             for similar_id in application.similar_apps:
                 insert_preliminary(similar_id)
+
         update_status_preliminary(app_id)
 
     def shutdown(self):

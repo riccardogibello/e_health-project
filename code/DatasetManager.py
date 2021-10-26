@@ -5,7 +5,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 import DatabaseManager
 from DatabaseManager import insert_id_into_preliminary_db as insert_preliminary_id
-from settings import SERIOUS_GAMES_CATEGORIES_LIST, MAX_DATASET_THREADS, DEBUG
+from settings import SERIOUS_GAMES_CATEGORIES_LIST, MAX_DATASET_THREADS, DEBUG, DATASET_DEBUG
 
 
 def is_english(string):
@@ -21,7 +21,7 @@ class DatasetManager:
 
     def __init__(self, dataset_file):
         threading.currentThread().name = 'Dataset Manager'
-        if DEBUG:
+        if DEBUG and DATASET_DEBUG:
             print(f'{threading.currentThread()}  || Dataset Manager: Started')
         # Constructor reads the file and stores in memory a DataFrame
         # object (from pandas package) containing the list of the applications
@@ -34,7 +34,7 @@ class DatasetManager:
         # Method used to load in the database data of the application
         # Insertion of data in the db is made using multithreading in order to improve performance
         start_time = time.time()
-        if DEBUG:
+        if DEBUG and DATASET_DEBUG:
             print(f'{threading.currentThread().getName()}  || Dataset Manager : Loading data from {self.__dataset_file}')
 
         # Using ThreadPoolExecutor the insertion in the database is parallelized
@@ -48,14 +48,14 @@ class DatasetManager:
                         executor.submit(self.__store_app_data, app_id, app_name)
 
         end_time = time.time()
-        if DEBUG:
+        if DEBUG and DATASET_DEBUG:
             print(f'{threading.currentThread()}  || Dataset Manager : Data from {self.__dataset_file} loaded '
                   f'in {round(end_time - start_time, 1)} s')
 
     def is_in_database(self, app_id):
         if app_id in self.__in_database_apps:
             self.__in_database_apps.remove(app_id)
-            if DEBUG:
+            if DEBUG and DATASET_DEBUG:
                 print(f'{threading.currentThread()}  || Dataset Manager: {app_id} already present in database ')
             return True
         return False
@@ -68,7 +68,7 @@ class DatasetManager:
     def filter_key_columns(self, key_columns):
         # Methods deletes from DataFrame object the columns not included in the given set
 
-        if DEBUG:
+        if DEBUG and DATASET_DEBUG:
             print(f'{threading.currentThread()}  || Dataset Manager: Filtering columns ')
 
         for column in self.__apps_list.columns.values:
@@ -85,11 +85,11 @@ class DatasetManager:
     def read_file(self):
         # Reads the file and stores in memory DataFrame object
         start_time = time.time()
-        if DEBUG:
+        if DEBUG and DATASET_DEBUG:
             print(f'{threading.currentThread()}  || Dataset Manager : Reading dataset file')
         self.__apps_list = pandas.read_csv(self.__dataset_file)
         end_time = time.time()
-        if DEBUG:
+        if DEBUG and DATASET_DEBUG:
             print(
                 f'{threading.currentThread()}  || Dataset Manager : Reading of \'{self.__dataset_file}\' '
                 f'completed in {round(end_time - start_time, 1)} s')
@@ -97,6 +97,6 @@ class DatasetManager:
     def shutdown(self):
         # Explicitly delete the reference to DataFrame object in order to free memory
 
-        if DEBUG:
+        if DEBUG and DATASET_DEBUG:
             print(f'{threading.currentThread()}  || Dataset Manager: execution terminated')
         self.__apps_list = None
