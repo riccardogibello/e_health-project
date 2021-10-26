@@ -57,10 +57,10 @@ def label_apps():
             exit()
         if int(is_serious) == 0:
             query = "INSERT INTO labeled_app(app_id, human_classified)  VALUES (%s, %s)"
-            do_query([str(app_features[0]), True], query)
+            do_query([str(app_features[0]), False], query)
         if int(is_serious) == 1:
             query = "INSERT INTO labeled_app(app_id, human_classified)  VALUES (%s, %s)"
-            do_query([str(app_features[0]), False], query)
+            do_query([str(app_features[0]), True], query)
 
         last_analyzed_index = last_analyzed_index + 1
 
