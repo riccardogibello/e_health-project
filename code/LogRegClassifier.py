@@ -25,7 +25,7 @@ def retrieve_columns_names():
 
 class LogRegClassifier:
     def __init__(self):
-        self.trained_model = LogisticRegression
+        self.trained_model = LogisticRegression()
 
     def train_model(self):
         print('========================================== TRAINING ==========================================')
@@ -72,10 +72,12 @@ class LogRegClassifier:
         dataset = retrieve_app_features()
         columns_names = retrieve_columns_names()
         feature_dataset = DataFrame(columns=columns_names, data=dataset)
-        app_id_list = feature_dataset[['app_id']].values
+        feature_dataset.drop('machine_classified', axis=1)
+        feature_dataset['score_rating'] = feature_dataset['score'] * feature_dataset['rating']
         X = zscore(feature_dataset[['serious_words_count', 'teacher_approved', 'score_rating', 'category_id']].values)
 
         i = 0
+        app_id_list = feature_dataset[['app_id']].values
         y = self.trained_model.predict(X)
         for label_predicted in y:
             if label_predicted:

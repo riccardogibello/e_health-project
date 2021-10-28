@@ -5,6 +5,13 @@ from numpy import arange
 from DatabaseManager import do_query, clear_table
 
 
+def load_features():
+    clear_table('app_features')
+    clear_table('app_word_occurrences')
+    query = "INSERT INTO app_features SELECT * FROM featured_all_app;"
+    app_details = do_query('', query)
+
+
 class FeatureExtractor:
     serious_games_words = []  # this is a set of meaningful words related to serious games, both manually and
     # automatically (done by the WordsMiner) extracted
@@ -25,7 +32,7 @@ class FeatureExtractor:
     def compute_features(self):
         clear_table('app_features')
         clear_table('app_word_occurrences')
-        query = "SELECT * FROM app"
+        query = "SELECT * FROM app LIMIT 1000"
         app_details = do_query('', query)
         for el in arange(0, len(app_details)):
             self.indexes_to_analyze.append(el)

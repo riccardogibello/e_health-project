@@ -1,4 +1,4 @@
-from FeatureExtractor import FeatureExtractor
+from FeatureExtractor import FeatureExtractor, load_features
 from LogRegClassifier import LogRegClassifier
 
 if __name__ == '__main__':
@@ -13,5 +13,6 @@ if __name__ == '__main__':
              "brain training",
              "educational multiplayer online game", "problem solving strategies"]
     feature_extractor = FeatureExtractor(words)
-    feature_extractor.compute_features()
+    # feature_extractor.compute_features()
+    load_features()
     log_classif.classify_apps()
