@@ -39,4 +39,4 @@ if __name__ == '__main__':
              "decision-making",
              ]
     feature_extractor = FeatureExtractor(words)
-    feature_extractor.compute_features()
+    feature_extractor.compute_training_features()

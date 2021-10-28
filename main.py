@@ -67,7 +67,7 @@ if __name__ == '__main__':
              "brain training",
              "educational multiplayer online game", "problem solving strategies"]
     feature_extractor = FeatureExtractor(words)
-    feature_extractor.compute_features()
+    feature_extractor.compute_training_features()
 
     classifier = MNBayesClassifier(word_miner)
 

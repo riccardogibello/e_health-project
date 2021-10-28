@@ -1,5 +1,7 @@
 import random
 
+from numpy import arange
+
 from DatabaseManager import do_query, clear_table
 
 
@@ -11,19 +13,39 @@ class FeatureExtractor:
     def __init__(self, words):
         self.serious_games_words = words
 
+    def compute_training_features(self):
+        clear_table('app_features')
+        clear_table('app_word_occurrences')
+        query = "SELECT * FROM app"
+        app_details = do_query('', query)
+        self.generate_random_non_repeated_indexes(len(app_details) - 1)
+
+        self.generate_feature(app_details)
+
     def compute_features(self):
         clear_table('app_features')
         clear_table('app_word_occurrences')
-        query = "SELECT * FROM APP"
+        query = "SELECT * FROM app"
         app_details = do_query('', query)
-        self.generate_random_non_repeated_indexes(len(app_details) - 1)
-        i = 0
+        for el in arange(0, len(app_details)):
+            self.indexes_to_analyze.append(el)
 
+        self.generate_feature(app_details)
+
+    def generate_feature(self, app_details_list):
+        i = 0
         while self.indexes_to_analyze:
-            app = app_details[int(self.indexes_to_analyze[0])]
+            app = app_details_list[int(self.indexes_to_analyze[0])]
             self.indexes_to_analyze.pop(0)
 
             app_id = str(app[0])
+            category_id = str(app[6])
+            query = "SELECT id FROM category WHERE category_id = %s"
+            result = do_query([category_id], query)
+            if result:
+                category_id = int(result[0][0])
+            else:
+                category_id = 15
             try:
                 score = int(app[4])
             except TypeError:
@@ -35,9 +57,11 @@ class FeatureExtractor:
             is_approved = int(app[8])
             serious_words_count, word_occurrence = self.count_occurrences(str(app[1]), str(app[2]))
 
-            query = "INSERT INTO app_features(app_id, serious_words_count, teacher_approved, score, rating) " \
-                    "VALUES (%s, %s, %s, %s, %s)"
-            do_query([app_id, serious_words_count, is_approved, score, n_reviews], query)
+            query = "INSERT INTO app_features(app_id, serious_words_count, teacher_approved, score, rating, " \
+                    "category_id) " \
+                    "VALUES (%s, %s, %s, %s, %s, %s)"
+            do_query([app_id, serious_words_count, is_approved, score, n_reviews, category_id],
+                     query)
             query = "INSERT INTO app_word_occurrences(app_id, app_name, word, occurrences) " \
                     "VALUES (%s, %s, %s, %s)"
             for word in word_occurrence.keys():
