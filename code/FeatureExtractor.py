@@ -32,7 +32,7 @@ class FeatureExtractor:
     def compute_features(self):
         clear_table('app_features')
         clear_table('app_word_occurrences')
-        query = "SELECT * FROM app LIMIT 1000"
+        query = "SELECT * FROM app"
         app_details = do_query('', query)
         for el in arange(0, len(app_details)):
             self.indexes_to_analyze.append(el)
