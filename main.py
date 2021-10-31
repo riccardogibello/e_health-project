@@ -4,7 +4,7 @@ from cefpython3 import cefpython as cef
 import ManualClassifier
 from OldDatasetManager import *
 from ProcessManager import ProcessManager
-from DataMiner import DataMiner
+from DataMiner import DataMiner, is_teacher_approved_app
 from WordsMiner import *
 import tkinter as tk
 from GUI.ApplicationGUI import ApplicationGUI
@@ -37,9 +37,6 @@ def launch_words_miner():
 
 
 if __name__ == '__main__':
-    print(google_play_scraper.app('air.com.devgameapp.TheGirlCasualDay').get('familyGenre'))
-    print(google_play_scraper.app('air.com.devgameapp.BabyFirstKindergartenDay').get('familyGenreId'))
-
     process_manager = ProcessManager()
     root = tk.Tk()
     app = ApplicationGUI(root, process_manager)

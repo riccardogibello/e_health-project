@@ -55,7 +55,7 @@ class Application:
     more_by_developer = None
     app_id = None
     url = None
-    is_teacher_approved = False
+    teacher_approved = False
 
     def __init__(self, application_id, online):
         # online is a boolean parameter.
@@ -68,9 +68,13 @@ class Application:
             self.summary = result.get('summary')
             self.summary_html = result.get('summaryHTML')
             self.installs = result.get('installs')
-            self.min_installs = result.get('minInstalls')
+            self.min_installs = int(result.get('minInstalls'))
             self.score = result.get('score')
+            if not self.score:
+                self.score = 0
             self.ratings = result.get('ratings')
+            if not self.ratings:
+                self.ratings = 0
             self.reviews = result.get('reviews')
             self.histogram = result.get('histogram')
             self.price = result.get('price')
@@ -92,6 +96,8 @@ class Application:
             self.developer_internal_id = result.get('developerInternalID')
             self.category = result.get('genre')
             self.genre_id = result.get('genreId')
+            self.family_genre = result.get('familyGenre')
+            self.family_genre_id = result.get('familyGenreId')
             self.icon = result.get('icon')
             self.header_image = result.get('headerImage')
             self.screenshots = result.get('screenshots')

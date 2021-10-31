@@ -12,7 +12,7 @@ class ApplicationGUI(tk.Frame):
         self.main_width = 450
         self.__process_manager = process_manager
 
-        #Screen Information
+        # Screen Information
         self.screen_width = root.winfo_screenwidth()
         self.screen_height = root.winfo_screenmmheight()
 
@@ -31,7 +31,7 @@ class ApplicationGUI(tk.Frame):
 
         # Logo
         logo = Image.open('resources/images/Google_Play-Logo.wine.png')
-        logo = logo.resize((self.main_width, int(self.main_width/3)))
+        logo = logo.resize((self.main_width, int(self.main_width / 3)))
         logo = ImageTk.PhotoImage(logo)
         logo_label = tk.Label(image=logo)
         logo_label.image = logo
@@ -42,15 +42,16 @@ class ApplicationGUI(tk.Frame):
 
         # Dataset Button
         self.new_dataset_button = tk.Button(root, text='Load data from kaggle_dataset',
-                                              width=self.menu_button_width, height=self.menu_button_height,
-                                              bg="#3bccff", font="Raleway",
-                                              command=self.new_dataset_command)
+                                            width=self.menu_button_width, height=self.menu_button_height,
+                                            bg="#3bccff", font="Raleway",
+                                            command=self.new_dataset_command)
         self.new_dataset_button.grid(column=1, row=1)
 
         # Dataset Button
         self.old_dataset_button = tk.Button(root, text='Load data from old dataset',
                                             width=self.menu_button_width, height=self.menu_button_height,
-                                            bg="#48ff48", font="Raleway")
+                                            bg="#48ff48", font="Raleway",
+                                            command=self.old_dataset_command)
         self.old_dataset_button.grid(column=1, row=2)
 
         # Data Miner Button

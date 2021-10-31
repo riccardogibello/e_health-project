@@ -24,6 +24,8 @@ UPDATE preliminary SET `check` = TRUE WHERE `check` IS FALSE;
 
 UPDATE preliminary SET `check` = FALSE WHERE `check` IS TRUE;
 
+DELETE FROM labeled_app WHERE app_id IS NOT NULL
+
 
 
 

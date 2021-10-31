@@ -2,6 +2,8 @@ import time
 import google_play_scraper.exceptions
 import mysql
 from bs4 import BeautifulSoup
+
+import settings
 from DatabaseManager import insert_app_into_db, insert_id_into_preliminary_db as insert_preliminary, \
     update_status_preliminary, delete_id_from_preliminary_db
 from DatasetManager import is_english
@@ -23,10 +25,8 @@ def is_teacher_approved_app(app_id):
     path = 'https://play.google.com/store/apps/details?id='
     page = find_web_page(path + app_id + '&hl=en&gl=US')
     soup = BeautifulSoup(page, 'html.parser')
-    approved_tag = soup.find_all("img", class_="T75of LgkPtd")
-    if approved_tag:
-        return True
-    return False
+    approved_tag = soup.find("img", class_="T75of LgkPtd")
+    return str(approved_tag).find('Approved by teachers for:') > 0
 
 
 def get_app_data(app_id):
@@ -106,18 +106,29 @@ class DataMiner:
 
     def load_app_into_database(self, app_id, from_dataset):
         application = get_app_data(app_id)
-        if not application:
-            return
-        if (application.category in SERIOUS_GAMES_CATEGORIES_LIST) \
-                and (is_english(application.description)) and (from_dataset or is_english(application.title)):
 
-            application.is_teacher_approved = is_teacher_approved_app(app_id)
-            update_status_preliminary(application.app_id)
+        if self.insertable_in_db(application, from_dataset):
+
+            application.teacher_approved = is_teacher_approved_app(app_id)
+            insert_app_into_db(application)
 
             for similar_id in application.similar_apps:
                 insert_preliminary(similar_id)
+            for developer_app in application.more_by_developer:
+                insert_preliminary(developer_app)
 
         update_status_preliminary(app_id)
 
     def shutdown(self):
         self.__running = False
+
+    def insertable_in_db(self, app, from_dataset):
+        if not app or app.category not in SERIOUS_GAMES_CATEGORIES_LIST:
+            return False
+        if app.updated <= settings.LAST_UPDATE:
+            return False
+        if not (from_dataset or is_english(app.title)):
+            return False
+        if not is_english(app.description):
+            return False
+        return True

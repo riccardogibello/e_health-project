@@ -31,7 +31,6 @@ def do_query(tuple_data, query):
         # Commit your changes in the database
         conn.commit()
     except EnvironmentError:
-        print('LOL')
         # Rolling back in case of error
         conn.rollback()
 
@@ -83,20 +82,23 @@ def update_status_preliminary(app_id):
 
 def insert_app_into_db(application):
     insert_query = (
-        "INSERT IGNORE INTO APP(app_id, app_name, description, category, score, rating, category_id, developer_id, "
-        "teacher_approved) "
-        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s, %s)"
+        "INSERT IGNORE INTO APP(app_id, app_name, description, category_id, score, rating, installs,"
+        " developer_id, last_update, content_rating, content_rating_description, teacher_approved) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
     )
 
     query_values = (application.app_id,
                     application.title,
                     application.description,
-                    application.category,
+                    application.genre_id,
                     application.score,
                     application.ratings,
-                    application.genre_id,
+                    application.min_installs,
                     application.developer_id,
-                    application.is_teacher_approved
+                    application.updated,
+                    application.content_rating,
+                    application.content_rating_description,
+                    application.teacher_approved
                     )
 
     do_query(tuple_data=query_values, query=insert_query)
