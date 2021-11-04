@@ -19,8 +19,7 @@ class FeatureExtractor:
 
     def compute_features(self):
         clear_table('app_features')
-        # TODO : reset REMOVING 1000
-        query = "SELECT * FROM app LIMIT 1000"
+        query = "SELECT * FROM app"
         app_details = do_query('', query)
         self.generate_feature(app_details)
 
