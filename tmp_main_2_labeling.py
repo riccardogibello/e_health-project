@@ -1,9 +1,11 @@
 from threading import Thread
 from selenium.common.exceptions import WebDriverException
-from DatabaseManager import do_query
+from DataManagers.DatabaseManager import do_query
 import time
 import numpy as np
 from selenium import webdriver
+
+from WEBFunctions.web_mining_functions import find_available_categories
 
 
 def browse(url_to_open, how_long):

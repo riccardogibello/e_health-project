@@ -1,8 +1,8 @@
 import time
 import pandas as pd
 import play_scraper
-from DatabaseManager import *
 from concurrent.futures import ThreadPoolExecutor
+from DataManagers.DatabaseManager import do_query
 
 
 def find_app_id(old_app_title):
@@ -98,39 +98,5 @@ class OldDatasetManager:
                 "INSERT INTO preliminary(app_id, `check`, from_dataset)"
                 "VALUES (%s, %s, %s)"
             )
-            do_query((details[2],False, True), insert_stmt)
+            do_query((details[2], False, True), insert_stmt)
         threads_status.pop()
-
-
-"""
-    def load_app_reviews_into_db(self):
-        columns = ['App', 'Translated_Review']
-        for i in range(self.reviews.size):
-            details = self.extract_review_details(i, columns)
-            insert_tuple(details, 'INSERT INTO review(app_id, review) VALUES (%s, %s)')
-
-    def extract_review_details(self, i, columns):
-        details = []
-        for column_name in columns:
-            element = self.reviews.at[i, column_name]
-            if not isinstance(element, str):
-                element = str(element)
-            # if the new app name extracted is not the same as the one before, it means that I found a review for a new
-            # app, so...
-            if column_name == 'App' and not element == self.latest_app_name_extracted and element != self.app_not_found:
-                # search if the app_id of that app is present in the DB
-                result = insert_tuple(element, 'SELECT app_id FROM app WHERE STRCMP(app_name,%s)')
-                if not result:
-                    self.app_not_found = element
-                else:
-                    self.latest_app_name_extracted = element
-                    details.append(self.latest_app_id_extracted)
-            elif column_name == 'App' and element == self.app_not_found:
-                return []
-            elif column_name == 'App' and element == self.latest_app_name_extracted:
-                details.append(self.latest_app_id_extracted)
-            else:
-                details.append(element)
-        return details
-        
-"""

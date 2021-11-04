@@ -1,20 +1,11 @@
 import random
-
 from numpy import arange
-
-from DatabaseManager import do_query, clear_table
-
-
-def load_features():
-    clear_table('app_features')
-    clear_table('app_word_occurrences')
-    query = "INSERT INTO app_features SELECT * FROM featured_all_app;"
-    app_details = do_query('', query)
+from DataManagers.DatabaseManager import do_query, clear_table
+from settings import *
 
 
 class FeatureExtractor:
-    serious_games_words = []  # this is a set of meaningful words related to serious games, both manually and
-    # automatically (done by the WordsMiner) extracted
+    serious_games_words = []  # this is a set of meaningful words related to serious games (manually extracted)
     indexes_to_analyze = []
 
     def __init__(self, words):
@@ -22,57 +13,46 @@ class FeatureExtractor:
 
     def compute_training_features(self):
         clear_table('app_features')
-        clear_table('app_word_occurrences')
-        query = "SELECT * FROM app"
+        query = "SELECT * FROM app WHERE app_id IN (SELECT app_id FROM labeled_app)"
         app_details = do_query('', query)
-        self.generate_random_non_repeated_indexes(len(app_details) - 1)
-
         self.generate_feature(app_details)
 
     def compute_features(self):
         clear_table('app_features')
-        clear_table('app_word_occurrences')
-        query = "SELECT * FROM app"
+        # TODO : reset REMOVING 1000
+        query = "SELECT * FROM app LIMIT 1000"
         app_details = do_query('', query)
-        for el in arange(0, len(app_details)):
-            self.indexes_to_analyze.append(el)
-
         self.generate_feature(app_details)
 
     def generate_feature(self, app_details_list):
         i = 0
-        while self.indexes_to_analyze:
-            app = app_details_list[int(self.indexes_to_analyze[0])]
-            self.indexes_to_analyze.pop(0)
+        for app in app_details_list:
 
-            app_id = str(app[0])
-            category_id = str(app[6])
+            app_id = str(app[APP_ID_POS])
+            category_id = str(app[CATEGORY_ID_POS])
             query = "SELECT id FROM category WHERE category_id = %s"
             result = do_query([category_id], query)
             if result:
                 category_id = int(result[0][0])
             else:
-                category_id = 15
+                category_id = 100
             try:
-                score = int(app[4])
+                score = int(app[SCORE_POS])
             except TypeError:
                 score = 0
             try:
-                n_reviews = int(app[5])
+                n_reviews = int(app[RATING_POS])
             except TypeError:
                 n_reviews = 0
-            is_approved = int(app[8])
-            serious_words_count, word_occurrence = self.count_occurrences(str(app[1]), str(app[2]))
+            is_approved = int(app[TEACHER_APPROVED_DESC])
+            serious_words_count, word_occurrence = self.count_occurrences(str(app[APP_NAME_POS]),
+                                                                          str(app[DESCRIPTION_POS]))
 
             query = "INSERT INTO app_features(app_id, serious_words_count, teacher_approved, score, rating, " \
                     "category_id) " \
                     "VALUES (%s, %s, %s, %s, %s, %s)"
             do_query([app_id, serious_words_count, is_approved, score, n_reviews, category_id],
                      query)
-            query = "INSERT INTO app_word_occurrences(app_id, app_name, word, occurrences) " \
-                    "VALUES (%s, %s, %s, %s)"
-            for word in word_occurrence.keys():
-                do_query([app_id, str(app[1]), word, word_occurrence.get(word)], query)
             i = i + 1
 
     def generate_random_non_repeated_indexes(self, max_value):
@@ -104,7 +84,7 @@ class FeatureExtractor:
         i = 0
         teacher_approved_index = 0
         for app in app_details:
-            approved = app[8]
+            approved = app[TEACHER_APPROVED_DESC]
             if approved == 1:
                 self.indexes_to_analyze.append(teacher_approved_index)
                 file_out.write(str(teacher_approved_index) + ',')

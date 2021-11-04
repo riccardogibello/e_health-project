@@ -1,11 +1,9 @@
-import google_play_scraper
 from cefpython3 import cefpython as cef
 
-import ManualClassifier
-from OldDatasetManager import *
+from DataManagers.OldDatasetManager import *
 from ProcessManager import ProcessManager
-from DataMiner import DataMiner, is_teacher_approved_app
-from WordsMiner import *
+from DataManagers.DataMiner import DataMiner
+from DataManagers.WordsMiner import *
 import tkinter as tk
 from GUI.ApplicationGUI import ApplicationGUI
 

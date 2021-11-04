@@ -3,8 +3,9 @@ import langid
 import pandas
 import threading
 from concurrent.futures import ThreadPoolExecutor
-import DatabaseManager
-from DatabaseManager import insert_id_into_preliminary_db as insert_preliminary_id
+
+from DataManagers import DatabaseManager
+from DataManagers.DatabaseManager import insert_id_into_preliminary_db as insert_preliminary_id
 from settings import SERIOUS_GAMES_CATEGORIES_LIST, MAX_DATASET_THREADS, DEBUG, DATASET_DEBUG
 
 

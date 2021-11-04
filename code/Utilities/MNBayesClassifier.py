@@ -1,15 +1,15 @@
-from nltk import WordNetLemmatizer, PunktSentenceTokenizer, WordPunctTokenizer
+from nltk import WordNetLemmatizer, PunktSentenceTokenizer, WordPunctTokenizer, sent_tokenize
 from nltk.corpus import stopwords
+from DataManagers.DatabaseManager import do_query
+from DataManagers.WordsMiner import WordsMiner
 
-from DatabaseManager import do_query
-from WordsMiner import WordsMiner
 
-
-def count_labelings(evaluations):
+def count_labels(name_desc_eval):
     serious = 0
     non_serious = 0
-    for el in evaluations:
-        if el == 0:
+    for el in name_desc_eval:
+        evaluation = el[2]
+        if evaluation == 0:
             non_serious = non_serious + 1
         else:
             serious = serious + 1
@@ -26,21 +26,14 @@ def extract_data_from_db():
     :return: a list of all the training descriptions of the applications
     :return: a list of all the labels related to the given training descriptions
     """
-    evaluations = []
-    descriptions = []
 
-    query = "SELECT description, teacher_approved FROM app WHERE teacher_approved = True"
-    descriptions_evaluations = do_query('', query)  # this returns a list of lists, in the form of [(description,
-    # True), ...]
-    query = "SELECT description, False FROM discarded_app"
-    tmp_descriptions_evaluations = do_query('', query)
-    descriptions_evaluations.append(tmp_descriptions_evaluations)
+    query = "SELECT app_name, description, human_classified " \
+            "FROM app AS a, labeled_app AS la " \
+            "WHERE la.app_id = a.app_id"
+    name_desc_eval = do_query('', query)  # this returns a list of tuples, in which we find name,
+    # description and manual classification of the training app
 
-    for desc_eval in descriptions_evaluations:
-        descriptions.append(desc_eval[0])
-        evaluations.append(desc_eval[1])
-
-    return descriptions, evaluations
+    return name_desc_eval
 
 
 def transform_dictionary(dictionary_word_occurrence):
@@ -58,38 +51,46 @@ def transform_dictionary(dictionary_word_occurrence):
 
 
 class MNBayesClassifier:
-    descriptions = []
-    evaluations = []
+    name_desc_eval = []
     non_serious_games_words = []
     serious_games_words = []
     non_serious_occurrences = {}
     serious_occurrences = {}
-    prior_probabilites = {'serious': 0.0, 'non-serious': 0.0}
+    prior_probabilities = {'serious': 0.0, 'non-serious': 0.0}
     serious_likelihood_probabilities = {}
     non_serious_likelihood_probabilities = {}
     word_miner = WordsMiner
 
-    def __init__(self, word_miner):
-        self.word_miner = word_miner
-        self.create_bag_of_words()
+    def __init__(self):
+        self.word_miner = WordsMiner({'wikipage': 'https://en.wikipedia.org/wiki/Serious_game',
+                                      'paper_1': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5222787/pdf/fpsyt-07'
+                                                 '-00215.pdf',
+                                      'paper_2': 'https://www.hindawi.com/journals/ijcgt/2014/787968/'})
+
+    def build_model(self):
         self.compute_prior_probabilities()
+        self.create_bag_of_words()
         self.compute_likelihood_probabilities()
         self.save_statistics()
 
     def save_statistics(self):
-        f_out = open('./data/output_data/priors.txt')
-        f_out.write('serious -> ' + str(self.prior_probabilites.get('serious')))
-        f_out.write('non-serious -> ' + str(self.prior_probabilites.get('non-serious')))
-        f_out = open('./data/output_data/likelihoods.txt')
+        f_out = open('./data/output_data/priors.txt', 'w', encoding='utf-8')
+        f_out.write('serious -> ' + str(self.prior_probabilities.get('serious')) + '\n')
+        f_out.write('non-serious -> ' + str(self.prior_probabilities.get('non-serious')) + '\n')
+        f_out = open('./data/output_data/likelihoods.txt', 'w', encoding='utf-8')
         f_out.write('-------------------------------------------------- SERIOUS LIKELIHOODS '
                     '--------------------------------------------------\n')
         for word in self.serious_likelihood_probabilities.keys():
             occurrences = self.serious_likelihood_probabilities.get(word)
+            if occurrences < 0.005 or len(word) < 3:
+                continue
             f_out.write(str(occurrences) + ' --> ' + word + '\n')
         f_out.write('\n-------------------------------------------------- NON SERIOUS LIKELIHOODS '
                     '--------------------------------------------------\n')
         for word in self.non_serious_likelihood_probabilities.keys():
             occurrences = self.non_serious_likelihood_probabilities.get(word)
+            if occurrences < 0.005 or len(word) < 3:
+                continue
             f_out.write(str(occurrences) + ' --> ' + word + '\n')
 
     def compute_prior_probabilities(self):
@@ -97,12 +98,11 @@ class MNBayesClassifier:
         This method computes the prior probabilities for the two classes of descriptions
         ('serious game' / 'non serious game')
         """
-        descriptions, evaluations = extract_data_from_db()
-        serious, non_serious = count_labelings(evaluations)
-        self.prior_probabilites.__setitem__('serious', serious / len(evaluations))
-        self.prior_probabilites.__setitem__('non-serious', non_serious / len(evaluations))
-        self.descriptions = descriptions
-        self.evaluations = evaluations
+        name_desc_eval = extract_data_from_db()
+        serious, non_serious = count_labels(name_desc_eval)
+        self.prior_probabilities.__setitem__('serious', serious / len(name_desc_eval))
+        self.prior_probabilities.__setitem__('non-serious', non_serious / len(name_desc_eval))
+        self.name_desc_eval = name_desc_eval
 
     def compute_likelihood_probabilities(self):
         """
@@ -111,14 +111,14 @@ class MNBayesClassifier:
         ('serious game' / 'non serious game'). The likelihood is then computed by dividing two terms A/B:
             - A: # of occurrences of the word in the descriptions, given a specific class
             - B: # of words in the descriptions, given the specific class
-        In particular a simple smoother, like Lapace smoother, is used, in order to avoid zero-vanishing when
+        In particular a simple smoother, like Laplace smoother, is used, in order to avoid zero-vanishing when
         computing the product of probabilities.
         """
-        vocabulary_size = len(self.non_serious_games_words) + len(self.serious_games_words)
-        occurrences = set().union(self.serious_occurrences.keys(), self.non_serious_occurrences.keys())
+        word_occurrences = set().union(self.serious_occurrences.keys(), self.non_serious_occurrences.keys())
+        vocabulary_size = len(word_occurrences)
         serious_vocabulary_size = len(self.serious_games_words)
         non_serious_vocabulary_size = len(self.non_serious_games_words)
-        for word in occurrences:
+        for word in word_occurrences:
             occurrences_given_serious = self.serious_occurrences.get(word)
             if occurrences_given_serious:
                 likelihood = (occurrences_given_serious + 1) / (serious_vocabulary_size + vocabulary_size)
@@ -134,10 +134,6 @@ class MNBayesClassifier:
             self.non_serious_likelihood_probabilities.__setitem__(word, likelihood)
 
     def create_bag_of_words(self):
-        """
-        # TODO:
-        :return:
-        """
         self.tokenize_descriptions('serious')
         self.integrate_counts_with_mined_pages()
         self.tokenize_descriptions('non-serious')
@@ -152,57 +148,56 @@ class MNBayesClassifier:
                 self.serious_occurrences.__setitem__(word, mined_pages_occurrences.get(word))
 
     def tokenize_descriptions(self, list_field_to_update):
-        """
-        # TODO:
-        :return:
-        """
-        tokenized_descriptions = []  # this list contains all the words found into all the descriptions
-        i = 0
-        for description in self.descriptions:
+        tmp_cnt = 0
+        for tuple_ in self.name_desc_eval:
+            name = tuple_[0].lower()
+            description = tuple_[1].lower()
+            is_serious_game = tuple_[2]
+
             # here the description is not considered if the actual tokenization is being done on a class of
             # game description different from the current one
-            if list_field_to_update == 'serious' and self.evaluations[i] == 0:
+            if list_field_to_update == 'serious' and is_serious_game == 0:
                 continue
-            if list_field_to_update == 'non-serious' and self.evaluations[i] == 1:
+            if list_field_to_update == 'non-serious' and is_serious_game == 1:
                 continue
 
-            # firstly, divide the whole description into sentences, using punctuation as divider.
-            sent_tokenizer = PunktSentenceTokenizer(description)
-            sentences = sent_tokenizer.tokenize(description)
+            self.compute_occurrences(name, list_field_to_update)
+            self.compute_occurrences(description, list_field_to_update)
+            tmp_cnt = tmp_cnt + 1
+        print(tmp_cnt)
 
-            # secondly, split each sentence into single words.
-            word_punctuation_tokenizer = WordPunctTokenizer()
-            words = []
-            for sentence in sentences:
-                words.append(word_punctuation_tokenizer.tokenize(sentence))
+    def compute_occurrences(self, text, list_field_to_update):
+        # firstly, divide the whole text into sentences, using punctuation as divider.
+        try:
+            sent_tokenizer = PunktSentenceTokenizer(text)
+            sentences = sent_tokenizer.tokenize(text)
+        except ValueError:
+            sentences = sent_tokenize(text)
 
-            # lastly, if possible, lemmatize the words given, that is, try to find the root of the word in the WordNet
-            # dictionary.
-            lemmatizer = WordNetLemmatizer()
-            stop_words = set(stopwords.words('english'))
-            for word in words:
-                if word in stop_words:
-                    continue
-                lemmatized_word = lemmatizer.lemmatize(word)
-                if word != lemmatized_word:
-                    words.remove(word)
-                    words.append(lemmatized_word)
-                # now updated in the right dictionary (serious / non-serious) the number of
-                # occurrences of the current word by adding one to the count.
-                self.update_word_count(list_field_to_update, lemmatized_word)
-            tokenized_descriptions.append(words)
-            i = i + 1
+        # secondly, split each sentence into single words.
+        word_punctuation_tokenizer = WordPunctTokenizer()
+        words = []
+        for sentence in sentences:
+            word_list = word_punctuation_tokenizer.tokenize(sentence)
+            for word in word_list:
+                words.append(word)
 
-        if list_field_to_update == 'non-serious':
-            self.non_serious_games_words = tokenized_descriptions
-        else:
-            self.serious_games_words = tokenized_descriptions
+        # lastly, if possible, lemmatize the words given, that is, try to find the root of the word in the WordNet
+        # dictionary.
+        lemmatizer = WordNetLemmatizer()
+        stop_words = set(stopwords.words('english'))
+        for word in words:
+            if word in stop_words:
+                continue
+            lemmatized_word = lemmatizer.lemmatize(word)
+            if word != lemmatized_word:
+                words.remove(word)
+                words.append(lemmatized_word)
+            # now update in the right dictionary (serious / non-serious) the number of
+            # occurrences of the current word by adding one to the count.
+            self.update_word_count(list_field_to_update, lemmatized_word)
 
     def update_word_count(self, list_field_to_update, word):
-        """
-        # TODO:
-        :return:
-        """
         if list_field_to_update == 'serious':
             actual_count = self.serious_occurrences.get(word)
             if actual_count:

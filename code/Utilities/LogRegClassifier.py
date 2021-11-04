@@ -1,7 +1,7 @@
 from pandas import DataFrame
 from scipy.stats import zscore
 from sklearn.model_selection import train_test_split
-from DatabaseManager import do_query
+from DataManagers.DatabaseManager import do_query
 from sklearn.utils import shuffle
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
@@ -9,6 +9,12 @@ from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, r
 
 def retrieve_app_features():
     query = "SELECT * FROM app_features"
+    return do_query('', query)
+
+
+def retrieve_app_features_with_labels():
+    query = "SELECT af.app_id, af.serious_words_count, af.teacher_approved, af.score, af.rating, af.category_id, " \
+            "la.human_classified FROM app_features AS af, labeled_app AS la WHERE af.app_id = la.app_id "
     return do_query('', query)
 
 
@@ -23,24 +29,40 @@ def retrieve_columns_names():
     return col_names
 
 
+def print_performances(y_pred, y):
+    print('The confusion matrix of the model is:')
+    print(confusion_matrix(y, y_pred))
+
+    print('\n')
+    print('The accuracy of the model is: ' + str(accuracy_score(y, y_pred)))
+
+    print('The precision of the model is: ' + str(precision_score(y, y_pred)))
+
+    print('The recall of the model is: ' + str(recall_score(y, y_pred)))
+
+    print('The precision of the model is: ' + str(f1_score(y, y_pred)))
+
+
 class LogRegClassifier:
     def __init__(self):
         self.trained_model = LogisticRegression()
 
     def train_model(self):
         print('========================================== TRAINING ==========================================')
-        dataset = retrieve_app_features()
+        dataset = retrieve_app_features_with_labels()
         columns_names = retrieve_columns_names()
+        columns_names.append('human_classified')
+        columns_names.remove('machine_classified')
         feature_dataset = DataFrame(columns=columns_names, data=dataset)
         feature_dataset['score_rating'] = feature_dataset['score'] * feature_dataset['rating']
-        X = zscore(feature_dataset[['serious_words_count', 'teacher_approved', 'score_rating', 'category_id']].values)
+        x = zscore(feature_dataset[['serious_words_count', 'teacher_approved', 'score_rating', 'category_id']].values)
         t = feature_dataset['human_classified'].values == 1
 
-        X, t = shuffle(X, t, random_state=0)
-        X_train, X_test, y_train, y_test = train_test_split(X, t, test_size=0.20, random_state=42)
+        x, t = shuffle(x, t, random_state=0)
+        x_train, x_test, y_train, y_test = train_test_split(x, t, test_size=0.20, random_state=42)
 
         self.trained_model = LogisticRegression(penalty='l2')  # regularization is applied as default
-        feat = X_train
+        feat = x_train
         self.trained_model.fit(feat, y_train)
 
         i = 0
@@ -55,17 +77,17 @@ class LogRegClassifier:
                 do_query([str(0), app_id], query)
             i = i + 1
 
-        print('The confusion matrix of the model is:')
-        print(confusion_matrix(y_train, y_pred_list))
+        print_performances(y_pred_list, y_train)
+        print('=================================================================================================')
 
-        print('\n')
-        print('The accuracy of the model is: ' + str(accuracy_score(y_train, y_pred_list)))
+        # TODO : uncomment the following line when ready to analyze the testing performances
+        # self.test_model(x_test, y_test)
 
-        print('The precision of the model is: ' + str(precision_score(y_train, y_pred_list)))
-
-        print('The recall of the model is: ' + str(recall_score(y_train, y_pred_list)))
-
-        print('The precision of the model is: ' + str(f1_score(y_train, y_pred_list)))
+    def test_model(self, x_test, y_test):
+        print('========================================== TESTING ==========================================')
+        y_pred = self.trained_model.predict(x_test)
+        print_performances(y_pred, y_test)
+        print('=================================================================================================')
 
     def classify_apps(self):
         print('========================================== CLASSIFYING ==========================================')
@@ -74,14 +96,16 @@ class LogRegClassifier:
         feature_dataset = DataFrame(columns=columns_names, data=dataset)
         feature_dataset.drop('machine_classified', axis=1)
         feature_dataset['score_rating'] = feature_dataset['score'] * feature_dataset['rating']
-        X = zscore(feature_dataset[['serious_words_count', 'teacher_approved', 'score_rating', 'category_id']].values)
+        x = zscore(feature_dataset[['serious_words_count', 'teacher_approved', 'score_rating', 'category_id']].values)
 
         i = 0
         app_id_list = feature_dataset[['app_id']].values
-        y = self.trained_model.predict(X)
+        y = self.trained_model.predict(x)
         for label_predicted in y:
             if label_predicted:
-                query = "INSERT INTO app_tmp(app_id) VALUES (%s)"
-                do_query([str(app_id_list[i][0])], query)
+                app_id = str(app_id_list[i][0])
+                query = "INSERT INTO selected_app SELECT * FROM app WHERE %s = app.app_id"
+                do_query([app_id], query)
             i = i + 1
 
+        print('=================================================================================================')

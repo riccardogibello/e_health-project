@@ -1,4 +1,4 @@
-import DatabaseManager
+from DataManagers import DatabaseManager
 
 
 class ManualClassifier:

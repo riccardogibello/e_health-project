@@ -22,6 +22,7 @@ class ApplicationGUI(tk.Frame):
         self.__new_dataset_button_thread = None
         self.__old_dataset_button_thread = None
         self.__manual_classifier_thread = None
+        self.__auto_classifier_thread = None
 
         # Root
         self.root = root
@@ -69,7 +70,7 @@ class ApplicationGUI(tk.Frame):
         # Data Miner Button
         self.auto_classify_button = tk.Button(root, text='Automatic apps classification',
                                               width=self.menu_button_width, height=self.menu_button_height,
-                                              bg="#3bccff", font="Raleway")
+                                              bg="#3bccff", font="Raleway", command=self.auto_classify_command)
         self.auto_classify_button.grid(column=1, row=5)
 
         # Exit Button
@@ -102,6 +103,11 @@ class ApplicationGUI(tk.Frame):
         self.__manual_classifier_thread = threading.Thread(target=self.manual_classify_window())
         self.__manual_classifier_thread.start()
         self.__manual_classifier_thread.join()
+
+    def auto_classify_command(self):
+        self.__auto_classifier_thread = threading.Thread(target=self.__process_manager.do_classification_dataset)
+        self.__auto_classifier_thread.start()
+        self.__auto_classifier_thread.join()
 
     def manual_classify_window(self):
         self.root.update()

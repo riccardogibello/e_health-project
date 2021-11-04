@@ -2,17 +2,16 @@ import time
 import google_play_scraper.exceptions
 import mysql
 from bs4 import BeautifulSoup
-
 import settings
-from DatabaseManager import insert_app_into_db, insert_id_into_preliminary_db as insert_preliminary, \
+from DataManagers.DatabaseManager import insert_app_into_db, insert_id_into_preliminary_db as insert_preliminary, \
     update_status_preliminary, delete_id_from_preliminary_db
-from DatasetManager import is_english
-from DatabaseManager import do_query
+from DataManagers.DatasetManager import is_english
+from DataManagers.DatabaseManager import do_query
 from Application import Application
 from concurrent.futures import ThreadPoolExecutor
-from settings import MAX_RETRIEVE_APP_DATA_THREADS, SERIOUS_GAMES_CATEGORIES_LIST, DEBUG, MAX_CONNECTION_ATTEMPTS
+from settings import MAX_RETRIEVE_APP_DATA_THREADS, SERIOUS_GAMES_CATEGORIES_LIST, DEBUG
 import threading
-from web_mining_functions import find_web_page
+from WEBFunctions.web_mining_functions import find_web_page
 
 
 def is_teacher_approved_app(app_id):

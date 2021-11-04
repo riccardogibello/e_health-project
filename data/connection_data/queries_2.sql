@@ -6,38 +6,50 @@ SELECT '# teacher approved apps in training', count(*) FROM app_features WHERE t
 	UNION
 SELECT '# total apps extracted', count(*) FROM app;
 
-CREATE TABLE tmp_labeled_apps
-	SELECT app_id, human_classified FROM app_features;
+DROP TABLE IF EXISTS `tmp_labeled_apps`;
+CREATE TABLE `tmp_labeled_apps` (
+  `app_id` varchar(100) UNIQUE NOT NULL,
+  `human_classified` boolean
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 SELECT COUNT(*) FROM tmp_labeled_apps;
 
 # import back in app_features all the labeled apps
-INSERT INTO app_features SELECT app_id, ..., human_classified FROM tmp_labeled_apps;
+# INSERT INTO app_features SELECT app_id, ..., human_classified FROM tmp_labeled_apps;
 
 /*
 ================================================================================================================================================
-THIS PART HAS TO BE UNCOMMENTED ONLY IF YOU NEED TO INVERT THE LABELS IN THE TABLE labeled_app
+THIS PART HAS TO BE UNCOMMENTED ONLY IF YOU NEED TO INVERT THE LABELS IN THE TABLE tmp_labeled_apps
 */
 /*
 USE `projectdatabase`;
 DROP TABLE IF EXISTS `FALSE_labels`;
 CREATE TABLE `FALSE_labels` 
-	SELECT app_id FROM labeled_app WHERE human_classified = 0;
+	SELECT app_id FROM tmp_labeled_apps WHERE human_classified = 0;
 
 DROP TABLE IF EXISTS `TRUE_labels`;
 CREATE TABLE `TRUE_labels` 
-	SELECT app_id FROM labeled_app WHERE human_classified = 1;
+	SELECT app_id FROM tmp_labeled_apps WHERE human_classified = 1;
 
 
-UPDATE app_features SET human_classified = 1 WHERE app_id IN (
+UPDATE tmp_labeled_apps SET human_classified = 1 WHERE app_id IN (
 																SELECT app_id FROM false_labels
 															);
 
-UPDATE app_features SET human_classified = 0 WHERE app_id IN (
+UPDATE tmp_labeled_apps SET human_classified = 0 WHERE app_id IN (
 																SELECT app_id FROM true_labels
 															);
                                                             
 DROP TABLE IF EXISTS `FALSE_labels`;
 DROP TABLE IF EXISTS `TRUE_labels`;
+
+INSERT INTO labeled_app(app_id, human_classified) SELECT * FROM tmp_labeled_apps;
+TRUNCATE tmp_labeled_apps;
+
+SELECT COUNT(*) FROM labeled_app;
+
+SELECT COUNT(*) FROM app_features WHERE app_features.app_id NOT IN (SELECT labeled_app.app_id FROM labeled_app); 
+
+SELECT app_id FROM tmp_labeled_apps WHERE app_id NOT IN (SELECT app_id FROM labeled_app);
 */
 /*
 ================================================================================================================================================

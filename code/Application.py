@@ -1,5 +1,5 @@
 from google_play_scraper import app
-from DatabaseManager import do_query
+from DataManagers.DatabaseManager import do_query
 
 
 class Application:
