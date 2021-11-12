@@ -1,8 +1,9 @@
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
+
 import langid
 import pandas
-import threading
-from concurrent.futures import ThreadPoolExecutor
 
 from DataManagers import DatabaseManager
 from DataManagers.DatabaseManager import insert_id_into_preliminary_db as insert_preliminary_id
@@ -36,7 +37,8 @@ class DatasetManager:
         # Insertion of data in the db is made using multithreading in order to improve performance
         start_time = time.time()
         if DEBUG and DATASET_DEBUG:
-            print(f'{threading.currentThread().getName()}  || Dataset Manager : Loading data from {self.__dataset_file}')
+            print(
+                f'{threading.currentThread().getName()}  || Dataset Manager : Loading data from {self.__dataset_file}')
 
         # Using ThreadPoolExecutor the insertion in the database is parallelized
         # The maximum number of Threads for the given job can be modified in the settings file

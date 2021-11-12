@@ -1,4 +1,5 @@
 import re
+
 import mysql
 import mysql.connector
 
@@ -83,8 +84,8 @@ def update_status_preliminary(app_id):
 def insert_app_into_db(application):
     insert_query = (
         "INSERT IGNORE INTO APP(app_id, app_name, description, category_id, score, rating, installs,"
-        " developer_id, last_update, content_rating, content_rating_description, teacher_approved) "
-        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+        " developer_id, last_update, content_rating, teacher_approved) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
     )
 
     query_values = (application.app_id,
@@ -97,7 +98,6 @@ def insert_app_into_db(application):
                     application.developer_id,
                     application.updated,
                     application.content_rating,
-                    application.content_rating_description,
                     application.teacher_approved
                     )
 

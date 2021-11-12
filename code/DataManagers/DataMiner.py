@@ -1,17 +1,19 @@
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
+
 import google_play_scraper.exceptions
 import mysql
 from bs4 import BeautifulSoup
+
 import settings
+from Application import Application
+from DataManagers.DatabaseManager import do_query
 from DataManagers.DatabaseManager import insert_app_into_db, insert_id_into_preliminary_db as insert_preliminary, \
     update_status_preliminary, delete_id_from_preliminary_db
 from DataManagers.DatasetManager import is_english
-from DataManagers.DatabaseManager import do_query
-from Application import Application
-from concurrent.futures import ThreadPoolExecutor
-from settings import MAX_RETRIEVE_APP_DATA_THREADS, SERIOUS_GAMES_CATEGORIES_LIST, DEBUG
-import threading
 from WEBFunctions.web_mining_functions import find_web_page
+from settings import MAX_RETRIEVE_APP_DATA_THREADS, SERIOUS_GAMES_CATEGORIES_LIST, DEBUG, ADULT_RATINGS
 
 
 def is_teacher_approved_app(app_id):
@@ -66,7 +68,7 @@ class DataMiner:
         # Looks in the preliminary table for checked apps has not been checked yet
         # and save their IDs in self.__apps_id_list
         query = (
-            "SELECT app_id, from_dataset FROM preliminary WHERE preliminary.`check` IS FALSE"
+            "SELECT app_id, from_dataset FROM preliminary WHERE preliminary.`check` IS FALSE LIMIT 24"
         )
         try:
             self.__apps_id_list = do_query((), query)
@@ -93,7 +95,8 @@ class DataMiner:
 
     def fill_database(self):
         while self.__running:
-            self.__retrieve_incomplete_data()
+            if not len(self.__apps_id_list):
+                self.__retrieve_incomplete_data()
             if not self.__running:
                 return
 
@@ -105,29 +108,38 @@ class DataMiner:
 
     def load_app_into_database(self, app_id, from_dataset):
         application = get_app_data(app_id)
+        insert_app, insert_similar = self.check_app(application, from_dataset)
 
-        if self.insertable_in_db(application, from_dataset):
-
+        if insert_app:
             application.teacher_approved = is_teacher_approved_app(app_id)
             insert_app_into_db(application)
 
-            for similar_id in application.similar_apps:
-                insert_preliminary(similar_id)
-            for developer_app in application.more_by_developer:
-                insert_preliminary(developer_app)
+        if insert_similar:
+            if application.similar_apps:
+                for similar_id in application.similar_apps:
+                    insert_preliminary(similar_id)
+            if application.more_by_developer:
+                for developer_app in application.more_by_developer:
+                    insert_preliminary(developer_app)
 
         update_status_preliminary(app_id)
 
     def shutdown(self):
         self.__running = False
 
-    def insertable_in_db(self, app, from_dataset):
+    def check_app(self, app, from_dataset):
         if not app or app.category not in SERIOUS_GAMES_CATEGORIES_LIST:
-            return False
-        if app.updated <= settings.LAST_UPDATE:
-            return False
+            return False, False
+        if app.score <= 0:
+            return False, True
+        if app.updated < settings.LAST_UPDATE:
+            return False, True
+        if app.content_rating_description:
+            return False, True
+        if app.content_rating in ADULT_RATINGS:
+            return False, False
         if not (from_dataset or is_english(app.title)):
-            return False
+            return False, False
         if not is_english(app.description):
-            return False
-        return True
+            return False, False
+        return True, True
