@@ -1,6 +1,8 @@
 import sys
 import threading
 import tkinter as tk
+import tkinter.font
+
 from cefpython3 import cefpython as cef
 from PIL import Image, ImageTk
 from GUI.ClassifierBrowser import ClassifierBrowser
@@ -8,6 +10,9 @@ from GUI.ClassifierBrowser import ClassifierBrowser
 
 class ApplicationGUI(tk.Frame):
     def __init__(self, root, process_manager):
+
+        self.font = tkinter.font.Font(family="Calibri", size=16, weight="normal")
+
         self.main_height = 800
         self.main_width = 450
         self.__process_manager = process_manager
@@ -38,44 +43,44 @@ class ApplicationGUI(tk.Frame):
         logo_label.image = logo
         logo_label.grid(column=1, row=0)
 
-        self.menu_button_width = 49
-        self.menu_button_height = 3
+        self.menu_button_width = 41
+        self.menu_button_height = 2
 
         # Dataset Button
-        self.new_dataset_button = tk.Button(root, text='Load data from kaggle_dataset',
+        self.new_dataset_button = tk.Button(root, text='Load data from new dataset',
                                             width=self.menu_button_width, height=self.menu_button_height,
-                                            bg="#3bccff", font="Raleway",
+                                            bg="#3bccff", font=self.font,
                                             command=self.new_dataset_command)
         self.new_dataset_button.grid(column=1, row=1)
 
         # Dataset Button
         self.old_dataset_button = tk.Button(root, text='Load data from old dataset',
                                             width=self.menu_button_width, height=self.menu_button_height,
-                                            bg="#48ff48", font="Raleway",
+                                            bg="#48ff48", font=self.font,
                                             command=self.old_dataset_command)
         self.old_dataset_button.grid(column=1, row=2)
 
         # Data Miner Button
         self.data_miner_button = tk.Button(root, text='Retrieve data from google play',
                                            width=self.menu_button_width, height=self.menu_button_height,
-                                           bg="#ffd400", font="Raleway", command=self.data_miner_command)
+                                           bg="#ffd400", font=self.font, command=self.data_miner_command)
         self.data_miner_button.grid(column=1, row=3)
 
         # Manual classification Button
         self.manual_classify_button = tk.Button(root, text='Classify applications manually',
                                                 width=self.menu_button_width, height=self.menu_button_height,
-                                                bg="#ff3333", font="Raleway", command=self.manual_classify_command)
+                                                bg="#ff3333", font=self.font, command=self.manual_classify_command)
         self.manual_classify_button.grid(column=1, row=4)
 
         # Data Miner Button
         self.auto_classify_button = tk.Button(root, text='Automatic apps classification',
                                               width=self.menu_button_width, height=self.menu_button_height,
-                                              bg="#3bccff", font="Raleway", command=self.auto_classify_command)
+                                              bg="#3bccff", font=self.font, command=self.auto_classify_command)
         self.auto_classify_button.grid(column=1, row=5)
 
         # Exit Button
         exit_button = tk.Button(root, text='Exit', width=self.menu_button_width, height=self.menu_button_height,
-                                font="Raleway", command=self.exit_button_command)
+                                font=self.font, command=self.exit_button_command)
         exit_button.grid(column=1, row=6)
 
         tk.Frame.__init__(self, root)

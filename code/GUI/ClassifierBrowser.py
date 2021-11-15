@@ -1,3 +1,5 @@
+import tkinter.messagebox
+
 from cefpython3 import cefpython as cef
 import ctypes
 import tkinter as tk
@@ -162,6 +164,7 @@ class NavigationBar(tk.Frame):
         self.app_classifier = None
         self.current_id = None
         self.start_stop_button_status = None
+
         tk.Frame.__init__(self, master)
 
         # Start Entry
@@ -196,17 +199,28 @@ class NavigationBar(tk.Frame):
         self.stop_image = tk.PhotoImage(file='resources/images/stop_image.png')
 
     def start_stop_function(self):
+        try:
+            start = int(self.start_entry.get())
+            end = int(self.end_entry.get())
+        except ValueError:
+            tk.messagebox.showerror("Wrong Value!", "Illegal values inserted", parent=self)
+            return
+
+        if start >= end:
+            tkinter.messagebox.showerror("Range Error", "Check range values!", parent=self)
+            return
+        if not self.app_classifier:
+            self.app_classifier = ManualClassifier(start, end)
+
         if self.start_stop_button_status:
             self.start_stop_button_status = False
             self.start_stop_button.configure(image=self.start_image)
             self.not_serious_button.config(state='disabled')
             self.serious_button.config(state='disabled')
-            return
-        start = int(self.start_entry.get())
-        end = int(self.end_entry.get())
+            self.app_classifier = None
 
-        if not self.app_classifier:
-            self.app_classifier = ManualClassifier(start, end)
+
+        else:
             self.start_stop_button.config(state='disabled')
             self.not_serious_button.config(state='normal')
             self.serious_button.config(state='normal')
@@ -215,12 +229,11 @@ class NavigationBar(tk.Frame):
             self.start_stop_button.config(state='normal')
             self.start_stop_button_status = True
 
-        self.current_id = self.app_classifier.get_app_to_classify()[1]
-        url_to_load = self.app_classifier.get_app_to_classify()[0]
-        if not url_to_load:
-            return
-        # implementare avviso
-        self.master.get_browser().LoadUrl(url_to_load)
+            self.current_id = self.app_classifier.get_app_to_classify()[1]
+            url_to_load = self.app_classifier.get_app_to_classify()[0]
+            if not url_to_load:
+                return
+            self.master.get_browser().LoadUrl(url_to_load)
 
     def not_serious_function(self):
         self.classify_button(False)
