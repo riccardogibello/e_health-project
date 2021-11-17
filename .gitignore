@@ -6,3 +6,5 @@
 /data/input_data/kaggle_playstore_apps_new.csv
 /data/input_data/dump_database.csv
 /data/input_data/last_analyzed.txt
+/data/input_data/descr_test.txt
+/data/input_data/descr_test_sanitized.txt
