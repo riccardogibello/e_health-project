@@ -17,7 +17,7 @@ class ManualClassifier:
         if DEBUG:
             print(f"Starting classifying apps in range {start} - {end}")
         self.start_index = start
-        self.end_index = end + 1
+        self.end_index = end
         self.current_index = self.start_index
         get_apps_query = (
             "SELECT app_id, human_classified FROM labeled_app"

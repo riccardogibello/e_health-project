@@ -1,16 +1,21 @@
+import http
+import http
 import threading
 import time
+import urllib.error
 from concurrent.futures import ThreadPoolExecutor
 
 import google_play_scraper.exceptions
 import mysql
+import regex as re
 from bs4 import BeautifulSoup
+from mysutils.text import clean_text
 
 import settings
 from Application import Application
 from DataManagers.DatabaseManager import do_query
 from DataManagers.DatabaseManager import insert_app_into_db, insert_id_into_preliminary_db as insert_preliminary, \
-    update_status_preliminary, delete_id_from_preliminary_db
+    update_status_preliminary, delete_app_from_database, delete_app_from_labeled_app
 from DataManagers.DatasetManager import is_english
 from WEBFunctions.web_mining_functions import find_web_page
 from settings import MAX_RETRIEVE_APP_DATA_THREADS, SERIOUS_GAMES_CATEGORIES_LIST, DEBUG, ADULT_RATINGS
@@ -32,18 +37,47 @@ def is_teacher_approved_app(app_id):
 
 def get_app_data(app_id):
     try:
+        # Creating object Application
         application = Application(app_id, True)
     except google_play_scraper.exceptions.NotFoundError:
-        delete_id_from_preliminary_db(app_id)
-        application = None
+        # App not found on Google Play Market meaning it does not exist anymore so it must be deleted from
+        # labeled_app because it can not be used for training of ML model and from app table because it is
+        # useless to classify it. The id is not deleted from preliminary table in order to keep trace of checked apps
+        # and not check more than once in case the app is still given as similar of another one.
+
+        update_status_preliminary(app_id)
+        delete_app_from_database(app_id)
+        delete_app_from_labeled_app(app_id)
+
         if DEBUG:
             print(f'{threading.currentThread()}  || Data Miner : APP {app_id} not found')
+        # Explicit elimination of Application object
+        application = None
+
+    except (urllib.error.HTTPError, urllib.error.URLError, http.client.RemoteDisconnected, ConnectionResetError):
+        # Connection errors, probably related to high number of requests to the server.
+        # None is returned and a new try to retrieve data will be made later
+        application = None
+
 
     return application
 
 
+def clean_description(description):
+    # remove all non-ascii characters
+    clear_description = str(description.encode('ascii', errors='ignore').decode())
+    # remove useless hyphens (multiple hyphens, hyphens at the begging or at the end of a word)
+    clear_description = re.sub(r'(--)+', ' ', clear_description)
+    clear_description = re.sub(r'( -)+', ' ', clear_description)
+    clear_description = re.sub(r'(- )+', ' ', clear_description)
+    # clean_text function removes punctuation, removes urls and transform lowers the string
+    # because there is no need to distinguish words between lower and upper cases
+    return clean_text(clear_description)
+
+
 class DataMiner:
     __apps_id_list = []
+    b = 0
 
     def __init__(self):
         threading.currentThread().name = 'Data Miner'
@@ -68,7 +102,10 @@ class DataMiner:
         # Looks in the preliminary table for checked apps has not been checked yet
         # and save their IDs in self.__apps_id_list
         query = (
-            "SELECT app_id, from_dataset FROM preliminary WHERE preliminary.`check` IS FALSE LIMIT 24"
+            "SELECT app_id, from_dataset FROM preliminary WHERE preliminary.`check` IS FALSE"
+        )
+        test_query = (
+            "SELECT A.app_id, B.from_dataset FROM app as A, preliminary as B WHERE A.app_id = B.app_id AND B.check IS FALSE"
         )
         try:
             self.__apps_id_list = do_query((), query)
@@ -77,13 +114,13 @@ class DataMiner:
                 if not start:
                     self.__running = False
                     if DEBUG:
-                        print(f'{threading.currentThread()}  || Data Miner : No new app found - Execution terminated')
+                        print(f'{threading.currentThread()}  || Data Miner : No new app found')
 
         except mysql.connector.errors.DatabaseError:
             self.__increment_connection_counter()
             if self.__failed_connections < 5:
                 if DEBUG:
-                    print(f'{threading.currentThread()} || Data Miner : Database communication error!! - '
+                    print(f'{threading.currentThread()} || Data Miner : Database communication error - '
                           f'Retry in 30 seconds')
                 time.sleep(30)
                 return
@@ -102,17 +139,35 @@ class DataMiner:
 
             with ThreadPoolExecutor(max_workers=MAX_RETRIEVE_APP_DATA_THREADS) as executor:
                 for application in self.__apps_id_list:
-                    self.__apps_id_list.remove(application)
                     executor.submit(self.load_app_into_database, application[0], application[1])
             self.__apps_id_list = []
 
+    def load_chunk(self, chunk):
+        for application in chunk:
+            self.load_app_into_database(application[0], application[1])
+
+    def split_list_in_chunks(self, num_chunks=MAX_RETRIEVE_APP_DATA_THREADS):
+        chunk_dim = int(len(self.__apps_id_list) / num_chunks) + 1
+        chunks = [self.__apps_id_list[x:x + chunk_dim] for x in range(0, len(self.__apps_id_list), chunk_dim)]
+        return chunks
+
     def load_app_into_database(self, app_id, from_dataset):
         application = get_app_data(app_id)
+        if not application:
+            return
         insert_app, insert_similar = self.check_app(application, from_dataset)
 
         if insert_app:
-            application.teacher_approved = is_teacher_approved_app(app_id)
-            insert_app_into_db(application)
+            application.description = clean_description(application.description)
+            try:
+                application.teacher_approved = is_teacher_approved_app(app_id)
+            except urllib.error.URLError:
+                return
+
+            if len(application.description) > 2:
+                insert_app_into_db(application)
+        if not insert_app:
+            delete_app_from_database(app_id)
 
         if insert_similar:
             if application.similar_apps:
@@ -130,7 +185,7 @@ class DataMiner:
     def check_app(self, app, from_dataset):
         if not app or app.category not in SERIOUS_GAMES_CATEGORIES_LIST:
             return False, False
-        if app.score <= 0:
+        if app.score <= 0 and app.min_installs < 500:
             return False, True
         if app.updated < settings.LAST_UPDATE:
             return False, True

@@ -5,7 +5,6 @@ USE `projectdatabase`;
 DROP TABLE IF EXISTS `labeled_app`;
 CREATE TABLE `labeled_app` (
   `app_id` varchar(100) UNIQUE NOT NULL,
-  `machine_classified` boolean,
   `human_classified` boolean
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

@@ -9,7 +9,7 @@ from Utilities.FeatureExtractor import FeatureExtractor
 from Utilities.LogRegClassifier import LogRegClassifier
 from Utilities.MNBayesClassifier import MNBayesClassifier
 from WEBFunctions.web_mining_functions import find_available_categories
-from settings import KAGGLE_DATASET_PATH
+from settings import KAGGLE_DATASET_PATH, SERIOUS_WORDS
 
 
 def execute_data_miner():
@@ -29,43 +29,7 @@ def execute_old_dataset_manager():
 
 def execute_classification():
     find_available_categories()
-    words = ["strong educational potential",
-             "educational potential"
-             "educational-related needs",
-             "educational needs"
-             "teaching material",
-             "teaching",
-             "serious",
-             "serious game",
-             "serious purpose",
-             "serious purpose scenario",
-             "real life cases",
-             "training",
-             "education",
-             "learning game",
-             "learning",
-             "increase awareness",
-             "stimulate",
-             "train",
-             "inform",
-             "teach",
-             "influence",
-             "edugames",
-             "edu-games",
-             "rules",
-             "games for education",
-             "educational game",
-             "transmit educational knowledge",
-             "transmit knowledge",
-             "cognitive performance",
-             "brain training",
-             "educational multiplayer online game",
-             "problem solving strategies",
-             "problem solving",
-             "solving strategies",
-             "decision making",
-             "decision-making",
-             ]
+    words = SERIOUS_WORDS
     feature_extractor = FeatureExtractor(words)
     feature_extractor.compute_training_features()
 

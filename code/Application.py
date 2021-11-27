@@ -62,13 +62,18 @@ class Application:
         # If True it will load data from Play Store, if False data will be loaded from local database.
         if online:
             result = app(application_id)
+            if not result:
+                return
             self.title = result.get('title')
             self.description = result.get('description')
             #self.description_html = result.get('descriptionHTML')
             #self.summary = result.get('summary')
             #self.summary_html = result.get('summaryHTML')
             self.installs = result.get('installs')
-            self.min_installs = int(result.get('minInstalls'))
+            try:
+                self.min_installs = int(result.get('minInstalls'))
+            except TypeError:
+                self.min_installs = None
             self.score = result.get('score')
             if not self.score:
                 self.score = 0

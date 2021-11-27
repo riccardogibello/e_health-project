@@ -1,6 +1,8 @@
 from pandas import DataFrame
 from scipy.stats import zscore
 from sklearn.model_selection import train_test_split
+
+import DataManagers.DatabaseManager
 from DataManagers.DatabaseManager import do_query
 from sklearn.utils import shuffle
 from sklearn.linear_model import LogisticRegression
@@ -91,6 +93,7 @@ class LogRegClassifier:
 
     def classify_apps(self):
         print('========================================== CLASSIFYING ==========================================')
+        DataManagers.DatabaseManager.clear_table('selected_app')
         dataset = retrieve_app_features()
         columns_names = retrieve_columns_names()
         feature_dataset = DataFrame(columns=columns_names, data=dataset)

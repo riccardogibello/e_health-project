@@ -1,6 +1,6 @@
 import random
 from numpy import arange
-from DataManagers.DatabaseManager import do_query, clear_table
+from DataManagers.DatabaseManager import do_query, clear_table, multiple_query
 from settings import *
 
 
@@ -24,35 +24,41 @@ class FeatureExtractor:
         self.generate_feature(app_details)
 
     def generate_feature(self, app_details_list):
+        insert_query = "INSERT IGNORE INTO app_features(app_id, serious_words_count, teacher_approved, score, rating, " \
+                       "category_id) " \
+                       "VALUES (%s, %s, %s, %s, %s, %s)"
         i = 0
+        computed_features = []
         for app in app_details_list:
+            computed_features.append(self.compute_features_values(app))
+            if len(computed_features) > 500:
+                multiple_query(computed_features, insert_query)
+                computed_features = []
+        if len(computed_features):
+            multiple_query(computed_features, insert_query)
 
-            app_id = str(app[APP_ID_POS])
-            category_id = str(app[CATEGORY_ID_POS])
-            query = "SELECT id FROM category WHERE category_id = %s"
-            result = do_query([category_id], query)
-            if result:
-                category_id = int(result[0][0])
-            else:
-                category_id = 100
-            try:
-                score = int(app[SCORE_POS])
-            except TypeError:
-                score = 0
-            try:
-                n_reviews = int(app[RATING_POS])
-            except TypeError:
-                n_reviews = 0
-            is_approved = int(app[TEACHER_APPROVED_DESC])
-            serious_words_count, word_occurrence = self.count_occurrences(str(app[APP_NAME_POS]),
-                                                                          str(app[DESCRIPTION_POS]))
+    def compute_features_values(self, app):
+        app_id = str(app[APP_ID_POS])
+        category_id = str(app[CATEGORY_ID_POS])
+        query = "SELECT id FROM category WHERE category_id = %s"
+        result = do_query([category_id], query)
+        if result:
+            category_id = int(result[0][0])
+        else:
+            category_id = 100
+        try:
+            score = float(app[SCORE_POS])
+        except TypeError:
+            score = 0
+        try:
+            n_reviews = int(app[RATING_POS])
+        except TypeError:
+            n_reviews = 0
+        is_approved = int(app[TEACHER_APPROVED_DESC])
+        serious_words_count, word_occurrence = self.count_occurrences(str(app[APP_NAME_POS]),
+                                                                      str(app[DESCRIPTION_POS]))
 
-            query = "INSERT INTO app_features(app_id, serious_words_count, teacher_approved, score, rating, " \
-                    "category_id) " \
-                    "VALUES (%s, %s, %s, %s, %s, %s)"
-            do_query([app_id, serious_words_count, is_approved, score, n_reviews, category_id],
-                     query)
-            i = i + 1
+        return app_id, serious_words_count, is_approved, score, n_reviews, category_id
 
     def generate_random_non_repeated_indexes(self, max_value):
         try:
@@ -97,6 +103,9 @@ class FeatureExtractor:
         global_occurrences = 0
         for serious_word in self.serious_games_words:
             if serious_word in app_name or serious_word in app_description:
-                global_occurrences = global_occurrences + 1
+                global_occurrences += len(serious_word.split()*10)
                 word_occurrence.__setitem__(serious_word, 1)
+        if global_occurrences == 0:
+            if 5 < random.randint(1,10):
+                global_occurrences = (-1) * random.randint(1,25)
         return global_occurrences, word_occurrence

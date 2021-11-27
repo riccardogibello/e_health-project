@@ -32,7 +32,13 @@ SELECT  'FROM DATASET TO CHECK', COUNT(*) FROM preliminary WHERE preliminary.`ch
     UNION
 SELECT  'EXTERNAL TO CHECK', COUNT(*) FROM preliminary WHERE preliminary.`check` IS FALSE AND preliminary.from_dataset IS FALSE
     UNION
-SELECT  'TO_CLASSIFY APPS', COUNT(*) FROM app;
+SELECT  'TO_CLASSIFY APPS', COUNT(*) FROM app
+    UNION
+SELECT 'TRAINING SET', COUNT(*) FROM labeled_app
+    UNION
+SELECT 'TRAINING SERIOUS', COUNT(*) FROM labeled_app WHERE human_classified IS TRUE
+    UNION
+SELECT 'TRAINING NOT SERIOUS', COUNT(*) FROM labeled_app WHERE human_classified IS FALSE;
 
 
 UPDATE preliminary SET `check` = TRUE WHERE `check` IS FALSE;
@@ -42,6 +48,8 @@ UPDATE preliminary SET `check` = FALSE WHERE `check` IS TRUE;
 UPDATE preliminary SET `check` = FALSE WHERE app_id IN (
     SELECT app_id FROM app
     );
+
+UPDATE labeled_app SET human_classified = NULL WHERE human_classified IS NOT NULL;
 
 
 SELECT 'TOTAL_APPS', COUNT(*) FROM app
@@ -62,20 +70,35 @@ SELECT 'NOT_UPDATED_APPS AFTER 2021', COUNT(*) FROM app WHERE last_update < 1609
 
 
 #With ratings, no dangerous and updated >2020
-SELECT 'SELECTION 1', COUNT(*) FROM app WHERE score > 0 AND content_rating_description IS NULL AND NOT content_rating = 'Adults only 18+' AND
+SELECT 'SELECTION 1', COUNT(*) FROM app WHERE score > 0  AND NOT content_rating = 'Adults only 18+' AND
                                                 NOT content_rating = 'Mature 17+' AND NOT content_rating = 'Unrated' AND last_update > 1577836800
     UNION
 #With ratings, no dangerous and updated >2019
-SELECT 'SELECTION 2', COUNT(*) FROM app WHERE score > 0 AND content_rating_description IS NULL AND NOT content_rating = 'Adults only 18+' AND
+SELECT 'SELECTION 2', COUNT(*) FROM app WHERE score > 0 AND NOT content_rating = 'Adults only 18+' AND
                                                 NOT content_rating = 'Mature 17+' AND NOT content_rating = 'Unrated' AND last_update > 1546300800
     UNION
 #No dangerous and updated >2019
-SELECT 'SELECTION 3', COUNT(*) FROM app WHERE content_rating_description IS NULL AND NOT content_rating = 'Adults only 18+' AND
+SELECT 'SELECTION 3', COUNT(*) FROM app WHERE NOT content_rating = 'Adults only 18+' AND
                                                 NOT content_rating = 'Mature 17+' AND NOT content_rating = 'Unrated' AND last_update > 1546300800
     UNION
 #No dangerous, updated > 2019 and at least 500 installs
-SELECT 'SELECTION 4', COUNT(*) FROM app WHERE installs > 499 AND content_rating_description IS NULL AND NOT content_rating = 'Adults only 18+' AND
+SELECT 'SELECTION 4', COUNT(*) FROM app WHERE installs > 499 AND NOT content_rating = 'Adults only 18+' AND
                                                 NOT content_rating = 'Mature 17+' AND NOT content_rating = 'Unrated' AND last_update > 1546300800;
+
+
+
+#QUERY CREATING "labeled_app" TABLE
+TRUNCATE TABLE labeled_app;
+
+INSERT INTO labeled_app(app_id)
+SELECT app_id FROM app WHERE teacher_approved IS TRUE ORDER BY RAND() LIMIT 300;
+INSERT INTO labeled_app(app_id)
+SELECT app_id FROM app WHERE teacher_approved IS FALSE ORDER BY RAND() LIMIT 900;
+
+
+INSERT IGNORE INTO preliminary(app_id) SELECT app_id FROM app;
+
+TRUNCATE TABLE app;
 
 
 

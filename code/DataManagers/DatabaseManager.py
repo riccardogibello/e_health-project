@@ -40,6 +40,29 @@ def do_query(tuple_data, query):
     return result
 
 
+def multiple_query(tuple_list, query):
+    # establishing the connection
+    conn = create_connection()
+
+    # Creating a cursor object using the cursor() method
+    cursor = conn.cursor()
+    result = []
+
+    try:
+        # Executing the SQL command
+        cursor.executemany(query, tuple_list)
+        result = cursor.fetchall()
+        # Commit your changes in the database
+        conn.commit()
+    except EnvironmentError:
+        # Rolling back in case of error
+        conn.rollback()
+
+    # Closing the connection
+    conn.close()
+    return result
+
+
 def clear_table(table_name):
     do_query('', 'TRUNCATE TABLE ' + table_name)
 
@@ -56,6 +79,13 @@ def insert_id_into_preliminary_db(app_id, from_dataset_flag=False):
 def delete_id_from_preliminary_db(app_id):
     remove_query = (
         "DELETE FROM preliminary WHERE app_id = %s"
+    )
+    do_query((app_id,), remove_query)
+
+
+def delete_app_from_labeled_app(app_id):
+    remove_query = (
+        "DELETE FROM labeled_app WHERE app_id = %s"
     )
     do_query((app_id,), remove_query)
 
