@@ -66,15 +66,15 @@ class Application:
                 return
             self.title = result.get('title')
             self.description = result.get('description')
-            #self.description_html = result.get('descriptionHTML')
-            #self.summary = result.get('summary')
-            #self.summary_html = result.get('summaryHTML')
             self.installs = result.get('installs')
             try:
                 self.min_installs = int(result.get('minInstalls'))
             except TypeError:
                 self.min_installs = None
-            self.score = result.get('score')
+            try:
+                self.score = float(result.get('score'))
+            except TypeError:
+                self.score = 0
             if not self.score:
                 self.score = 0
             self.ratings = result.get('ratings')

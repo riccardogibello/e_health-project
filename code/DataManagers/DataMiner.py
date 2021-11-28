@@ -15,7 +15,7 @@ import settings
 from Application import Application
 from DataManagers.DatabaseManager import do_query
 from DataManagers.DatabaseManager import insert_app_into_db, insert_id_into_preliminary_db as insert_preliminary, \
-    update_status_preliminary, delete_app_from_database, delete_app_from_labeled_app
+    update_status_preliminary, delete_app_from_database, delete_app_from_labeled_app, insert_developer
 from DataManagers.DatasetManager import is_english
 from WEBFunctions.web_mining_functions import find_web_page
 from settings import MAX_RETRIEVE_APP_DATA_THREADS, SERIOUS_GAMES_CATEGORIES_LIST, DEBUG, ADULT_RATINGS
@@ -59,7 +59,6 @@ def get_app_data(app_id):
         # None is returned and a new try to retrieve data will be made later
         application = None
 
-
     return application
 
 
@@ -75,9 +74,27 @@ def clean_description(description):
     return clean_text(clear_description)
 
 
+def check_app(app, from_dataset):
+    if not app or app.category not in SERIOUS_GAMES_CATEGORIES_LIST:
+        return False, False
+    if app.score == 0 and app.min_installs < 500:
+        #print(f"score {app.app_id} - {app.score} - {app.min_installs}")
+        return False, True
+    if app.updated < settings.LAST_UPDATE:
+        return False, True
+    if app.content_rating_description:
+        return False, True
+    if app.content_rating in ADULT_RATINGS:
+        return False, False
+    if not (from_dataset or is_english(app.title)):
+        return False, False
+    if not is_english(app.description):
+        return False, False
+    return True, True
+
+
 class DataMiner:
     __apps_id_list = []
-    b = 0
 
     def __init__(self):
         threading.currentThread().name = 'Data Miner'
@@ -102,10 +119,10 @@ class DataMiner:
         # Looks in the preliminary table for checked apps has not been checked yet
         # and save their IDs in self.__apps_id_list
         query = (
-            "SELECT app_id, from_dataset FROM preliminary WHERE preliminary.`check` IS FALSE"
+            "SELECT app_id, from_dataset FROM preliminary WHERE preliminary.`check` IS FALSE ORDER BY RAND()"
         )
         test_query = (
-            "SELECT A.app_id, B.from_dataset FROM app as A, preliminary as B WHERE A.app_id = B.app_id AND B.check IS FALSE"
+            "SELECT A.app_id, B.from_dataset FROM labeled_app as A, preliminary as B WHERE A.app_id = B.app_id"
         )
         try:
             self.__apps_id_list = do_query((), query)
@@ -155,17 +172,20 @@ class DataMiner:
         application = get_app_data(app_id)
         if not application:
             return
-        insert_app, insert_similar = self.check_app(application, from_dataset)
+        insert_app, insert_similar = check_app(application, from_dataset)
 
         if insert_app:
             application.description = clean_description(application.description)
-            try:
-                application.teacher_approved = is_teacher_approved_app(app_id)
-            except urllib.error.URLError:
-                return
+            application.teacher_approved = is_teacher_approved_app(app_id)
 
             if len(application.description) > 2:
                 insert_app_into_db(application)
+                if is_english(application.developer):
+                    insert_developer(application.developer_id, application.developer)
+
+            else:
+                insert_app = False
+
         if not insert_app:
             delete_app_from_database(app_id)
 
@@ -181,20 +201,3 @@ class DataMiner:
 
     def shutdown(self):
         self.__running = False
-
-    def check_app(self, app, from_dataset):
-        if not app or app.category not in SERIOUS_GAMES_CATEGORIES_LIST:
-            return False, False
-        if app.score <= 0 and app.min_installs < 500:
-            return False, True
-        if app.updated < settings.LAST_UPDATE:
-            return False, True
-        if app.content_rating_description:
-            return False, True
-        if app.content_rating in ADULT_RATINGS:
-            return False, False
-        if not (from_dataset or is_english(app.title)):
-            return False, False
-        if not is_english(app.description):
-            return False, False
-        return True, True

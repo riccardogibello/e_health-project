@@ -133,6 +133,13 @@ def insert_app_into_db(application):
 
     do_query(tuple_data=query_values, query=insert_query)
 
+def insert_developer(developer_id, developer_name):
+    if developer_id and developer_name:
+        do_query((developer_id, developer_name),(
+            "INSERT IGNORE INTO developer(id, name) "
+            "VALUES (%s, %s)"
+        ))
+
 
 class DatabaseManager:
     __connection_data = []

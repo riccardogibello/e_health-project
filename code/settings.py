@@ -31,8 +31,8 @@ MAX_DATASET_THREADS = min(multiprocessing.cpu_count(), 6)
 MAX_RETRIEVE_APP_DATA_THREADS = multiprocessing.cpu_count()*2
 
 # DEBUG
-DEBUG = True
-DATASET_DEBUG = True
+DEBUG = False
+DATASET_DEBUG = False
 
 # DATABASE SETTINGS
 MAX_CONNECTION_ATTEMPTS = 20

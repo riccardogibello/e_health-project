@@ -38,7 +38,9 @@ SELECT 'TRAINING SET', COUNT(*) FROM labeled_app
     UNION
 SELECT 'TRAINING SERIOUS', COUNT(*) FROM labeled_app WHERE human_classified IS TRUE
     UNION
-SELECT 'TRAINING NOT SERIOUS', COUNT(*) FROM labeled_app WHERE human_classified IS FALSE;
+SELECT 'TRAINING NOT SERIOUS', COUNT(*) FROM labeled_app WHERE human_classified IS FALSE
+    UNION
+SELECT 'DEVELOPERS', COUNT(*) FROM developer;
 
 
 UPDATE preliminary SET `check` = TRUE WHERE `check` IS FALSE;
