@@ -1,8 +1,5 @@
 import re
-from concurrent.futures import ThreadPoolExecutor
-from threading import Thread
 from numpy import arange
-
 from DataManagers.DatabaseManager import create_connection
 
 

@@ -5,6 +5,8 @@ import time
 import numpy as np
 from selenium import webdriver
 
+from DataModel.Library import Library
+from Utilities.Scrapers.PubMedScraper import PubMedScraper
 from WEBFunctions.web_mining_functions import find_available_categories
 
 
@@ -68,4 +70,6 @@ def label_apps():
 
 
 if __name__ == '__main__':
-    label_apps()
+    # label_apps()
+    p = PubMedScraper(Library())
+    p.find_apps_evidence()
