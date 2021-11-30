@@ -1,9 +1,6 @@
-import re
 import time
 import requests
-from DataModel.Publication import Publication
-from Scraper import Scraper
-from descriptions_sanitizer import sanitize_string
+from Utilities.Scrapers.Scraper import Scraper
 
 
 def format_query(query):
@@ -15,7 +12,6 @@ class NatureScraper(Scraper):
         super().__init__(library)
         self.find_serious_games_papers()
         self.find_cited_apps()
-        # find_apps_evidence()
 
     def find_serious_games_papers(self):
         keywords_list = ['serious games children', 'gamification children applications', 'mobile children applications']

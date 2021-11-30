@@ -32,17 +32,19 @@ CREATE TABLE `paper_keywords` (
 
 DROP TABLE IF EXISTS `author_paper`;
 CREATE TABLE `author_paper` (
-  `author` varchar(100),
+  `author_name` varchar(100),
+  `author_surname` varchar(100),
   `paper_id` varchar(200),
-  PRIMARY KEY (`author`, `paper_id`)
+  PRIMARY KEY (`author_name`, `author_surname`, `paper_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `author`;
 CREATE TABLE `author` (
   `name` varchar(100),
+  `surname` varchar(100),
   `quotes` integer,
   `papers` integer,
-  PRIMARY KEY (`name`)
+  PRIMARY KEY (`name`, `surname`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `paper`;

@@ -14,10 +14,3 @@ CREATE TABLE `category` (
   `category_id` varchar(30),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-DROP TABLE IF EXISTS `review`;
-CREATE TABLE `review` (
-  `app_id` varchar(100) NOT NULL,
-  `review` varchar(1000),
-  PRIMARY KEY (`app_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

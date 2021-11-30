@@ -58,6 +58,7 @@ def find_web_page(path):
     """
     try:
         req = Request(path, headers={'User-Agent': 'Mozilla/5.0'})
+        print('requesting ' + str(path))
         page = io.BytesIO(urllib.request.urlopen(req).read())
     except http.client.RemoteDisconnected:
         return io.BytesIO(urllib.request.urlopen(Request(path, headers={'User-Agent': 'Mozilla/5.0'})).read())

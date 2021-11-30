@@ -130,4 +130,4 @@ class Application:
             )
             result_tuple = do_query((application_id,), get_query)
             self.app_id = application_id
-            self.title = result_tuple[1]
+            self.title = result_tuple[0][1]

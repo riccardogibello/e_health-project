@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from pymed import PubMed
+from Application import Application
 from DataManagers.DatabaseManager import do_query
 from Utilities.Scrapers.Scraper import Scraper, format_query
 from WEBFunctions.web_mining_functions import find_web_page
@@ -8,6 +9,10 @@ mesh_terms = ['Child', 'Video Games', 'Models, Educational']
 
 
 def find_author_n_publications(author):
+    """
+    This method find, given an author, all the publications related to this author and to any of the
+    mesh terms reported above the method (mesh terms are a sort of tag used to index the papers on PubMed).
+    """
     total = 0
     query = '(' + author.name + ' ' + author.surname + '[Author])'
     for mesh_term in mesh_terms:
@@ -27,6 +32,9 @@ def find_author_n_publications(author):
 
 
 def find_app_related_papers(app_name):
+    """
+    This method finds all the papers which cite the name of the app.
+    """
     pubmed = PubMed(tool='ehealth_group07', email='riccardo.gibello@mail.polimi.it')
     results = pubmed.query(app_name, max_results=100)
 
@@ -65,20 +73,29 @@ class PubMedScraper(Scraper):
 
     def __init__(self, library):
         super().__init__(library)
+        self.find_apps_evidence()
 
     def find_apps_evidence(self):
+        """
+        This methods searches for publications on PubMed which contain as occurrence the name of the application.
+        Given an application, if some papers are found, for each the id, title, abstract and authors are extracted.
+        Then, each author is retrieved (and in case created) from the library. At the end a new publication instance
+        is created and added to the library (if not already created). Lastly, the application instance,
+        which is cited into the paper, is added to the cited_apps list into the related publication instance.
+        """
         query = 'SELECT app_id, app_name FROM selected_app'
         app_name_list = do_query('', query)
 
         for app_name_sublist in app_name_list:
             app_id = app_name_sublist[0]
             app_name = app_name_sublist[1]
+            application = Application(app_id, False)
             papers = find_app_related_papers(
                 app_name)  # list of dictionaries, each one containing the information about a paper
 
             if len(papers):
                 for paper in papers:
-                    paper_id = paper.get('pubmed_id')
+                    paper_pubmed__id = paper.get('pubmed_id')
                     paper_title = paper.get('title')
                     paper_abstract = paper.get('abstract')
                     if not paper_abstract:
@@ -90,4 +107,7 @@ class PubMedScraper(Scraper):
                         author = self.library.find_generic_author(author['firstname'], author['lastname'])
                         new_authors.append(author)
 
-                    self.create_publication(paper_title, paper_abstract, authors)
+                    publication = self.create_pubmed_publication(paper_title, paper_abstract, authors, paper_pubmed__id)
+                    publication.add_cited_app(application)
+
+        self.library.persist_data()
