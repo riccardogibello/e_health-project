@@ -4,12 +4,13 @@
 /code/__pycache__
 /code/DataManagers/__pycache__
 /code/GUI/__pycache__
-/code/Utilities/__pycache__
+/code/Utilities/Scrapers/__pycache__
 /code/DataModel/__pycache__
 /code/WEBFunctions/__pycache__
-/__pycache__
+/__pycache__/
 /data/input_data/kaggle_playstore_apps_new.csv
 /data/input_data/dump_database.csv
 /data/input_data/last_analyzed.txt
 /data/input_data/descr_test.txt
 /data/input_data/descr_test_sanitized.txt
+**/__pycache__
