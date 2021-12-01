@@ -7,10 +7,10 @@ from DataManagers.WordsMiner import *
 import tkinter as tk
 from GUI.ApplicationGUI import ApplicationGUI
 
-word_miner = WordsMiner({'wikipage': 'https://en.wikipedia.org/wiki/Serious_game',
-                         'paper_1': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5222787/pdf/fpsyt-07'
-                                    '-00215.pdf',
-                         'paper_2': 'https://www.hindawi.com/journals/ijcgt/2014/787968/'})
+#word_miner = WordsMiner({'wikipage': 'https://en.wikipedia.org/wiki/Serious_game',
+#                         'paper_1': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5222787/pdf/fpsyt-07'
+#                                    '-00215.pdf',
+#                         'paper_2': 'https://www.hindawi.com/journals/ijcgt/2014/787968/'})
 
 
 def launch_data_miner():

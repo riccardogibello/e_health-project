@@ -107,8 +107,8 @@ class LogRegClassifier:
         for label_predicted in y:
             if label_predicted:
                 app_id = str(app_id_list[i][0])
-                query = "INSERT INTO selected_app SELECT * FROM app WHERE %s = app.app_id"
-                do_query([app_id], query)
+                do_query((app_id,), "INSERT INTO selected_app SELECT * FROM app WHERE %s = app.app_id")
+                do_query([app_id], "UPDATE app_features SET machine_classified = TRUE WHERE %s = app_id")
             i = i + 1
 
         print('=================================================================================================')

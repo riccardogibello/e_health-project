@@ -2,6 +2,21 @@ import random
 from numpy import arange
 from DataManagers.DatabaseManager import do_query, clear_table, multiple_query
 from settings import *
+import regex as re
+
+
+def get_words():
+    serious_words_file = open('data/input_data/words/serious_words.txt', 'r').readlines()
+    serious_words = []
+    non_serious_words_file = open('data/input_data/words/non_serious_words.txt', 'r').readlines()
+    non_serious_words = []
+
+    for word in serious_words_file:
+        serious_words.append(re.sub(r"[\n]+", " ", word))
+    for word in non_serious_words_file:
+        non_serious_words.append(re.sub(r"[\n]+", " ", word))
+
+    return serious_words, non_serious_words
 
 
 class FeatureExtractor:
@@ -9,7 +24,7 @@ class FeatureExtractor:
     indexes_to_analyze = []
 
     def __init__(self, words):
-        self.serious_games_words = words
+        self.serious_games_words, self.non_serious_game_words = get_words()
 
     def compute_training_features(self):
         clear_table('app_features')
@@ -102,10 +117,10 @@ class FeatureExtractor:
         word_occurrence = {}
         global_occurrences = 0
         for serious_word in self.serious_games_words:
-            if serious_word in app_name or serious_word in app_description:
-                global_occurrences += len(serious_word.split()*10)
+            if serious_word in app_description or serious_word in app_name:
+                global_occurrences += len(serious_word.split())
                 word_occurrence.__setitem__(serious_word, 1)
-        if global_occurrences == 0:
-            if 5 < random.randint(1,10):
-                global_occurrences = (-1) * random.randint(1,25)
+        for non_serious_word in self.non_serious_game_words:
+            if non_serious_word in app_description:
+                global_occurrences += (-1.05)*len(non_serious_word.split())
         return global_occurrences, word_occurrence
