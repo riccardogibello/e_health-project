@@ -1,13 +1,10 @@
 import multiprocessing
 
 from DataManagers.DataMiner import DataMiner
-from DataManagers.DatabaseManager import clear_table
 from DataManagers.DatasetManager import DatasetManager
 from DataManagers.OldDatasetManager import OldDatasetManager
-from DataManagers.WordsMiner import WordsMiner
-from Utilities.FeatureExtractor import FeatureExtractor
-from Utilities.LogRegClassifier import LogRegClassifier
-from Utilities.MNBayesClassifier import MNBayesClassifier
+from Utilities.Classifiers.FeatureExtractor import FeatureExtractor
+from Utilities.Classifiers.LogRegClassifier import LogRegClassifier
 from WEBFunctions.web_mining_functions import find_available_categories
 from settings import KAGGLE_DATASET_PATH, SERIOUS_WORDS
 

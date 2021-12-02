@@ -40,6 +40,32 @@ def do_query(tuple_data, query):
     return result
 
 
+def do_multiple_queries(dict_query_paramstuple):
+    # establishing the connection
+    conn = create_connection()
+
+    # Creating a cursor object using the cursor() method
+    cursor = conn.cursor()
+    query_result_dict = {}
+
+    try:
+        # Executing the SQL command
+        for query in dict_query_paramstuple.keys():
+            params = dict_query_paramstuple.get(query)
+            cursor.execute(query, params)
+            result = cursor.fetchall()
+            query_result_dict.__setitem__(query, result)
+        # Commit your changes in the database
+        conn.commit()
+    except EnvironmentError:
+        # Rolling back in case of error
+        conn.rollback()
+
+    # Closing the connection
+    conn.close()
+    return query_result_dict
+
+
 def multiple_query(tuple_list, query):
     # establishing the connection
     conn = create_connection()
@@ -133,9 +159,10 @@ def insert_app_into_db(application):
 
     do_query(tuple_data=query_values, query=insert_query)
 
+
 def insert_developer(developer_id, developer_name):
     if developer_id and developer_name:
-        do_query((developer_id, developer_name),(
+        do_query((developer_id, developer_name), (
             "INSERT IGNORE INTO developer(id, name) "
             "VALUES (%s, %s)"
         ))

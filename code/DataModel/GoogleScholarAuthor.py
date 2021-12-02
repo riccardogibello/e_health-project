@@ -6,8 +6,6 @@ from WEBFunctions.web_mining_functions import find_web_page
 
 
 class GoogleScholarAuthor(Author):
-    author_link_2_pubs = ''
-
     def __init__(self, author_name, author_surname, author_link_2_pubs):
         super().__init__(author_name, author_surname)
         self.author_link_2_pubs = author_link_2_pubs

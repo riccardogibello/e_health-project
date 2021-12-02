@@ -6,6 +6,8 @@ import numpy as np
 from selenium import webdriver
 
 from DataModel.Library import Library
+from DataModel.Publication import Publication
+from Utilities.Classifiers.PaperClassifier import PaperClassifier
 from Utilities.Scrapers.NatureScraper import NatureScraper
 from Utilities.Scrapers.PubMedScraper import PubMedScraper
 from WEBFunctions.web_mining_functions import find_available_categories
@@ -72,6 +74,20 @@ def label_apps():
 
 if __name__ == '__main__':
     # label_apps()
-    library = Library()
-    p = PubMedScraper(library)
+    # library = Library()
     # p = NatureScraper(library)
+    # p = NatureScraper(library)
+
+    # ===============================================================
+    # DEBUGGING PART
+    paper_classifier = PaperClassifier()
+    query = 'SELECT paper_title, abstract FROM paper LIMIT 1'
+    result = do_query('', query)
+    paper = Publication(result[0][0], result[0][1], '')
+    class_given = paper_classifier.classify_paper(paper)
+    print('The paper was classified as ' + class_given + '\n')
+    print('===============================================================\n')
+    print('TITLE : ' + str(result[0][0]) + '\n')
+    print('===============================================================\n')
+    print('ABSTRACT : ' + str(result[0][1]) + '\n')
+    print('===============================================================\n')

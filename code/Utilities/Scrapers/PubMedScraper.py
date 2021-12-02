@@ -5,7 +5,7 @@ from DataManagers.DatabaseManager import do_query
 from Utilities.Scrapers.Scraper import Scraper, format_query
 from WEBFunctions.web_mining_functions import find_web_page
 
-mesh_terms = ['Child', 'Video Games', 'Models, Educational']
+mesh_terms = ['Video Games']  # TODO : , 'Child', 'Models, Educational']
 
 
 def find_author_n_publications(author):

@@ -14,7 +14,8 @@ class NatureScraper(Scraper):
         self.find_cited_apps()
 
     def find_serious_games_papers(self):
-        keywords_list = ['serious games children', 'gamification children applications', 'mobile children applications']
+        keywords_list = [
+            'serious games children']  # TODO: , 'gamification children applications', 'mobile children applications']
         page_length = 50
         start = 1
 
@@ -40,7 +41,7 @@ class NatureScraper(Scraper):
 
                 self.find_information(json_result)
 
-        print('ended')
+        self.library.persist_data()
 
     def find_information(self, json_result):
         publications = json_result['records']

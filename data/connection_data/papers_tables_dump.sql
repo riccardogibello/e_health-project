@@ -50,8 +50,8 @@ CREATE TABLE `author` (
 DROP TABLE IF EXISTS `paper`;
 CREATE TABLE `paper` (
   `paper_id` integer NOT NULL AUTO_INCREMENT,
-  `paper_title` varchar(500),
-  `abstract` varchar(4000),
+  `paper_title` varchar(1000),
+  `abstract` varchar(10000),
   `type` varchar(100),
   `pubmed_id` integer,
   PRIMARY KEY (`paper_id`)

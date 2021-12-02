@@ -1,11 +1,12 @@
-from DataManagers.DatabaseManager import do_query
+from DataManagers.DatabaseManager import do_query, do_multiple_queries
 from DataModel.Author import Author
 from DataModel.GoogleScholarAuthor import GoogleScholarAuthor
 
 
 class Library:
-    publications = []
-    authors = []
+    def __init__(self):
+        self.publications = []
+        self.authors = []
 
     def add_publication(self, publication):
         for pub in self.publications:
@@ -48,26 +49,25 @@ class Library:
 
     def persist_publications(self):
         for publication in self.publications:
-            query = 'START TRANSACTION; ' \
-                    'INSERT INTO paper(paper_title, abstract) VALUES (%s, %s);' \
-                    'SELECT LAST_INSERT_ID();' \
-                    'COMMIT;'
-            sql_pub_id = do_query((publication.title, publication.abstract), query)
+            query_par_dict = {'START TRANSACTION': '',
+                              'INSERT IGNORE INTO paper(paper_title, abstract) VALUES (%s, %s)': (
+                                  publication.title, publication.abstract),
+                              'SELECT LAST_INSERT_ID()': '', 'COMMIT': ''}
+
+            results = do_multiple_queries(query_par_dict)
+            sql_pub_id = results.get('SELECT LAST_INSERT_ID()')[0][0]
+            publication.id = sql_pub_id
 
             for application in publication.cited_apps:
-                query = 'INSERT INTO app_paper(paper_id, app_id) VALUES (%s, %s)'
+                query = 'INSERT IGNORE INTO app_paper(paper_id, app_id) VALUES (%s, %s)'
                 do_query((sql_pub_id, application.app_id), query)
 
     def persist_authors(self):
         for author in self.authors:
-            query = 'INSERT INTO author(name, surname, papers) VALUES (%s, %s, %s)'
+            query = 'INSERT IGNORE INTO author(name, surname, papers) VALUES (%s, %s, %s)'
             do_query((author.name, author.surname, author.n_published_papers), query)
             publications = author.publications
             for publication in publications:
-                query = 'SELECT paper_id FROM paper WHERE paper_title = %s LIMIT 1'
-                result = do_query(publication.title, query)
-                if not result:
-                    continue
-                publication_id = result[0][0]
-                query = 'INSERT INTO author_paper(author_name, author_surname, paper_id) VALUES (%s, %s, %s)'
-                do_query((author.name, author.surname, publication_id), query)
+                publication_id = publication.id
+                query = 'INSERT IGNORE INTO author_paper(author_name, author_surname, paper_id) VALUES (%s, %s, %s)'
+                do_query((str(author.name), str(author.surname), publication_id), query)

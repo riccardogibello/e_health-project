@@ -20,25 +20,31 @@ class Scraper:
         results = do_query('', query)
 
         publications = self.library.publications
-        cited_apps = {}
 
         for result in results:
             app_id = result[0]
             app_name = result[1]
 
             for publication in publications:
+                pub_id = publication.id
                 title = publication.title
                 abstract = publication.abstract
 
                 if app_name in title or app_name in abstract:
-                    cited_apps.__setitem__(app_id, app_name)
-        return cited_apps
+                    query = 'INSERT IGNORE INTO app_paper(paper_id, app_id) VALUES (%s, %s)'
+                    do_query((pub_id, app_id), query)
 
     def create_publication(self, title, abstract, authors):
+        """
+        This method creates a new publication (if not already existing) and then adds this publication (if not already
+        present) to each author
+        """
         title = sanitize_string(title)
         title = re.sub(r'"+', "", title)
         publication = Publication(title, abstract, authors)
         self.library.add_publication(publication)
+        for author in authors:
+            author.add_publication(publication)
 
     def create_pubmed_publication(self, title, abstract, authors, pubmed_id):
         title = sanitize_string(title)
