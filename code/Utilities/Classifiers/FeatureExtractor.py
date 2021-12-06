@@ -27,14 +27,13 @@ class FeatureExtractor:
 
     def compute_training_features(self):
         clear_table('app_features')
-        query = "SELECT * FROM app WHERE app_id IN (SELECT app_id FROM labeled_app) LIMIT 100"
-        # TODO : eliminate the LIMIT
+        query = "SELECT * FROM app WHERE app_id IN (SELECT app_id FROM labeled_app)"
         app_details = do_query('', query)
         self.generate_feature(app_details)
 
     def compute_features(self):
         clear_table('app_features')
-        query = "SELECT * FROM app LIMIT 100"  # TODO : eliminate the LIMIT
+        query = "SELECT * FROM app"
         app_details = do_query('', query)
         self.generate_feature(app_details)
 

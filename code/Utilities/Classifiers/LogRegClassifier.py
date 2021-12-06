@@ -269,6 +269,7 @@ class LogRegClassifier:
 
         # The following line is added at debugging time to avoid having all teacher-approved applications = 0
         # (error in computation of z-score)
+        # TODO : remove the following line after debug
         # feature_dataset.at[0, 'teacher_approved'] = 1
 
         x = zscore(feature_dataset[['serious_words_count', 'teacher_approved', 'score_rating', 'category_id']].values)
