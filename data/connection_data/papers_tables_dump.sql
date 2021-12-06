@@ -57,3 +57,12 @@ CREATE TABLE `paper` (
   PRIMARY KEY (`paper_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+DROP TABLE IF EXISTS `test_paper`;
+CREATE TABLE `test_paper` (
+  `paper_id` integer NOT NULL AUTO_INCREMENT,
+  `text` varchar(10000),
+  `true_type` integer,
+  `predicted_type` integer,
+  PRIMARY KEY (`paper_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+

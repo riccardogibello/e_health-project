@@ -1,7 +1,6 @@
 import random
-from numpy import arange
 from DataManagers.DatabaseManager import do_query, clear_table, multiple_query
-from settings import *
+from DataManagers.settings import *
 import regex as re
 
 
@@ -28,13 +27,14 @@ class FeatureExtractor:
 
     def compute_training_features(self):
         clear_table('app_features')
-        query = "SELECT * FROM app WHERE app_id IN (SELECT app_id FROM labeled_app)"
+        query = "SELECT * FROM app WHERE app_id IN (SELECT app_id FROM labeled_app) LIMIT 100"
+        # TODO : eliminate the LIMIT
         app_details = do_query('', query)
         self.generate_feature(app_details)
 
     def compute_features(self):
         clear_table('app_features')
-        query = "SELECT * FROM app"
+        query = "SELECT * FROM app LIMIT 100"  # TODO : eliminate the LIMIT
         app_details = do_query('', query)
         self.generate_feature(app_details)
 
@@ -42,7 +42,7 @@ class FeatureExtractor:
         insert_query = "INSERT IGNORE INTO app_features(app_id, serious_words_count, teacher_approved, score, rating, " \
                        "category_id) " \
                        "VALUES (%s, %s, %s, %s, %s, %s)"
-        i = 0
+
         computed_features = []
         for app in app_details_list:
             computed_features.append(self.compute_features_values(app))

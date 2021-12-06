@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from pymed import PubMed
-from Application import Application
+from DataModel.Application import Application
 from DataManagers.DatabaseManager import do_query
 from Utilities.Scrapers.Scraper import Scraper, format_query
 from WEBFunctions.web_mining_functions import find_web_page
@@ -19,7 +19,9 @@ def find_author_n_publications(author):
         query = '(' + query + ' AND (' + mesh_term + '[MeSH Major Topic]))'
         # TODO : very unlikely that some results will be found with this further constraint given by MESH tokens
         url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=' + query \
-              + '&usehistory=y'
+              + '&sort=date'
+        # TODO : in previous query &sort=date set in place of &usehistory=y
+
         url = format_query(url)
         page = find_web_page(url)
         soup = BeautifulSoup(page, 'lxml')

@@ -3,10 +3,8 @@ import multiprocessing
 from DataManagers.DataMiner import DataMiner
 from DataManagers.DatasetManager import DatasetManager
 from DataManagers.OldDatasetManager import OldDatasetManager
-from Utilities.Classifiers.FeatureExtractor import FeatureExtractor
 from Utilities.Classifiers.LogRegClassifier import LogRegClassifier
-from WEBFunctions.web_mining_functions import find_available_categories
-from settings import KAGGLE_DATASET_PATH, SERIOUS_WORDS
+from DataManagers.settings import KAGGLE_DATASET_PATH
 
 
 def execute_data_miner():
@@ -25,14 +23,12 @@ def execute_old_dataset_manager():
 
 
 def execute_classification():
-    find_available_categories()
-    words = SERIOUS_WORDS
-    feature_extractor = FeatureExtractor(words)
-    feature_extractor.compute_training_features()
-
     classifier = LogRegClassifier()
-    classifier.train_model()
-    feature_extractor.compute_features()
+    for i in range(10):
+        classifier.train_model(final=False)
+        # TODO : update
+    path = classifier.train_model(final=True)
+    classifier.load_model(path)
     classifier.classify_apps()
 
 

@@ -50,7 +50,7 @@ def split_text(text):
     return words
 
 
-def sanitize_text(text):
+def sanitize_and_tokenize(text):
     text = text.lower()
     new_string = str(text.encode('ascii', errors='ignore').decode())
     new_string = re.sub(r"[ ]+", " ", new_string)
@@ -132,7 +132,7 @@ class WordsMiner:
             else:
                 text = find_text_from_web_page(path)
 
-            words = sanitize_text(text)  # the method returns a list of words found in the text
+            words = sanitize_and_tokenize(text)  # the method returns a list of words found in the text
 
             occurrence_word_dictionary = count_occurrences(words)  # return value -> { key = word, value = #occurrence }
             occurrences = sorted(

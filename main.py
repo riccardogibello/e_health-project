@@ -1,9 +1,8 @@
 from cefpython3 import cefpython as cef
 
 from DataManagers.OldDatasetManager import *
-from ProcessManager import ProcessManager
+from GUI.ProcessManager import ProcessManager
 from DataManagers.DataMiner import DataMiner
-from DataManagers.WordsMiner import *
 import tkinter as tk
 from GUI.ApplicationGUI import ApplicationGUI
 

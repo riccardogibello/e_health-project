@@ -115,7 +115,7 @@ class ApplicationGUI(tk.Frame):
         self.__auto_classifier_thread.join()
 
     def manual_classify_window(self):
-        self.root.update()
+        # self.root.update()
         mc_window = tk.Toplevel(self)
 
         x_coordinate = int((self.screen_width / 2) - 600)

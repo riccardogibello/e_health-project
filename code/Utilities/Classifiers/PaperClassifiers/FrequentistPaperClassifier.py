@@ -1,11 +1,10 @@
 import os
 import numpy as np
-
 from DataManagers.DatabaseManager import do_query
-from DataModel.Publication import Publication
+from Utilities.Classifiers.PaperClassifiers.PaperClassifier import PaperClassifier
 
 
-class PaperClassifier:
+class FrequentistPaperClassifier(PaperClassifier):
     """
     This class is used in order to classify a particular publication in one of the 8 possible classes.
     These are: Case Control, Case Series, Cohort Study, Meta Analysis, Observational Study, Other, RCT and Systematic
@@ -13,6 +12,7 @@ class PaperClassifier:
     """
 
     def __init__(self):
+        super().__init__()
         self.class_words__dictionary = {}  # this is a dictionary in which for every class (key)
         # a list of the related words is provided (value)
 
@@ -36,6 +36,8 @@ class PaperClassifier:
         class_array = []
         occurrence_array = []
         for class_ in self.class_words__dictionary.keys():
+            # for each type of publication, compute the total count of
+            # the occurrences of the words given in the vocabularies
             class_array.append(class_)
 
             title = publication.title
@@ -47,8 +49,13 @@ class PaperClassifier:
 
             occurrence_array.append(total_occurrences)
 
+        # find the class with the maximum number of occurrences of the words in the given publication abstract and title
         occurrence_array = np.array(occurrence_array)
         index_max = np.argmax(occurrence_array)
         assert (len(occurrence_array) == len(class_array))
+
+        # now updates the value in the table 'paper' for the given publication
+        query = 'UPDATE paper SET type = %s WHERE paper_id = %s'
+        do_query((class_array[index_max], publication.id), query)
 
         return class_array[index_max]

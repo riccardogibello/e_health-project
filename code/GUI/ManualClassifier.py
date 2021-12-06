@@ -1,5 +1,5 @@
 from DataManagers import DatabaseManager
-from settings import  DEBUG
+from DataManagers.settings import  DEBUG
 
 
 class ManualClassifier:

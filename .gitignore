@@ -14,3 +14,5 @@
 /data/input_data/descr_test.txt
 /data/input_data/descr_test_sanitized.txt
 **/__pycache__
+/data/models/
+/data/output_data/

@@ -4,7 +4,7 @@ from cefpython3 import cefpython as cef
 import ctypes
 import tkinter as tk
 import platform
-from ManualClassifier import ManualClassifier
+from GUI.ManualClassifier import ManualClassifier
 
 # Fix for PyCharm hints warnings
 WindowUtils = cef.WindowUtils()
