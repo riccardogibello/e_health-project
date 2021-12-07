@@ -1,5 +1,4 @@
 from cefpython3 import cefpython as cef
-
 from DataManagers.OldDatasetManager import *
 from GUI.ProcessManager import ProcessManager
 from DataManagers.DataMiner import DataMiner

@@ -5,10 +5,12 @@ import time
 import numpy as np
 from selenium import webdriver
 
+from DataModel.Library import Library
 from DataModel.Publication import Publication
 from Utilities.Classifiers.LogRegClassifier import LogRegClassifier
 from Utilities.Classifiers.PaperClassifiers.FrequentistPaperClassifier import PaperClassifier
 from Utilities.Classifiers.PaperClassifiers.NBayesPaperClassifier import NBayesPaperClassifier
+from Utilities.Scrapers.NatureScraper import NatureScraper
 
 
 def browse(url_to_open, how_long):
@@ -79,12 +81,13 @@ if __name__ == '__main__':
 
     # classifier = NBayesPaperClassifier(True)
 
-    '''classifier = LogRegClassifier()
-    for i in range(1):
+    classifier = LogRegClassifier()
+    for i in range(10):
         classifier.train_model(final=False)
+        # TODO : update
     path = classifier.train_model(final=True)
     classifier.load_model(path)
-    classifier.classify_apps()'''
+    classifier.classify_apps()
 
     # ===============================================================
     # DEBUGGING PART

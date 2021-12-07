@@ -5,12 +5,13 @@ import tkinter.font
 
 from cefpython3 import cefpython as cef
 from PIL import Image, ImageTk
-from GUI.ClassifierBrowser import ClassifierBrowser
+from GUI.HomePage import HomePage
 
 
 class ApplicationGUI(tk.Frame):
     def __init__(self, root, process_manager):
-
+        super().__init__()
+        self.homepage = None
         self.font = tkinter.font.Font(family="Calibri", size=16, weight="normal")
 
         self.main_height = 800
@@ -34,98 +35,20 @@ class ApplicationGUI(tk.Frame):
         self.root.config(bg='white')
         self.root.title("Google Play - Serious Games Finder")
         self.root.resizable(False, False)
+        self.create_homepage()
 
-        # Logo
-        logo = Image.open('resources/images/Google_Play-Logo.wine.png')
-        logo = logo.resize((self.main_width, int(self.main_width / 3)))
-        logo = ImageTk.PhotoImage(logo)
-        logo_label = tk.Label(image=logo)
-        logo_label.image = logo
-        logo_label.grid(column=1, row=0)
+    def create_homepage(self):
+        self.homepage = HomePage(self)
 
-        self.menu_button_width = 41
-        self.menu_button_height = 2
+    def destroy_homepage(self):
+        self.homepage.destroy()
 
-        # Dataset Button
-        self.new_dataset_button = tk.Button(root, text='Load data from new dataset',
-                                            width=self.menu_button_width, height=self.menu_button_height,
-                                            bg="#3bccff", font=self.font,
-                                            command=self.new_dataset_command)
-        self.new_dataset_button.grid(column=1, row=1)
+    def destroy_graphic(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
 
-        # Dataset Button
-        self.old_dataset_button = tk.Button(root, text='Load data from old dataset',
-                                            width=self.menu_button_width, height=self.menu_button_height,
-                                            bg="#48ff48", font=self.font,
-                                            command=self.old_dataset_command)
-        self.old_dataset_button.grid(column=1, row=2)
+        self.root.update()
 
-        # Data Miner Button
-        self.data_miner_button = tk.Button(root, text='Retrieve data from google play',
-                                           width=self.menu_button_width, height=self.menu_button_height,
-                                           bg="#ffd400", font=self.font, command=self.data_miner_command)
-        self.data_miner_button.grid(column=1, row=3)
-
-        # Manual classification Button
-        self.manual_classify_button = tk.Button(root, text='Classify applications manually',
-                                                width=self.menu_button_width, height=self.menu_button_height,
-                                                bg="#ff3333", font=self.font, command=self.manual_classify_command)
-        self.manual_classify_button.grid(column=1, row=4)
-
-        # Data Miner Button
-        self.auto_classify_button = tk.Button(root, text='Automatic apps classification',
-                                              width=self.menu_button_width, height=self.menu_button_height,
-                                              bg="#3bccff", font=self.font, command=self.auto_classify_command)
-        self.auto_classify_button.grid(column=1, row=5)
-
-        # Exit Button
-        exit_button = tk.Button(root, text='Exit', width=self.menu_button_width, height=self.menu_button_height,
-                                font=self.font, command=self.exit_button_command)
-        exit_button.grid(column=1, row=6)
-
-        tk.Frame.__init__(self, root)
-
-    def data_miner_command(self):
-        self.data_miner_button.config(state='disabled')
-        self.__data_miner_button_thread = threading.Thread(target=self.__process_manager.launch_data_miner)
-        self.__data_miner_button_thread.start()
-        self.__data_miner_button_thread.join()
-        # self.data_miner_button.config(state='normal')
-
-    def new_dataset_command(self):
-        self.new_dataset_button.config(state='disabled')
-        self.__new_dataset_button_thread = threading.Thread(target=self.__process_manager.launch_new_dataset)
-        self.__new_dataset_button_thread.start()
-        self.__new_dataset_button_thread.join()
-
-    def old_dataset_command(self):
-        self.old_dataset_button.config(state='disabled')
-        self.__old_dataset_button_thread = threading.Thread(target=self.__process_manager.launch_old_dataset)
-        self.__old_dataset_button_thread.start()
-        self.__old_dataset_button_thread.join()
-
-    def manual_classify_command(self):
-        self.__manual_classifier_thread = threading.Thread(target=self.manual_classify_window())
-        self.__manual_classifier_thread.start()
-        self.__manual_classifier_thread.join()
-
-    def auto_classify_command(self):
-        self.__auto_classifier_thread = threading.Thread(target=self.__process_manager.do_classification_dataset)
-        self.__auto_classifier_thread.start()
-        self.__auto_classifier_thread.join()
-
-    def manual_classify_window(self):
-        # self.root.update()
-        mc_window = tk.Toplevel(self)
-
-        x_coordinate = int((self.screen_width / 2) - 600)
-        y_coordinate = int((self.screen_height / 2))
-        mc_window.geometry(f"{1200}x{800}+{x_coordinate}+{y_coordinate}")
-
-        window = ClassifierBrowser(mc_window, None)
-
-    def exit_button_command(self):
-        self.root.destroy()
 
 
 if __name__ == '__main__':

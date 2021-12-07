@@ -100,7 +100,14 @@ class LogRegClassifier:
         self.trained_models_list = []
         self.performance_metrics_list = []
         self.results = []
-        self.final_model = LogisticRegression(penalty='l2')
+
+    def reset(self):
+        self.x = []
+        self.t = []
+        self.ids = []
+        self.trained_models_list = []
+        self.performance_metrics_list = []
+        self.results = []
 
     def find_number_and_indexes_serious_games(self):
         n_serious_games = 0
@@ -164,6 +171,7 @@ class LogRegClassifier:
         # TODO : describe the update
 
         set_environment(is_train=True)
+        self.reset()
 
         feature_dataframe = extract_dataframe()
 
@@ -207,16 +215,16 @@ class LogRegClassifier:
             # evaluate the model on the training set
             y_pred_list_train = self.trained_models_list[iteration].predict(
                 x_train)  # predict_proba to have the probability estimate as output
-            if final:
-                self.save_and_print_performances(y_pred_list_train, y_train, 'Train_',
-                                                 save_model_performances=False)
+            self.save_and_print_performances(y_pred_list_train, y_train, 'Train_',
+                                             save_model_performances=False,
+                                             is_final=final)
 
             # evaluate the model on the test set
             y_pred_list_test = self.trained_models_list[iteration].predict(
                 x_test)  # predict_proba to have the probability estimate as output
-            if final:
-                self.save_and_print_performances(y_pred_list_test, y_test, 'Test_',
-                                                 save_model_performances=True)
+            self.save_and_print_performances(y_pred_list_test, y_test, 'Test_',
+                                             save_model_performances=True,
+                                             is_final=final)
 
             # now save the results of the test set.
             # So, a list of ['id_app', 'true_label', 'predicted_label'] is provided.
@@ -234,11 +242,11 @@ class LogRegClassifier:
                 return exp_file_path
 
     def load_model(self, path):
-        self.trained_models_list = []
+        self.reset()
         f_in = open(path, 'rb')
         self.trained_models_list.append(pickle.load(f_in))
 
-    def save_and_print_performances(self, y_pred, y, model_name, save_model_performances):
+    def save_and_print_performances(self, y_pred, y, model_name, save_model_performances, is_final):
         cm = confusion_matrix(y_true=transform_labels(y),
                               y_pred=transform_labels(y_pred),
                               labels=['Serious Game', 'Non-Serious Game'])
@@ -255,7 +263,8 @@ class LogRegClassifier:
                                                                     recall=recall_score(y, y_pred),
                                                                     f1=f1_score(y, y_pred)))
 
-        save_confusion_matrix(5, 3, 3, 2, cm_df, './data/output_data/' + str(model_name) + '_Model.png')
+        if is_final:
+            save_confusion_matrix(5, 3, 3, 2, cm_df, './data/output_data/' + str(model_name) + '_Model.png')
 
     def classify_apps(self):
         clear_table('selected_app')

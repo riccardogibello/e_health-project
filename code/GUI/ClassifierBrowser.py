@@ -1,5 +1,5 @@
 import tkinter.messagebox
-
+from PIL import Image, ImageTk
 from cefpython3 import cefpython as cef
 import ctypes
 import tkinter as tk
@@ -21,7 +21,8 @@ MAC = (platform.system() == "Darwin")
 
 class ClassifierBrowser(tk.Frame):
 
-    def __init__(self, root, classifier):
+    def __init__(self, application_gui, classifier):
+        root = application_gui.root
         self.browser_frame = None
         self.navigation_bar = None
         self.default_page = None
@@ -35,19 +36,18 @@ class ClassifierBrowser(tk.Frame):
         # MainFrame
         tk.Frame.__init__(self, root)
         self.master.title("Serious Game manual classifier")
-        self.master.protocol("WM_DELETE_WINDOW", self.on_close)
-        self.master.bind("<Configure>", self.on_root_configure)
         self.bind("<Configure>", self.on_configure)
 
         # NavigationBar
-        self.navigation_bar = NavigationBar(self)
+        self.navigation_bar = NavigationBar(self, application_gui)
         self.navigation_bar.grid(row=0, column=0)
         tk.Grid.rowconfigure(self, 0, weight=0)
         tk.Grid.columnconfigure(self, 0, weight=0)
 
         # BrowserFrame
         self.browser_frame = BrowserFrame(self, self.default_page, self.navigation_bar)
-        self.browser_frame.grid(row=1, column=0,
+        self.browser_frame.grid(row=1,
+                                column=0,
                                 sticky=(tk.N + tk.S + tk.E + tk.W))
         tk.Grid.rowconfigure(self, 1, weight=1)
         tk.Grid.columnconfigure(self, 0, weight=1)
@@ -157,7 +157,9 @@ class BrowserFrame(tk.Frame):
 
 
 class NavigationBar(tk.Frame):
-    def __init__(self, master):
+    def __init__(self, master, application_gui):
+        self.master = master
+        self.application_gui = application_gui
         self.not_serious_state = tk.NONE
         self.serious_state = tk.NONE
         # Classifier variables
@@ -195,6 +197,14 @@ class NavigationBar(tk.Frame):
         self.not_serious_button = tk.Button(self, image=self.not_serious_image, command=self.not_serious_function)
         self.not_serious_button.config(state='disabled')
         self.not_serious_button.grid(row=0, column=4)
+
+        # Go Back to Homepage button
+        image = Image.open('resources/images/home.png')
+        img = image.resize((261, 41))
+        self.homepage_image = ImageTk.PhotoImage(img)
+        self.homepage_button = tk.Button(self, image=self.homepage_image, command=self.homepage_function)
+        # self.homepage_button.config(state='disabled')
+        self.homepage_button.grid(row=0, column=5)
 
         self.stop_image = tk.PhotoImage(file='resources/images/stop_image.png')
 
@@ -251,3 +261,8 @@ class NavigationBar(tk.Frame):
             self.master.master.destroy()
             return
         self.master.get_browser().LoadUrl(url_to_load)
+
+    def homepage_function(self):
+        self.application_gui.destroy_graphic()
+        self.application_gui.create_homepage()
+
