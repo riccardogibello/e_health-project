@@ -16,9 +16,10 @@ from sklearn.metrics import confusion_matrix, accuracy_score, f1_score, recall_s
 from DataManagers.settings import SERIOUS_WORDS
 from DataModel.PerformanceMetrics import PerformanceMetrics
 from DataModel.Results import Results
-from Utilities.Classifiers.FeatureExtractor import FeatureExtractor
+from Utilities.Classifiers.FeatureExtractor import FeatureExtractor, get_dictionary
 from Utilities.ConfusionMatrixPrinter import save_confusion_matrix
 from WEBFunctions.web_mining_functions import find_available_categories
+from DataManagers.settings import DICTIONARY_INCREMENT, TRUE_CLASSIFIED_INCREMENT, WRONG_CLASSIFIED_INCREMENT
 
 
 def retrieve_app_features():
@@ -59,7 +60,7 @@ def set_environment(is_train):
     words = SERIOUS_WORDS  # this is a hand-crafted vocabulary of serious-games related words
 
     # Then find all the features of the training applications (the ones manually labeled)
-    feature_extractor = FeatureExtractor(words)
+    feature_extractor = FeatureExtractor()
     if is_train:
         feature_extractor.compute_training_features()
     else:
@@ -92,6 +93,45 @@ def extract_dataframe():
     return feature_dataset
 
 
+def load_dictionaries():
+    serious_dictionary = get_dictionary('data/input_data/words/serious_dictionary.txt')
+    not_serious_dictionary = get_dictionary('data/input_data/words/not_serious_dictionary.txt')
+    return serious_dictionary, not_serious_dictionary
+
+
+def save_dictionaries(serious_dictionary, not_serious_dictionary):
+    serious_file = open('data/input_data/words/serious_dictionary.txt', 'w')
+    not_serious_file = open('data/input_data/words/not_serious_dictionary.txt', 'w')
+
+    for word in serious_dictionary:
+        serious_file.write(f'{serious_dictionary[word]} | {word}\n')
+
+    for word in not_serious_dictionary:
+        not_serious_file.write(f'{not_serious_dictionary[word]} | {word}\n')
+
+
+def load_apps_descriptions():
+    app_dictionary = {}
+    apps = do_query('', "SELECT app_id, description FROM app")
+    for app in apps:
+        app_dictionary[app[0]] = app[1]
+    return app_dictionary
+
+
+def increment_occurrences(dictionary, description, increment):
+    for key in dictionary:
+        if key in description:
+            dictionary[key] = dictionary[key] + increment
+
+
+def modify_base_values(dictionary, temp_dictionary, total_increment):
+    occurrences = 0
+    for key in temp_dictionary:
+        occurrences = occurrences + dictionary[key]
+    for key in dictionary:
+        dictionary[key] += (temp_dictionary[key] * total_increment) / occurrences
+
+
 class LogRegClassifier:
     def __init__(self):
         self.x = []
@@ -100,6 +140,41 @@ class LogRegClassifier:
         self.trained_models_list = []
         self.performance_metrics_list = []
         self.results = []
+        self.descriptions = load_apps_descriptions()
+
+    def update_dictionary(self):
+        temp_serious_dict, temp_non_serious_dict = load_dictionaries()
+        serious_dict, non_serious_dict = load_dictionaries()
+
+        for i in range(len(self.performance_metrics_list)):
+            print(self.performance_metrics_list[i].f1)
+            performance = self.performance_metrics_list[i]
+            multiplier = float(performance.f1)
+            result = self.results[i].results
+            for app_result in result:
+                app_id = app_result[0]
+                tp = app_result[1] and app_result[2]
+                fp = not app_result[2] and app_result[2]
+                fn = app_result[1] and not app_result[2]
+                tn = not app_result[1] and not app_result[2]
+
+                if tp:
+                    increment_occurrences(temp_serious_dict, self.descriptions[app_id], TRUE_CLASSIFIED_INCREMENT
+                                          * multiplier)
+                if fn:
+                    increment_occurrences(temp_serious_dict, self.descriptions[app_id], WRONG_CLASSIFIED_INCREMENT
+                                          * multiplier)
+                if tn:
+                    increment_occurrences(temp_non_serious_dict, self.descriptions[app_id], TRUE_CLASSIFIED_INCREMENT
+                                          * (-1) * multiplier)
+                if fp:
+                    increment_occurrences(temp_non_serious_dict, self.descriptions[app_id], WRONG_CLASSIFIED_INCREMENT
+                                          * (-1) * multiplier)
+
+        modify_base_values(serious_dict, temp_serious_dict, DICTIONARY_INCREMENT)
+        modify_base_values(non_serious_dict, temp_non_serious_dict, (-1) * DICTIONARY_INCREMENT)
+
+        save_dictionaries(serious_dict, non_serious_dict)
 
     def reset(self):
         self.x = []
@@ -281,7 +356,8 @@ class LogRegClassifier:
         # TODO : remove the following line after debug
         # feature_dataset.at[0, 'teacher_approved'] = 1
 
-        x = zscore(feature_dataset[['serious_words_count', 'teacher_approved', 'score_rating', 'category_id']].values)
+        x = zscore(feature_dataset[['serious_words_count', 'category_id']].values)
+        # 'teacher_approved', 'score_rating',
 
         i = 0
         app_id_list = feature_dataset[['app_id']].values

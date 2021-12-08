@@ -100,7 +100,8 @@ class HomePage:
     def data_miner_command(self):
         self.data_miner_button.config(state='disabled')
         self.__data_miner_button_thread = threading.Thread(
-            target=self.ApplicationGUI.__process_manager.launch_data_miner)
+            target=self.ApplicationGUI.get_process_manager().launch_data_miner)
+
         self.__data_miner_button_thread.start()
         self.__data_miner_button_thread.join()
         # self.data_miner_button.config(state='normal')
@@ -108,14 +109,14 @@ class HomePage:
     def new_dataset_command(self):
         self.new_dataset_button.config(state='disabled')
         self.__new_dataset_button_thread = threading.Thread(
-            target=self.ApplicationGUI.__process_manager.launch_new_dataset)
+            target=self.ApplicationGUI.get_process_manager().launch_new_dataset)
         self.__new_dataset_button_thread.start()
         self.__new_dataset_button_thread.join()
 
     def old_dataset_command(self):
         self.old_dataset_button.config(state='disabled')
         self.__old_dataset_button_thread = threading.Thread(
-            target=self.ApplicationGUI.__process_manager.launch_old_dataset)
+            target=self.ApplicationGUI.get_process_manager().launch_old_dataset)
         self.__old_dataset_button_thread.start()
         self.__old_dataset_button_thread.join()
 
@@ -128,7 +129,7 @@ class HomePage:
 
     def auto_classify_command(self):
         self.__auto_classifier_thread = threading.Thread(
-            target=self.ApplicationGUI.__process_manager.do_classification_dataset)
+            target=self.ApplicationGUI.get_process_manager().do_classification_dataset)
         self.__auto_classifier_thread.start()
         self.__auto_classifier_thread.join()
 

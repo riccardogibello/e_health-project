@@ -146,6 +146,7 @@ dysgraphia
 preschool-kindergarten
 kids-friendly
 home-schooling
+kids abc
 toddler-friendly
 child-oriented
 early-learning
@@ -163,6 +164,7 @@ for children
 for toddlers
 educational games
 educational game
+educational value
 learning games
 motor skills
 learning game
@@ -194,6 +196,8 @@ language skills
 early learning
 preschool children
 learn vocabulary
+serious game
+serious games
 best educational
 makes learning
 kids math
@@ -213,6 +217,7 @@ thinking skills
 kindergarten kids
 alphabet letters
 colors shapes
+tap letters
 missing letters
 game kids
 teach kids
@@ -386,9 +391,9 @@ kids can play
 your child learn
 teach your child
 learn to recognize
+expand your vocabulary
 learning a new
 toddlers and preschoolers
-an educational app
 child will learn
 able to learn
 learn the names
@@ -419,6 +424,7 @@ games for babies
 our educational games
 will help children
 for the kids
+solve enigmas on-the-fly
 fun while learning
 helps children learn
 puzzles for toddlers
@@ -428,6 +434,7 @@ for kids learning
 helps your kids
 help you improve
 app for learning
+prevention of dementia
 for kids toddlers
 synonyms and antonyms
 toddler learning games
@@ -471,6 +478,8 @@ free educational app
 free learning games
 apps for toddlers
 perfect for children
+touch the animal
+game with animals
 educational kids games
 for toddlers kids
 best learning app
@@ -578,6 +587,7 @@ develop hand-eye coordination
 perfect for toddlers
 made for kids
 baby to learn
+for young children
 abc learning app
 teach your kid
 toddler learn phonics
@@ -614,6 +624,7 @@ kids early education
 educational game learning
 pronunciation and orthography
 for kids development
+kids developing game
 preschoolers to learn
 applications for children
 to develop children
@@ -712,6 +723,7 @@ learning games for kindergarten
 phonics and alphabet teaching
 will help your toddler
 game for your kids
+learn all five vowels
 designed especially for children
 game designed to teach
 educational games for boys

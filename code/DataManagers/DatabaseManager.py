@@ -110,10 +110,7 @@ def delete_id_from_preliminary_db(app_id):
 
 
 def delete_app_from_labeled_app(app_id):
-    remove_query = (
-        "DELETE FROM labeled_app WHERE app_id = %s"
-    )
-    do_query((app_id,), remove_query)
+    do_query((app_id,), "DELETE FROM labeled_app WHERE app_id = %s")
 
 
 def delete_app_from_database(app_id):

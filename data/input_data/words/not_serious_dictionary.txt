@@ -1,0 +1,696 @@
+-12.135502546363767 | 3d viewer
+-12.842425220544856 | accelerated learning method
+-13.378044076818467 | accountancy
+-12.597443546966026 | activity of the heart
+-11.962949149860645 | add accessories
+-12.75125740912634 | add an ebook
+-12.793424766016788 | addictive arcade
+-11.66180543650115 | addictive idle
+-11.66180543650115 | addictive idle clicker game
+-11.66180543650115 | addictive idle game
+-12.842425220544856 | advanced c1
+-12.358036745043222 | affiliated to the university
+-12.593792743548317 | after-school assignment
+-12.72257690617396 | agricultural economics
+-13.297583251556382 | agricultural statistics
+-16.453845838640365 | agriculture
+-12.255638642107806 | ahca ncal
+-11.66180543650115 | alerts from school
+-11.868329568825361 | all the children combined
+-11.66180543650115 | alway clear and tidy
+-12.507703706206756 | amazing fashion
+-12.154593549779767 | analyst interview
+-13.906463581131824 | anatomy
+-11.66180543650115 | anatomy class
+-14.093369351657959 | angry
+-12.985407367608518 | angry teacher
+-12.603371362989023 | antistress
+-12.85565181592281 | app for the libraries
+-12.507703706206756 | appropriate hairstyle
+-12.375410490042164 | arduino
+-13.700072792831326 | arts and commerce
+-12.37342938083577 | assistant practice exam
+-11.66180543650115 | asvab
+-11.66180543650115 | at the bus station
+-12.24947017297232 | at the hotel
+-12.24947017297232 | at the restaurant
+-12.842425220544856 | attend a language course
+-40.51657890605028 | attendance
+-11.66180543650115 | auto-tap
+-11.66180543650115 | auto-tap function
+-13.702304629882555 | automate
+-11.66180543650115 | automate work
+-11.66180543650115 | automatic tapping
+-12.956787799754126 | automation testing
+-12.171663267313672 | baby care app
+-14.248614180520468 | baby care game
+-11.868329568825361 | based on their class
+-13.289434686292896 | basic conversation
+-11.66180543650115 | basic ecg
+-12.597443546966026 | basic ekg
+-18.06131863600777 | beauty salon
+-13.17559932814954 | become a princess
+-11.66180543650115 | benefit of the e-services
+-11.66180543650115 | best application for entertaining
+-15.18833533464871 | bible
+-11.66180543650115 | bible coloring
+-12.480417695634305 | bible study
+-12.164407638493815 | big beauty salon
+-11.66180543650115 | big-data
+-13.350370119520383 | blast game
+-12.176321701343136 | blockchain
+-13.700072792831326 | board examinations
+-11.66180543650115 | boost your career
+-15.024852955742668 | brain training game
+-12.306186810588414 | break a curse
+-11.66180543650115 | break the rules
+-11.66180543650115 | bridge the ict gap
+-12.36129771268608 | bumpy roads
+-37.80884113180084 | business
+-12.72257690617396 | business management
+-11.74302781447595 | business simulator
+-12.842425220544856 | business vocabulary
+-11.66180543650115 | busy schedule
+-11.66180543650115 | cambridge certification
+-12.118878749984411 | can punish you
+-11.66180543650115 | candidates studying
+-20.39339002047945 | card game
+-24.555116688830946 | career
+-28.554768879699264 | casual
+-11.861960514262336 | casual adventure game
+-12.174888446928803 | cat exam
+-13.93798368381759 | catholic
+-12.220788543255413 | catholic hymn
+-12.593792743548317 | center management
+-11.836851325613498 | challenging exams
+-12.008233765013525 | chemistry games
+-28.5386158337946 | christ
+-14.706140214796626 | christian
+-12.220788543255413 | christian hymns
+-13.222778186746702 | circulars
+-33.21099395670276 | class details
+-12.593792743548317 | class score
+-11.66180543650115 | class time table
+-11.868329568825361 | classroom contents
+-12.154826905618723 | classroom-friendly
+-12.59743908845717 | clean game
+-12.59743908845717 | clean games
+-12.59743908845717 | clean home
+-12.126202226885445 | clean kitchen
+-11.66180543650115 | clean living room
+-11.66180543650115 | clean the house
+-11.66180543650115 | clean the kitchen
+-12.126202226885445 | clean the room
+-19.997399091906818 | clean up
+-11.66180543650115 | clean up bedrooms
+-13.379387985904197 | clean up game
+-12.26494771089766 | clean up games
+-33.25571619907487 | cleaning
+-19.45235021991308 | cleanup
+-16.844711696564993 | cleanup game
+-14.518659141097704 | cleanup games
+-11.8733522274138 | clearing the exam
+-13.953544371886537 | click escape game
+-17.359486240839388 | clicker
+-15.474884686642937 | clicker game
+-11.66180543650115 | clicker game offline
+-11.66180543650115 | clicker genre
+-11.66180543650115 | clicking game
+-12.199796815060763 | clothing and costumes
+-11.66180543650115 | cma studying
+-39.870464716706536 | coaching
+-13.700072792831326 | coaching centre
+-11.66180543650115 | coding journey
+-14.435328777138045 | collect garbage
+-30.420508593343385 | college
+-13.090200040678065 | college administration
+-13.256457149740386 | color by number
+-11.894665470571967 | color by number app
+-11.95114847419673 | comparative adjectives
+-21.37073974024437 | competitive exams
+-11.66180543650115 | completes and exam
+-11.66180543650115 | complex road traffic
+-11.66180543650115 | complex scripts
+-12.597443546966026 | comprehensive guide
+-12.76536662389406 | conceptual videos
+-12.181068200692422 | conjugations of any language
+-12.574334766728628 | connecting college and students
+-12.671904355768723 | contain various lessons
+-12.507703706206756 | cooking and styling
+-11.894665470571967 | cool pixel works
+-12.393131180701397 | cosmetic salon
+-13.766899877582901 | cosmetics
+-73.75579503004366 | course
+-14.67824512194205 | course material
+-40.65547668695178 | courses
+-11.66180543650115 | courses as you want
+-12.128900309808294 | courses prepare you
+-11.66180543650115 | courses working
+-11.907195638803893 | coursework
+-11.962949149860645 | create a unique look
+-11.815137057867817 | creates stress
+-11.66180543650115 | crypto education
+-11.66180543650115 | crypto market
+-18.35033924999674 | current affairs
+-12.306186810588414 | curse
+-12.777059627064096 | daily conversation dialogs
+-11.66180543650115 | daily diary
+-12.220788543255413 | daily missal
+-14.218635526201934 | daily news
+-11.66180543650115 | data science
+-28.96098852015724 | dating
+-12.842425220544856 | dating phrases
+-11.66180543650115 | deep learning
+-12.35846732082928 | defensive game
+-11.912008338224611 | definitions offline
+-11.974298066278628 | dele test
+-11.974298066278628 | dele test preparation
+-12.550056355067932 | delivery service
+-11.66180543650115 | dental anatomy
+-11.66180543650115 | dental school
+-11.66180543650115 | dental students
+-11.926661880549542 | design tools
+-12.24947017297232 | designed for non-native
+-11.66180543650115 | detailed rationales
+-44.78203669299963 | dictionary
+-11.66180543650115 | dictionary for academic success
+-12.897558636080113 | dictionary for learners
+-17.96406830674672 | different languages
+-14.250302850047838 | digital dollhouse
+-12.593792743548317 | digital white board
+-12.483882900782309 | dirty clothes
+-14.563130451148979 | doll house
+-15.432023368354637 | dollhouse game
+-14.89403198979503 | dollhouse games
+-46.77500903191607 | dress up
+-20.536667033260123 | dress up game
+-16.966189136372737 | dress up games
+-12.507703706206756 | dress your characters
+-12.199796815060763 | dressup the little princess
+-20.020221672631852 | drift
+-11.983433040960445 | drift racing
+-11.66180543650115 | drifter cars
+-11.66180543650115 | drifty cars
+-11.66180543650115 | drifty vehicles
+-12.666278953198724 | driving lesson
+-12.666278953198724 | driving lessons
+-16.238171787751213 | e-book
+-12.033542842994168 | e-book experience
+-21.29136651549692 | e-learning
+-11.66180543650115 | e-services
+-11.868329568825361 | each child s performance
+-11.965752773979123 | ear training
+-11.66180543650115 | earn passive income
+-12.312069026140021 | easy escape
+-12.671904355768723 | easy voice translation
+-12.842425220544856 | eating out
+-12.597443546966026 | ecg
+-20.206763101279872 | editor
+-12.058803023162039 | educational lessons
+-11.66180543650115 | educational services
+-13.832497855558692 | effective translation
+-12.597443546966026 | ekg
+-12.597443546966026 | ekg interpretation
+-12.597443546966026 | electrocardiogram
+-21.17398893669861 | emergency
+-11.815137057867817 | empowered to guide
+-11.66180543650115 | enable students to pass
+-20.2654790176775 | endless runner
+-11.66180543650115 | endless traffic
+-25.915235810757252 | engineering
+-11.974298066278628 | entire word dictionary
+-12.339247148361999 | epic mode
+-31.35291158472896 | episode
+-21.248664455376908 | escape game
+-11.66180543650115 | ethical behaviour
+-12.220788543255413 | eucharistic
+-14.102316390841988 | exam practice
+-11.66180543650115 | exam prep tests
+-21.386391433261057 | exam preparation
+-14.218635526201934 | exam preparation app
+-14.218635526201934 | exam updates
+-20.855429196137862 | examinations
+-18.16176237338498 | example sentences
+-11.836851325613498 | exams preparation
+-61.7410439273991 | explore the
+-12.393131180701397 | face paint model
+-116.22250642247019 | facebook
+-12.574334766728628 | faculty can interact
+-12.207108842295142 | fairy princess
+-11.66180543650115 | fairy salon
+-11.66180543650115 | faith-based
+-11.66180543650115 | familiar with native speaker
+-12.393131180701397 | fancy party
+-11.66180543650115 | fashion cup
+-14.358109106933957 | fashion game
+-13.136230021647522 | fashion stylist
+-11.66180543650115 | fast traffic
+-12.842425220544856 | fastest growing language course
+-17.48200213483554 | fb
+-12.994950803458778 | fee details
+-33.99346157474972 | fees management
+-13.700072792831326 | final board examinations
+-12.123202917233899 | final year student
+-221.86705138935963 | first
+-12.128900309808294 | fit the course
+-11.907195638803893 | fmge
+-21.445499569951473 | for adult
+-21.445499569951473 | for adults
+-12.574334766728628 | for college
+-12.593792743548317 | for educational institutions
+-12.593792743548317 | for parents and management
+-11.66180543650115 | for people who works
+-22.102664488613744 | foreign language
+-12.671904355768723 | foreign language learning skills
+-12.330380490043435 | free logo quiz
+-12.942926682810793 | frequently asked questions
+-13.832497855558692 | frequently used phrase sentences
+-13.417184226180328 | from a dictionary
+-12.002940839600251 | full makeover
+-12.406091169218513 | funny hairstyles
+-12.36143438727496 | game for adults
+-12.972253199050627 | game is about kissing
+-11.66180543650115 | generate income
+-11.8733522274138 | get online tests
+-11.66180543650115 | girl hair salon
+-12.456207009519115 | gmat
+-11.66180543650115 | gmat preparation
+-12.54304475171809 | goal is having fun
+-12.406091169218513 | good cosmetics
+-12.72257690617396 | government exams
+-43.29898495706145 | grades
+-11.846164403934914 | grammar and spelling questions
+-11.66180543650115 | grammar explanation
+-11.846164403934914 | grammar questions
+-11.95114847419673 | grammar tests
+-11.66180543650115 | gre test
+-12.078261446449734 | gre vocabulary
+-12.078261446449734 | gre words
+-12.528334054125263 | great tutor for you
+-11.66180543650115 | greatest tycoon
+-13.042198984933917 | greetings
+-11.66180543650115 | grinding
+-11.836851325613498 | group exams
+-11.836851325613498 | grow your iq
+-12.330380490043435 | guess the correct logo
+-12.330380490043435 | guess the logo
+-12.330380490043435 | guess the logo game
+-11.66180543650115 | guess the logo games
+-11.66180543650115 | hackathons
+-20.391962413586135 | hair salon
+-14.337099418641742 | haircut
+-14.514334293491402 | hairdresser
+-19.334970054553356 | hairstyles
+-11.962949149860645 | hairstyling
+-11.962949149860645 | hairstyling for kids
+-12.68956997996289 | hard game
+-11.96452200494542 | helpful tips
+-19.38332249243896 | high school
+-11.66180543650115 | high school students
+-11.66180543650115 | highlt tested gre words
+-12.687947011354575 | hire managers
+-14.269373796139917 | hobbies
+-18.171112089791652 | holy
+-12.21593203119548 | holy quran
+-12.220788543255413 | holy rosary
+-11.815137057867817 | home tutor
+-42.85296551951251 | homework
+-12.76536662389406 | homework digitally
+-33.21099395670276 | homework submission
+-12.59743908845717 | house cleaner
+-17.000970276470273 | house cleaning
+-12.507703706206756 | house party
+-13.710334939835247 | housekeeping game
+-12.59743908845717 | housekeeping games
+-16.830018681239892 | housework
+-13.276186028817623 | how to clean
+-13.08675557924076 | html
+-12.46737129725429 | html code
+-11.926661880549542 | html5
+-12.24947017297232 | idiomatic expressions
+-21.076948208802396 | idle
+-11.66180543650115 | idle adventure
+-12.687947011354575 | idle cash
+-13.469369183757486 | idle clicker
+-12.166218306760738 | idle clicker game
+-16.157936273285813 | idle game
+-11.66180543650115 | idle games
+-11.66180543650115 | idle rpg
+-11.66180543650115 | improve iq
+-12.078261446449734 | improve your gre vocabulary
+-12.407032738064725 | improve your iq
+-14.245813499336759 | improve your vocabulary
+-13.54436686227002 | incremental clicker
+-12.228935481471956 | international public school
+-19.18989157173276 | interview
+-180.81687791899802 | iq
+-11.95114847419673 | irregular verbs
+-11.66180543650115 | is a clicker game
+-12.335311193946055 | is a simulator
+-16.510845750684947 | islamic
+-12.21593203119548 | islamic articles
+-12.21593203119548 | islamic scholars
+-13.934456696006261 | java
+-13.654953681930436 | javascript
+-12.480417695634305 | jesus
+-12.0919038124953 | job alerts
+-14.004848962651474 | just a dictionary
+-11.66180543650115 | just need to click
+-11.894665470571967 | just paint by numbers
+-12.126202226885445 | keep it tidy
+-13.113906547098878 | keep you excited
+-12.872779567871394 | keep yourself focused
+-12.399504420122213 | kill free time
+-21.208806196569128 | killer
+-11.66180543650115 | king of street cars
+-12.972253199050627 | kissing
+-12.972253199050627 | kissing app
+-12.972253199050627 | kissing game
+-12.372903279508149 | klondike
+-15.094065973193288 | language course
+-14.849321022124297 | language courses
+-11.66180543650115 | language educational method
+-11.974298066278628 | language learners
+-34.87794256175434 | language learning
+-12.528334054125263 | language learning addict
+-11.66180543650115 | languages course
+-11.66180543650115 | latest exam patterns
+-11.66180543650115 | learn about dentistry
+-11.66180543650115 | learn coding
+-12.24947017297232 | learn conversation
+-11.66180543650115 | learn danish
+-12.063346976871236 | learn finnish
+-13.026784187978624 | learn grammar
+-11.66180543650115 | learn hindi
+-11.846164403934914 | learn new vocabulary
+-12.464399753446322 | learn on-the-go
+-11.66180543650115 | learn php
+-12.671904355768723 | learn proper language
+-20.271834944777975 | learn vocabulary
+-13.832497855558692 | learn words more easily
+-13.685244841296365 | learning a foreign language
+-13.417184226180328 | learning a language
+-12.181068200692422 | learning another language
+-12.46737129725429 | learning html
+-13.117782983775585 | learning journey
+-14.280931480278682 | learning management
+-13.794564149864952 | learning management system
+-12.528334054125263 | learning new languages
+-28.233219672838228 | learning objective
+-85.83788303250185 | lesson
+-14.130046469726219 | lesson plans
+-75.44990371812081 | lessons
+-11.66180543650115 | lessons and tests
+-11.66180543650115 | lessons plan
+-12.85565181592281 | library district
+-12.895723011488885 | like a native speaker
+-14.589015333854322 | linkedin
+-12.24947017297232 | list of common words
+-13.832497855558692 | listen to your translations
+-12.574334766728628 | login for parents
+-12.330380490043435 | logo quiz
+-12.872779567871394 | looking to travel
+-12.842425220544856 | lower intermediate b1
+-14.698483678521091 | machine learning
+-11.907195638803893 | make a schedule
+-11.962949149860645 | make awesome hair
+-12.507703706206756 | make them look beautiful
+-23.90055209550867 | makeover
+-15.326753277786409 | makeup girls
+-11.66180543650115 | mark of the beast
+-40.81497013338589 | marks
+-12.574334766728628 | marksheet
+-11.66180543650115 | mastery courses
+-12.37156854809919 | math intelligence game
+-11.66180543650115 | mathematical instrument
+-12.029139167182835 | maths exam preparation
+-12.574334766728628 | meals menu
+-13.832497855558692 | meanings of the word
+-11.66180543650115 | medical exams
+-11.907195638803893 | medical school
+-12.201377354784224 | medical students
+-11.955987152481494 | medical terminology
+-12.972253199050627 | meet your girlfriend
+-12.37342938083577 | mental health needs
+-11.97212807418413 | mental math
+-12.243256113700829 | military equipment
+-12.585909985233993 | military school
+-16.15371940831799 | minecraft
+-11.66180543650115 | ministry news feed
+-12.956787799754126 | mobile testing
+-11.66180543650115 | monitor student progress
+-12.842425220544856 | more words and courses
+-12.842425220544856 | most frequent words
+-12.59743908845717 | move in cleaning
+-11.974298066278628 | movie without subtitle
+-11.965752773979123 | music teachers
+-11.965752773979123 | music theory
+-12.110501405708902 | national test
+-24.166932451861665 | native speaker
+-12.972253199050627 | naughty app
+-14.995098829134664 | neet
+-12.312069026140021 | new escape games
+-14.711425046756304 | new language
+-12.574334766728628 | newsletter
+-12.574334766728628 | newsletters
+-11.989305960315722 | nightmare
+-15.936958516531512 | no rules
+-12.118878749984411 | noob
+-40.37305310366636 | notes
+-12.255638642107806 | notes adjacent each slide
+-11.80236230524836 | nuclear fusion
+-12.870819288421039 | nuclear physics
+-11.894665470571967 | number coloring pages
+-11.894665470571967 | number draw
+-12.6676110968161 | nurses
+-11.66180543650115 | occlusion concepts
+-12.593792743548317 | one-to-one coaching
+-11.66180543650115 | online language learning solutions
+-13.037242820453097 | online learning platform
+-12.228935481471956 | online report card
+-13.989225891236345 | online test series
+-11.8733522274138 | online tests and exams
+-11.66180543650115 | online worksheets
+-12.181068200692422 | own favourites list
+-11.66180543650115 | own personalized training programming
+-11.894665470571967 | paint by numbers
+-13.054461993600405 | parent app
+-11.868329568825361 | parent s profile
+-11.868329568825361 | parents logs
+-12.128900309808294 | pass the exam
+-12.209046315537103 | pass the time
+-13.417184226180328 | personal dictionary
+-12.75125740912634 | personal library
+-44.76207796089391 | physics
+-11.894665470571967 | pixel works
+-11.66180543650115 | planet destroyer
+-33.21099395670276 | platform for managing data
+-12.758964655137794 | play almost endlessly
+-15.146625143297381 | podcast
+-14.357006849085314 | podcasts
+-11.836851325613498 | police exam
+-13.700072792831326 | possible exam questions
+-12.76536662389406 | posting homework
+-12.171663267313672 | practice becoming a babysitter
+-12.051107792456696 | practice pdfs
+-19.58726413190569 | practice questions
+-12.922030843523904 | practice quiz
+-20.900184945891887 | practice test
+-12.258548802148406 | practice test app
+-18.628857317826284 | practice tests
+-11.66180543650115 | practise exam
+-11.66180543650115 | practise for sat
+-11.66180543650115 | pre-dents
+-13.700072792831326 | pre-medical
+-11.955987152481494 | premedical students
+-11.66180543650115 | premium courses
+-11.66180543650115 | preparation of their exams
+-13.700072792831326 | preparation of thier exams
+-11.66180543650115 | preparation resource
+-12.37156854809919 | preparing for exams
+-12.078261446449734 | preparing for the gre
+-12.255638642107806 | presentation slides
+-12.945912042624355 | previous year questions
+-17.311354161428312 | princess game
+-14.085255286618265 | princess makeup
+-11.66180543650115 | printable worksheets
+-11.66180543650115 | prison break
+-11.97212807418413 | processing speed
+-13.549093813640317 | professional cleaning
+-11.965752773979123 | professional music teachers
+-12.406091169218513 | professional stylist
+-18.052743513008814 | programming
+-13.700072792831326 | provide notes
+-12.228935481471956 | provided by the school
+-11.66180543650115 | provides preparation study
+-13.2764061272157 | ptcb
+-13.282328422415913 | public school
+-12.199796815060763 | pure fun
+-12.199796815060763 | pure imagination fun
+-12.199796815060763 | pure imaginative fun
+-14.381228550680296 | python
+-12.013446788355266 | questions and answers app
+-11.66180543650115 | questions with solutions
+-116.81440243248935 | quick
+-13.832497855558692 | quick dictionary
+-11.965752773979123 | quickly recognize scale degrees
+-19.25654761464876 | quran
+-119.38565598983227 | race
+-11.66180543650115 | random lessons
+-12.128900309808294 | reading notes
+-12.36129771268608 | real-life racer
+-11.965752773979123 | recognize common rhythm patterns
+-12.28167710008651 | recommendation letters
+-12.597443546966026 | records the electrical activity
+-13.14751247455163 | recruitment exam
+-11.962949149860645 | redesign your model
+-11.66180543650115 | redesigned curriculum
+-12.207108842295142 | refreshing outfit
+-11.66180543650115 | relaxing baby care appe
+-15.297325021832515 | report for parents
+-11.66180543650115 | request services
+-11.66180543650115 | requires access
+-11.66180543650115 | review lessons
+-15.083582263832584 | revision questions
+-12.956787799754126 | risk analysis
+-12.956787799754126 | risk management
+-13.430089957016008 | romance
+-12.457476410939913 | romantic
+-33.35091709453517 | salon
+-11.894665470571967 | same numbers blocks
+-12.773656470123596 | sample question papers
+-13.556244251832664 | sandbox game
+-12.257656369945058 | save money
+-14.292948465340665 | save time
+-13.989001127862696 | save time and money
+-11.815137057867817 | savvy parents
+-13.296448990306017 | scheduling
+-12.924061340295646 | school calendar
+-14.951481747351146 | school curriculum
+-11.840160223046452 | school management
+-12.228935481471956 | school notices
+-12.0536359654042 | school of arts
+-14.610310203427202 | school videos
+-12.579551962467555 | science experiments
+-11.66180543650115 | science experiments game
+-12.154826905618723 | science journal
+-12.154826905618723 | science notebook
+-12.154826905618723 | science notebooks
+-12.078261446449734 | sentence equivalence
+-14.7553167547485 | sentences translation
+-37.26257466754076 | shoot
+-12.600029006214566 | shoot pro
+-12.309304060075297 | shooter game
+-22.960785589214833 | shopping
+-11.66180543650115 | shopping game
+-12.343902455455705 | simple yet addictive
+-11.66180543650115 | simply clicking
+-11.66180543650115 | simply clicking and tapping
+-12.24947017297232 | slang
+-12.842425220544856 | sleep learning
+-12.574334766728628 | social media platform
+-13.621981576166679 | social media sharing
+-12.842425220544856 | solid vocabulary
+-13.489663089853499 | solitaire game
+-12.593792743548317 | solutions for educational institutions
+-12.21593203119548 | special lessons
+-11.66180543650115 | sping cleaning
+-11.905100463598595 | streaming platform
+-12.872779567871394 | structure your learning
+-12.40729026801724 | student attendance
+-11.949175161847835 | student-related services
+-13.700072792831326 | students planning
+-11.984043377947504 | studies notes
+-13.273278240450374 | study guide
+-21.54572882803483 | study material
+-11.907195638803893 | study period
+-12.771404907897072 | study tool
+-13.341258559511836 | stunt game
+-16.746785988523982 | stylist
+-12.574334766728628 | submit assignments
+-11.66180543650115 | summarizes all the knowledge
+-12.507703706206756 | super stylist
+-11.66180543650115 | surprise encounter
+-12.532447411839117 | survival game
+-12.956787799754126 | system development
+-11.868329568825361 | taking an exam
+-14.108952996550906 | tap game
+-12.76536662389406 | teachers to stay connected
+-19.029281269211307 | test yourself
+-12.956787799754126 | testing tools
+-12.337454033514794 | textbooks
+-12.59743908845717 | tidy bedroom
+-15.356411237716427 | time killer
+-11.882460472919927 | time to relax
+-11.66180543650115 | timed tests
+-16.26838278293371 | timetable
+-12.002940839600251 | to do full makeover
+-14.76070903635535 | to graduate
+-12.029139167182835 | to recruit teachers
+-13.392778323776222 | to-do list
+-13.607104807352393 | toefl
+-12.406091169218513 | tools for hairdresser
+-11.66180543650115 | tooth morphology
+-19.976395490329608 | track your progress
+-26.39734785963316 | train your brain
+-12.128900309808294 | training delivery service
+-12.671904355768723 | translate anything they want
+-12.872779567871394 | translation app
+-23.788289074542902 | translator
+-12.872779567871394 | travel abroad
+-12.842425220544856 | travel phrases
+-31.89569056727181 | tutorial
+-19.947139534863815 | tutorials
+-33.21099395670276 | tutoring classes
+-35.46262822128297 | tutors
+-85.58755805292881 | twitter
+-17.80797004465978 | tycoon
+-11.984043377947504 | typical exam questions
+-11.981527376749737 | ultimate level editor
+-17.123973774493862 | universities
+-12.574334766728628 | unlimited storage
+-14.562446371604729 | unofficial application
+-12.842425220544856 | upper intermediate b2
+-14.248953865507263 | usage of the word
+-11.926661880549542 | useful editor
+-12.462278858119841 | variety of outfits
+-12.16225977659984 | vending machine
+-13.852524139812415 | verb conjugation
+-11.66180543650115 | video grammar explanation
+-16.42919978164583 | video lectures
+-15.346189335843599 | video lessons
+-12.132122725532328 | video tutorials
+-12.393131180701397 | virtual closet
+-12.393131180701397 | virtual makeup
+-12.393131180701397 | virtual makeup salon
+-12.25288432070816 | visual vocabulary
+-137.6007628931147 | vocab
+-136.87622647230197 | vocabulary
+-11.66180543650115 | vocabulary structures
+-12.25288432070816 | vocabulary topics
+-14.842596774826275 | voice translation
+-12.842425220544856 | want to learn grammar
+-12.483882900782309 | wash dishes
+-12.59743908845717 | wash game
+-19.219499556861578 | watch videos
+-11.66180543650115 | watch videos offline
+-14.588904818730413 | web development
+-12.574334766728628 | weekly updates
+-13.417184226180328 | when learning a language
+-11.66180543650115 | while idle
+-12.462278858119841 | wipe the baby
+-11.846164403934914 | word order
+-18.95840356433208 | word search
+-11.974298066278628 | word sets
+-12.078261446449734 | words frequently tested
+-12.251188194255448 | worlds hardest game
+-13.417184226180328 | you can search words
+-14.842596774826275 | you can translate
+-12.591060034677293 | you re not playing
+-12.36129771268608 | you will be hypnotized
+-12.393131180701397 | your first client
+-11.66180543650115 | your new language
+-11.974298066278628 | your overall progress
+-14.218635526201934 | your preparation
+-13.832497855558692 | your translations
+-11.66180543650115 | zimsec examinations

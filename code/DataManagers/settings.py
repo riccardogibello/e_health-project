@@ -31,8 +31,14 @@ MAX_DATASET_THREADS = min(multiprocessing.cpu_count(), 6)
 MAX_RETRIEVE_APP_DATA_THREADS = multiprocessing.cpu_count()*2
 
 # DEBUG
-DEBUG = False
+DEBUG = True
 DATASET_DEBUG = False
+
+
+# CLASSIFICATION SETTINGS
+DICTIONARY_INCREMENT = 100
+TRUE_CLASSIFIED_INCREMENT = 1
+WRONG_CLASSIFIED_INCREMENT = 5
 
 # DATABASE SETTINGS
 MAX_CONNECTION_ATTEMPTS = 20
@@ -139,5 +145,4 @@ SERIOUS_WORDS = [
     "speech therapy",
     "game for early development",
     "expand reading vocabulary"
-
 ]

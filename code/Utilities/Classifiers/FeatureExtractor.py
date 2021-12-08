@@ -4,26 +4,35 @@ from DataManagers.settings import *
 import regex as re
 
 
-def get_words():
-    serious_words_file = open('data/input_data/words/serious_words.txt', 'r').readlines()
-    serious_words = []
-    non_serious_words_file = open('data/input_data/words/non_serious_words.txt', 'r').readlines()
-    non_serious_words = []
+def get_dictionary(file_path):
+    dictionary = {}
+    file = open(file_path, 'r')
+    lines = file.readlines()
+    for line in lines:
+        words = line.split()
+        key = ''
+        for i in range(2, len(words)):
+            key = key + words[i] + ' '
+        if key[len(key) - 1] == ' ':
+            key = key[:len(key) - 1]
 
-    for word in serious_words_file:
-        serious_words.append(re.sub(r"[\n]+", " ", word))
-    for word in non_serious_words_file:
-        non_serious_words.append(re.sub(r"[\n]+", " ", word))
+        dictionary[key] = float(words[0])
+    file.close()
+    return dictionary
 
-    return serious_words, non_serious_words
+
+def get_dictionaries():
+    serious_dict = get_dictionary('data/input_data/words/serious_dictionary.txt')
+    not_serious_dict = get_dictionary('data/input_data/words/not_serious_dictionary.txt')
+
+    return serious_dict, not_serious_dict
 
 
 class FeatureExtractor:
-    serious_games_words = []  # this is a set of meaningful words related to serious games (manually extracted)
     indexes_to_analyze = []
 
-    def __init__(self, words):
-        self.serious_games_words, self.non_serious_game_words = get_words()
+    def __init__(self):
+        self.serious_games_dictionary, self.non_serious_game_dictionary = get_dictionaries()
 
     def compute_training_features(self):
         clear_table('app_features')
@@ -115,11 +124,11 @@ class FeatureExtractor:
     def count_occurrences(self, app_name, app_description):
         word_occurrence = {}
         global_occurrences = 0
-        for serious_word in self.serious_games_words:
+        for serious_word in self.serious_games_dictionary:
             if serious_word in app_description or serious_word in app_name:
-                global_occurrences += len(serious_word.split())
+                global_occurrences += len(serious_word.split())*self.serious_games_dictionary[serious_word]
                 word_occurrence.__setitem__(serious_word, 1)
-        for non_serious_word in self.non_serious_game_words:
+        for non_serious_word in self.non_serious_game_dictionary:
             if non_serious_word in app_description:
-                global_occurrences += (-1.05)*len(non_serious_word.split())
+                global_occurrences += len(non_serious_word.split())*self.non_serious_game_dictionary[non_serious_word]
         return global_occurrences, word_occurrence

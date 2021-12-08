@@ -118,7 +118,7 @@ class DataMiner:
         # Looks in the preliminary table for checked apps has not been checked yet
         # and save their IDs in self.__apps_id_list
         query = (
-            "SELECT app_id, from_dataset FROM preliminary WHERE preliminary.`check` IS FALSE ORDER BY RAND()"
+            "SELECT app_id, from_dataset FROM preliminary WHERE preliminary.`check` IS FALSE"
         )
         test_query = (
             "SELECT A.app_id, B.from_dataset FROM labeled_app as A, preliminary as B WHERE A.app_id = B.app_id"
@@ -187,6 +187,7 @@ class DataMiner:
 
         if not insert_app:
             delete_app_from_database(app_id)
+            delete_app_from_labeled_app(app_id)
 
         if insert_similar:
             if application.similar_apps:

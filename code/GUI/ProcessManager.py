@@ -24,8 +24,10 @@ def execute_old_dataset_manager():
 
 def execute_classification():
     classifier = LogRegClassifier()
-    for i in range(10):
+    for i in range(50):
+        print(f"TRAINING {i}")
         classifier.train_model(final=False)
+        classifier.update_dictionary()
         # TODO : update
     path = classifier.train_model(final=True)
     classifier.load_model(path)

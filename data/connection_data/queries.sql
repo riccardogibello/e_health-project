@@ -58,7 +58,7 @@ SELECT 'TOTAL_APPS', COUNT(*) FROM app
     UNION
 SELECT 'APPS_NO_SCORE', COUNT(*) FROM app WHERE score = 0
     UNION
-SELECT 'APPS_DANGEROUS_CONTENT', COUNT(*) FROM app WHERE content_rating = 'Adults only 18+' OR content_rating = 'Mature 17+' OR content_rating = 'Unrated' OR content_rating_description IS NOT NULL
+SELECT 'APPS_DANGEROUS_CONTENT', COUNT(*) FROM app WHERE content_rating = 'Adults only 18+' OR content_rating = 'Mature 17+' OR content_rating = 'Unrated'
     UNION
 SELECT 'NOT_UPDATED_APPS AFTER 2019', COUNT(*) FROM app WHERE last_update < 1546300800
     UNION

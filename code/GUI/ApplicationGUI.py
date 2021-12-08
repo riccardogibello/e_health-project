@@ -6,6 +6,7 @@ import tkinter.font
 from cefpython3 import cefpython as cef
 from PIL import Image, ImageTk
 from GUI.HomePage import HomePage
+from GUI.ProcessManager import ProcessManager
 
 
 class ApplicationGUI(tk.Frame):
@@ -16,7 +17,7 @@ class ApplicationGUI(tk.Frame):
 
         self.main_height = 800
         self.main_width = 450
-        self.__process_manager = process_manager
+        self.__process_manager = ProcessManager()
 
         # Screen Information
         self.screen_width = root.winfo_screenwidth()
@@ -42,6 +43,9 @@ class ApplicationGUI(tk.Frame):
 
     def destroy_homepage(self):
         self.homepage.destroy()
+
+    def get_process_manager(self):
+        return self.__process_manager
 
     def destroy_graphic(self):
         for widget in self.root.winfo_children():
