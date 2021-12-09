@@ -1,0 +1,125 @@
+from threading import Thread
+
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QWidget, QVBoxLayout, QLabel
+
+
+class HomePageWindow(QMainWindow):
+    def __init__(self, gui_manager):
+        super().__init__()
+        self.gui_manager = gui_manager
+
+        self.setWindowTitle("Serious Game Finder")
+        self.left = 100
+        self.top = 100
+        self.width = 600
+        self.height = 800
+        self.setGeometry(self.left, self.top, self.width, self.height)
+        main_widget = QWidget()
+        vertical_layout = QVBoxLayout()
+        inner_layout = QVBoxLayout()
+        inner_widget = QWidget()
+
+        label_logo = QLabel()
+        pixmap = QPixmap('./resources/images/Google_Play-Logo.wine.png')
+        pixmap = pixmap.scaled(500, 500, Qt.KeepAspectRatio, Qt.FastTransformation)
+        label_logo.setPixmap(pixmap)
+        vertical_layout.addWidget(label_logo)
+
+        load_new_dataset_button = QPushButton('Load Data from new dataset')
+        load_new_dataset_button.setStyleSheet(
+            "border-radius:20; border:2px solid black; background-color: #3bccff; "
+            "margin-top:2; font-size:25px; margin-top: 15px;")
+        load_new_dataset_button.setFixedSize(500, 80)
+        load_new_dataset_button.clicked.connect(self.on_click_load_new_dataset)
+        inner_layout.addWidget(load_new_dataset_button, alignment=Qt.AlignCenter)
+
+        load_old_dataset_button = QPushButton('Load Data from old dataset')
+        load_old_dataset_button.setStyleSheet(
+            "border-radius:20; border:2px solid black; background-color: #48ff48; "
+            "margin-top:2; font-size:25px; margin-top: 15px;")
+        load_old_dataset_button.setFixedSize(500, 80)
+        load_old_dataset_button.clicked.connect(self.on_click_load_old_dataset_button)
+        inner_layout.addWidget(load_old_dataset_button, alignment=Qt.AlignCenter)
+
+        retrieve_data_button = QPushButton('Retrieve Data from Google Play')
+        retrieve_data_button.setFixedSize(500, 80)
+        retrieve_data_button.setStyleSheet(
+            "border-radius:20; border:2px solid black; background-color: #ffd400; "
+            "margin-top:2; font-size:25px; margin-top: 15px;")
+        retrieve_data_button.clicked.connect(self.on_click_retrieve_data_button)
+        inner_layout.addWidget(retrieve_data_button, alignment=Qt.AlignCenter)
+
+        manual_classify_button = QPushButton('Classify manually some apps')
+        manual_classify_button.setFixedSize(500, 80)  # width, height
+        manual_classify_button.setStyleSheet(
+            "border-radius:20; border:2px solid black; background-color: #ff3333; "
+            "margin-top:2; font-size:25px; margin-top: 15px;")
+        manual_classify_button.clicked.connect(self.on_click_manual_classify_button)
+        inner_layout.addWidget(manual_classify_button, alignment=Qt.AlignCenter)
+
+        automatic_classify_button = QPushButton('Automatic Apps classification')
+        automatic_classify_button.setFixedSize(500, 80)  # width, height
+        automatic_classify_button.setStyleSheet(
+            "border-radius:20; border:2px solid black; background-color: #3bccff; "
+            "margin-top:2; font-size:25px; margin-top: 15px;")
+        automatic_classify_button.clicked.connect(self.on_click_automatic_classify_button)
+        inner_layout.addWidget(automatic_classify_button, alignment=Qt.AlignCenter)
+
+        exit_button = QPushButton('Exit')
+        exit_button.setFixedSize(500, 90)  # width, height
+        exit_button.setStyleSheet(
+            "border-radius:20; border:2px solid black; background-color: #48ff48; margin-top:2; "
+            "font-size:25px; margin-top: 15px;  margin-bottom: 15px;")
+        exit_button.clicked.connect(self.on_click_exit_button)
+        inner_layout.addWidget(exit_button, alignment=Qt.AlignCenter)
+        inner_widget.setLayout(inner_layout)
+        inner_widget.setStyleSheet("border-radius:20; border:2px solid black; background-color: #d5d5d7;")
+        vertical_layout.addWidget(inner_widget)
+
+        main_widget.setLayout(vertical_layout)
+
+        self.setCentralWidget(main_widget)
+
+        main_widget.setStyleSheet("background-color: #ffffff;")
+
+    def on_click_load_new_dataset(self):
+        print('clicked')
+        # TODO : serious
+
+    def on_click_load_old_dataset_button(self):
+        print('clicked')
+        # TODO : serious
+
+    def on_click_retrieve_data_button(self):
+        self.gui_manager.go_to_waiting_page(
+            'The application is now retrieving data \nfrom the Google Play Store!',
+            './data/output_data/retrieval_data_statistics.png')
+
+        # =================================================================================
+        # The following code is used to start the process in the ProcessHandler on another thread (different from the
+        # one of the GUI) and to callback the refresh of the page when it ends
+        process_manager = self.gui_manager.process_manager
+        thread = Thread(target=process_manager.launch_data_miner)
+        print('k')
+        thread.start()
+        process_manager.signal.connect(lambda: self.gui_manager.go_to_generic_page(
+            'The information retrieval has ended,\nnow you can go back to the homepage!'))
+
+        second_thread = Thread(target=process_manager.update_data_retrieval_page, args=(self.gui_manager,))
+        process_manager.update_signal.connect(
+            lambda: self.gui_manager.window.update_statistic_image('./data/output_data/retrieval_data_statistics.png'))
+        second_thread.start()
+        # =================================================================================
+
+    def on_click_manual_classify_button(self):
+        self.gui_manager.go_to_manual_classifier_page()
+
+    def on_click_automatic_classify_button(self):
+        print('clicked')
+        # TODO : serious
+
+    def on_click_exit_button(self):
+        print('clicked')
+        # TODO : serious
