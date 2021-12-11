@@ -4,6 +4,8 @@ from DataManagers.DataMiner import DataMiner
 from DataManagers.DatasetManager import DatasetManager
 from DataManagers.OldDatasetManager import OldDatasetManager
 from Utilities.Classifiers.LogRegClassifier import LogRegClassifier
+from Utilities.Classifiers.MNBayesClassifier import MNBayesClassifier
+from Utilities.Classifiers.MNBayesAppsClassifier import MNBayesAppsClassifier
 from DataManagers.settings import KAGGLE_DATASET_PATH
 
 
@@ -23,15 +25,21 @@ def execute_old_dataset_manager():
 
 
 def execute_classification():
-    classifier = LogRegClassifier()
-    for i in range(50):
-        print(f"TRAINING {i}")
-        classifier.train_model(final=False)
-        classifier.update_dictionary()
-        # TODO : update
-    path = classifier.train_model(final=True)
-    classifier.load_model(path)
+    #classifier = LogRegClassifier()
+    #for i in range(10):
+    #    print(f"TRAINING {i}")
+    #    classifier.train_model(final=False)
+    #    classifier.update_dictionary()
+    #path = classifier.train_model(final=True)
+    #classifier.load_model(path)
+    #classifier.classify_apps()
+
+    #classifier = MNBayesClassifier()
+    #classifier.build_model()
+    #classifier.classify_apps()
+    classifier = MNBayesAppsClassifier()
     classifier.classify_apps()
+
 
 
 class ProcessManager:
@@ -50,7 +58,7 @@ class ProcessManager:
     def launch_old_dataset(self):
         if self.__old_dataset_process:
             return
-        self.__old_dataset_process = multiprocessing.Process(target=execute_old_dataset_manager)
+        self.__old_dataset_process = multiprocessing.Process(name= 'Dataset Loader', target=execute_old_dataset_manager)
         self.__old_dataset_process.start()
 
     def launch_new_dataset(self):

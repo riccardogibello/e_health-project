@@ -10,6 +10,11 @@ medical exams
 detailed rationales
 learn finnish
 learn hindi
+learn italian
+learn russian
+learn english
+learn chinese
+learn japanese
 learn danish
 learn coding
 anatomy class
@@ -256,11 +261,9 @@ word order
 grammar and spelling questions
 grammar questions
 learn new vocabulary
-brain training game
 iq
 improve iq
 improve your iq
-train your brain
 dele test
 dele test preparation
 word sets
@@ -321,7 +324,7 @@ move in cleaning
 wash game
 professional cleaning
 how to clean
-alway clear and tidy
+always clear and tidy
 clean the house
 collect garbage
 housekeeping games
@@ -354,6 +357,9 @@ easy escape
 new escape games
 meet your girlfriend
 game is about kissing
+virtual boyfriend
+boyfriend
+girlfriend
 casual adventure game
 exam updates
 practice test app
@@ -439,6 +445,7 @@ learning journey
 savvy parents
 learning objective
 home tutor
+religion
 baby care game
 relaxing baby care appe
 baby care app

@@ -50,7 +50,6 @@ attention
 babies
 creative
 visual
-alphabets
 count
 painting
 solving
@@ -129,9 +128,7 @@ homeschool
 skill-building
 handwritting
 handwritten
-scholastic
 kindergarden
-punctuations
 punctuation
 strengths
 child-safe
@@ -152,8 +149,6 @@ child-oriented
 early-learning
 preschool-age
 toddler-games
-children-friendly
-preschool-friendly
 preschool-learning
 sound-spelling
 well-spelled
@@ -169,8 +164,6 @@ learning games
 motor skills
 learning game
 learning experience
-your pronunciation
-kids games
 kids learning
 learning apps
 fun learning
@@ -196,6 +189,7 @@ language skills
 early learning
 preschool children
 learn vocabulary
+vocabulary-building game
 serious game
 serious games
 best educational
@@ -281,6 +275,7 @@ small children
 speaking listening
 learning letters
 practice reading
+practice reading and spelling
 listening speaking
 great educational
 kindergarten games
@@ -299,10 +294,12 @@ improve kids
 pre-school kids
 color learning
 encourage kids
+motivate children
 kindergarten age
 learn kids
 education games
 alphabet phonics
+number sorting
 entertaining educational
 educate children
 learning reading
@@ -321,6 +318,7 @@ pre-school education
 early learners
 color recognition
 childs development
+developed to help young
 eye-hand coordination
 visual learning
 toddlers learning
@@ -354,6 +352,8 @@ childrens development
 number pronunciation
 games for kids
 game for kids
+first reading experience
+first reading
 fine motor skills
 games for toddlers
 app for kids
@@ -380,6 +380,7 @@ sparking kids creativity
 designed for kids
 can learn words
 suitable for children
+stimulating game environment
 for kids app
 children will learn
 learning for kids
@@ -410,6 +411,7 @@ imagination and creativity
 perfect for kids
 children and toddlers
 free educational game
+develop important skills
 this educational app
 educational and entertaining
 opportunity to learn
@@ -619,7 +621,6 @@ your child improve
 encourage your child
 counting for toddlers
 alphabet for children
-safe for children
 kids early education
 educational game learning
 pronunciation and orthography
@@ -766,6 +767,7 @@ to promote socio-emotional skills
 key skills for literacy
 help kids recognize letter
 children learn to read
+learn to read
 the ministry of education
 your kid will learn
 designed for children aged
@@ -779,3 +781,5 @@ motor skills of hands
 will help them improve
 develop their fine motor
 kids learn a lot
+educational potential
+strong educational potential
