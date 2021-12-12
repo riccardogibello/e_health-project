@@ -5,25 +5,18 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QObject
 from AlternativeGUI.WindowComponents.WaitingWindow import WaitingWindow
 from DataManagers.DataMiner import DataMiner
-from DataManagers.DatabaseManager import do_query
+from DataManagers.DatabaseManager import do_query, clear_table
 from DataManagers.DatasetManager import DatasetManager
 from DataManagers.OldDatasetManager import OldDatasetManager
 from Utilities.Classifiers.LogRegClassifier import LogRegClassifier
 from DataManagers.settings import KAGGLE_DATASET_PATH
-import dataframe_image as dfi
 
 
-def create_dictionary_data_retrieval_statistics(p_apps):
-    values = [0, 0, 0]
-    dict_ = {'category': ['currently loaded', 'checked', 'taken from dataset'], 'values': values}
-    for app in p_apps:
-        check = app[0]
-        from_dataset = app[1]
-        if check:
-            values[1] = values[1] + 1
-        if from_dataset:
-            values[2] = values[2] + 1
-        values[0] = values[0] + 1
+def create_dictionary_load_data_statistics(p_apps):
+    occurrence_list = []
+    dict_ = {'occurrence': occurrence_list}
+    for i in range(len(p_apps)):
+        occurrence_list.append(1)
 
     return pd.DataFrame(dict_)
 
@@ -40,8 +33,10 @@ def execute_old_dataset_manager():
 
 def execute_classification():
     classifier = LogRegClassifier()
-    for i in range(10):
+    for i in range(50):
+        print(f"TRAINING {i}")
         classifier.train_model(final=False)
+        classifier.update_dictionary()
         # TODO : update
     path = classifier.train_model(final=True)
     classifier.load_model(path)
@@ -50,6 +45,7 @@ def execute_classification():
 
 def execute_data_miner():
     miner = DataMiner()
+
     miner.fill_database()
 
 
@@ -64,45 +60,66 @@ class ProcessHandler(QObject):
         self.__dataset_process = None
         self.__old_dataset_process = None
         self.__classification_process = None
+        self.terminated_process = False
 
     def launch_data_miner(self):
         if self.__data_miner_process:
             return
         self.keep_on_updating = True
 
-        execute_data_miner()
+        self.__data_miner_process = multiprocessing.Process(target=execute_data_miner)
+        self.__data_miner_process.start()
+        self.__data_miner_process.join()
 
-        self.keep_on_updating = False
-        self.signal.emit('Idle.')
+        if not self.terminated_process:
+            self.signal.emit('Idle.')
+        self.terminated_process = False
 
-    def update_data_retrieval_page(self, gui_manager):
+    def update_data_retrieval_page(self, gui_manager, thread):
         window = gui_manager.window
         time.sleep(3)
 
-        while self.keep_on_updating:
-            time.sleep(1)
-            print('updating')
+        while self.keep_on_updating and thread.is_alive():
+            time.sleep(3)
+
             if isinstance(window, WaitingWindow):
                 query = 'SELECT `check`, from_dataset FROM preliminary'
                 apps_from_dataset = do_query((), query)
-
-                dataframe = create_dictionary_data_retrieval_statistics(apps_from_dataset)
-
-                dfi.export(dataframe, './data/output_data/retrieval_data_statistics.png')
-
+                window.apps_from_dataset = apps_from_dataset
                 self.update_signal.emit('Idle.')
 
-    def launch_old_dataset(self):
-        if self.__old_dataset_process:
+    def load_datasets(self):
+        clear_table('preliminary')
+        if self.__old_dataset_process or self.__dataset_process:
             return
+
+        self.keep_on_updating = True
+
         self.__old_dataset_process = multiprocessing.Process(target=execute_old_dataset_manager)
         self.__old_dataset_process.start()
-
-    def launch_new_dataset(self):
-        if self.__dataset_process:
-            return
         self.__dataset_process = multiprocessing.Process(target=execute_new_dataset_manager)
         self.__dataset_process.start()
+        self.__dataset_process.join()
+        self.__old_dataset_process.join()
+
+        self.keep_on_updating = False
+        if not self.terminated_process:
+            self.signal.emit('Idle.')
+        self.terminated_process = False
+
+    def update_load_data_page(self, gui_manager, thread):
+        window = gui_manager.window
+        time.sleep(3)
+
+        while self.keep_on_updating and thread.is_alive():
+            time.sleep(1)
+
+            if isinstance(window, WaitingWindow):
+                query = 'SELECT app_id FROM preliminary'
+                apps_from_dataset = do_query((), query)
+                window.apps_from_dataset = apps_from_dataset
+                self.update_signal.emit('Idle.')
+        print('end update_load_data_page')
 
     def do_classification_dataset(self):
         if self.__classification_process:
@@ -111,7 +128,13 @@ class ProcessHandler(QObject):
         self.__classification_process.start()
 
     def close_application(self):
+        self.terminated_process = True
         if self.__data_miner_process:
             self.__data_miner_process.terminate()
+        if self.__old_dataset_process:
+            self.__old_dataset_process.terminate()
         if self.__dataset_process:
             self.__dataset_process.terminate()
+        if self.__classification_process:
+            self.__classification_process.terminate()
+        print('closed')

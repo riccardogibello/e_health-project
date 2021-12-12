@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import google_play_scraper.exceptions
 import mysql
+import numpy as np
 import regex as re
 from bs4 import BeautifulSoup
 from mysutils.text import clean_text
@@ -39,7 +40,7 @@ def get_app_data(app_id):
         # Creating object Application
         application = Application(app_id, True)
     except google_play_scraper.exceptions.NotFoundError:
-        # App not found on Google Play Market meaning it does not exist anymore so it must be deleted from
+        # App not found on Google Play Market meaning it does not exist anymore, so it must be deleted from
         # labeled_app because it can not be used for training of ML model and from app table because it is
         # useless to classify it. The id is not deleted from preliminary table in order to keep trace of checked apps
         # and not check more than once in case the app is still given as similar of another one.
@@ -77,7 +78,7 @@ def check_app(app, from_dataset):
     if not app or app.category not in SERIOUS_GAMES_CATEGORIES_LIST:
         return False, False
     if app.score == 0 and app.min_installs < 500:
-        #print(f"score {app.app_id} - {app.score} - {app.min_installs}")
+        # print(f"score {app.app_id} - {app.score} - {app.min_installs}")
         return False, True
     if app.updated < settings.LAST_UPDATE:
         return False, True
@@ -92,85 +93,16 @@ def check_app(app, from_dataset):
     return True, True
 
 
-class DataMiner:
-    __apps_id_list = []
+def load_app_into_database(app_list, offset, batch_size, threads):
+    for i in np.arange(offset, batch_size):
+        app_data = app_list[i]
 
-    def __init__(self):
-        threading.currentThread().name = 'Data Miner'
-        if DEBUG:
-            print(f'{threading.currentThread()}  || Data Miner : Started')
-        self.__running = True
-        start_attempts = 0
-        self.__failed_connections = 0
-        self.__retrieve_incomplete_data(True)
-        while (not len(self.__apps_id_list)) and start_attempts < 5:
-            start_attempts += 1
-            time.sleep(30)
-            self.__retrieve_incomplete_data()
-
-    def __reset_connection_counter(self):
-        self.__failed_connections = 0
-
-    def __increment_connection_counter(self):
-        self.__failed_connections += 1
-
-    def __retrieve_incomplete_data(self, start=False):
-        # Looks in the preliminary table for checked apps has not been checked yet
-        # and save their IDs in self.__apps_id_list
-        query = (
-            "SELECT app_id, from_dataset FROM preliminary WHERE preliminary.`check` IS FALSE"
-        )
-        test_query = (
-            "SELECT A.app_id, B.from_dataset FROM labeled_app as A, preliminary as B WHERE A.app_id = B.app_id"
-        )
-        try:
-            self.__apps_id_list = do_query((), query)
-            self.__reset_connection_counter()
-            if not len(self.__apps_id_list):
-                if not start:
-                    self.__running = False
-                    if DEBUG:
-                        print(f'{threading.currentThread()}  || Data Miner : No new app found')
-
-        except mysql.connector.errors.DatabaseError:
-            self.__increment_connection_counter()
-            if self.__failed_connections < 5:
-                if DEBUG:
-                    print(f'{threading.currentThread()} || Data Miner : Database communication error - '
-                          f'Retry in 30 seconds')
-                time.sleep(30)
-                return
-            elif self.__failed_connections >= 5:
-                self.__running = False
-                if DEBUG:
-                    print(f'{threading.currentThread()} || Data Miner : Database communication error!!\n'
-                          f'TOO MANY ATTEMPTS FAILED - Execution terminated')
-
-    def fill_database(self):
-        while self.__running:
-            if not len(self.__apps_id_list):
-                self.__retrieve_incomplete_data()
-            if not self.__running:
-                return
-
-            with ThreadPoolExecutor(max_workers=MAX_RETRIEVE_APP_DATA_THREADS) as executor:
-                for application in self.__apps_id_list:
-                    executor.submit(self.load_app_into_database, application[0], application[1])
-            self.__apps_id_list = []
-
-    def load_chunk(self, chunk):
-        for application in chunk:
-            self.load_app_into_database(application[0], application[1])
-
-    def split_list_in_chunks(self, num_chunks=MAX_RETRIEVE_APP_DATA_THREADS):
-        chunk_dim = int(len(self.__apps_id_list) / num_chunks) + 1
-        chunks = [self.__apps_id_list[x:x + chunk_dim] for x in range(0, len(self.__apps_id_list), chunk_dim)]
-        return chunks
-
-    def load_app_into_database(self, app_id, from_dataset):
+        app_id = app_data[0]
+        print('loading ' + str(app_id))
+        from_dataset = app_data[1]
         application = get_app_data(app_id)
         if not application:
-            return
+            continue
         insert_app, insert_similar = check_app(application, from_dataset)
 
         if insert_app:
@@ -198,6 +130,105 @@ class DataMiner:
                     insert_preliminary(developer_app)
 
         update_status_preliminary(app_id)
+    threads.pop()
+
+
+class DataMiner:
+    __apps_id_list = []
+
+    def __init__(self):
+        threading.currentThread().name = 'Data Miner'
+        if DEBUG:
+            print(f'{threading.currentThread()}  || Data Miner : Started')
+        self.__running = True
+        start_attempts = 0
+        self.__failed_connections = 0
+        self.__retrieve_incomplete_data(True)
+
+        while (not len(self.__apps_id_list)) and start_attempts < 5:
+            start_attempts += 1
+            time.sleep(30)
+
+            self.__retrieve_incomplete_data()
+
+    def __reset_connection_counter(self):
+        self.__failed_connections = 0
+
+    def __increment_connection_counter(self):
+        self.__failed_connections += 1
+
+    def __retrieve_incomplete_data(self, start=False):
+        # Looks in the preliminary table for checked apps has not been checked yet
+        # and save their IDs in self.__apps_id_list
+        query = (
+            "SELECT app_id, from_dataset FROM preliminary WHERE preliminary.`check` IS FALSE"
+        )
+        test_query = (
+            "SELECT A.app_id, B.from_dataset FROM labeled_app as A, preliminary as B WHERE A.app_id = B.app_id"
+        )
+
+        try:
+            self.__apps_id_list = do_query((), query)
+            self.__reset_connection_counter()
+            if not len(self.__apps_id_list):
+                if not start:
+                    self.__running = False
+                    if DEBUG:
+                        print(f'{threading.currentThread()}  || Data Miner : No new app found')
+
+        except mysql.connector.errors.DatabaseError:
+            self.__increment_connection_counter()
+            if self.__failed_connections < 5:
+                if DEBUG:
+                    print(f'{threading.currentThread()} || Data Miner : Database communication error - '
+                          f'Retry in 30 seconds')
+                time.sleep(30)
+                return
+            elif self.__failed_connections >= 5:
+                self.__running = False
+                if DEBUG:
+                    print(f'{threading.currentThread()} || Data Miner : Database communication error!!\n'
+                          f'TOO MANY ATTEMPTS FAILED - Execution terminated')
+
+    def fill_database(self):
+
+        while self.__running:
+            if not len(self.__apps_id_list):
+                self.__retrieve_incomplete_data()
+            if not self.__running:
+                return
+
+            batch_size = int(len(self.__apps_id_list) * 0.05)
+            n_threads_max = int(len(self.__apps_id_list) // batch_size + 1)
+            offset = 0
+
+            threads_status = []
+            status = False
+            i = 0
+            with ThreadPoolExecutor(max_workers=n_threads_max) as executor:
+                while offset < len(self.__apps_id_list):
+                    threads_status.append(status)
+                    executor.submit(load_app_into_database, self.__apps_id_list, offset, batch_size,
+                                    threads_status)
+                    offset = offset + batch_size
+                    print('thread ' + str(i))
+                    i = i + 1
+
+            while False in threads_status:
+                time.sleep(3)
+
+            print('ended')
+
+            self.__apps_id_list = []
+
+    def load_chunk(self, chunk):
+        for application in chunk:
+            load_app_into_database(application[0], application[1])
+
+    def split_list_in_chunks(self, num_chunks=MAX_RETRIEVE_APP_DATA_THREADS):
+        chunk_dim = int(len(self.__apps_id_list) / num_chunks) + 1
+        chunks = [self.__apps_id_list[x:x + chunk_dim] for x in range(0, len(self.__apps_id_list), chunk_dim)]
+        return chunks
 
     def shutdown(self):
         self.__running = False

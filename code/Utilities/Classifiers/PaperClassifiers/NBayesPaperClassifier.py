@@ -3,14 +3,14 @@ import os.path
 import re
 import numpy as np
 import pandas as pd
-from sklearn.metrics import confusion_matrix
-import matplotlib.pyplot as plt
-import seaborn as sns
+from pandas import DataFrame
+from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
 from DataManagers.DatabaseManager import do_query
 from DataManagers.WordsMiner import sanitize_and_tokenize, count_occurrences
 from DataModel.Publication import Publication
 from Utilities.Classifiers.PaperClassifiers.PaperClassifier import PaperClassifier
 from Utilities.ConfusionMatrixPrinter import save_confusion_matrix
+import dataframe_image as dfi
 
 URL_PATTERN = r'[A-Za-z0-9]+://[A-Za-z0-9%-_]+(/[A-Za-z0-9%-_])*(#|\\?)[A-Za-z0-9%-_&=]*'
 
@@ -36,6 +36,44 @@ def format_label(label):
             study_type = study_type + sub_word + '\n'
         study_type = study_type[:-1]
     return study_type
+
+
+def compute_total_occurrences(occurrence_list):
+    total = 0
+    for occurrence in occurrence_list:
+        total = total + occurrence
+    return total
+
+
+def print_metrics(results, labels):
+    # results = ([precision], [recall], [f1])
+    study_type_list = []
+    results_dictionary = {'precision': [], 'recall': [], 'f1': []}
+    index = 0
+    for label in labels:
+        study_type_list.append(label)
+        precision_list = results_dictionary.get('precision')
+        recall_list = results_dictionary.get('recall')
+        f1_list = results_dictionary.get('f1')
+        precision = results[0][index]
+        precision_list.append(precision)
+        recall = results[1][index]
+        recall_list.append(recall)
+        f1 = results[2][index]
+        f1_list.append(f1)
+
+        results_dictionary = {'precision': precision_list,
+                              'recall': recall_list,
+                              'f1': f1_list}
+
+        index = index + 1
+    dataframe = DataFrame(results_dictionary, index=study_type_list)
+    dataframe = dataframe.style.set_properties(**{'background-color': 'black',
+                                                  'color': 'green'})
+
+    dfi.export(dataframe, './data/output_data/resu.png')
+
+    print(results_dictionary)
 
 
 class NBayesPaperClassifier(PaperClassifier):
@@ -100,7 +138,7 @@ class NBayesPaperClassifier(PaperClassifier):
             # This dictionary contains as key the words found in the related papers and as value the related occurrence
             for text in paper_text_list:
                 word_list = sanitize_text(text, True, True)
-                word_list = sanitize_and_tokenize(word_list)
+                word_list = sanitize_and_tokenize(text=word_list, max_n_gram=1)
                 word_list_occurrences = count_occurrences(word_list)
                 for word in word_list_occurrences.keys():
                     occurrences = word_list_occurrences.get(word)
@@ -132,19 +170,21 @@ class NBayesPaperClassifier(PaperClassifier):
         for study_type in self.studytype__word_occurrence_dictionary__dictionary.keys():
             word_occurrence_dictionary = self.studytype__word_occurrence_dictionary__dictionary.get(study_type)
             vocabulary_set = set.union(vocabulary_set, word_occurrence_dictionary.keys())
-        vocabulary_size = len(vocabulary_set)
+
+        vocabulary_size = len(vocabulary_set)  # this is the size of the whole vocabulary
+        # (without duplicated of the words)
 
         # then we can compute the likelihood for each word in each of the study types
         for study_type in self.studytype__word_occurrence_dictionary__dictionary.keys():
             likelihoods = self.likelihoods.get(study_type)
             word_occurrence_dictionary = self.studytype__word_occurrence_dictionary__dictionary.get(study_type)
-            study_type_vocabulary_size = len(word_occurrence_dictionary)
+            study_type_dictionary_size = compute_total_occurrences(word_occurrence_dictionary.values())
             for word in vocabulary_set:
                 word_occurrences_given_studytype = word_occurrence_dictionary.get(word)
                 if word_occurrences_given_studytype:
-                    likelihood = (word_occurrences_given_studytype + 1) / (study_type_vocabulary_size + vocabulary_size)
+                    likelihood = (word_occurrences_given_studytype + 1) / (study_type_dictionary_size + vocabulary_size)
                 else:
-                    likelihood = 1 / (study_type_vocabulary_size + vocabulary_size)
+                    likelihood = 1 / (study_type_dictionary_size + vocabulary_size)
                 log_likelihood = math.log(likelihood, 2)
                 likelihoods.__setitem__(word, log_likelihood)
 
@@ -160,7 +200,7 @@ class NBayesPaperClassifier(PaperClassifier):
 
             title = publication.title
 
-            title_words = set(sanitize_and_tokenize(title))
+            title_words = set(sanitize_and_tokenize(text=title, max_n_gram=1))
             words = title_words
             probability = self.prior_probabilities.get(study_type)
             word_likelihood_dict = self.likelihoods.get(study_type)
@@ -168,7 +208,7 @@ class NBayesPaperClassifier(PaperClassifier):
                 word_likelihood = word_likelihood_dict.get(word)
                 if not word_likelihood:
                     continue
-                probability = probability * word_likelihood
+                probability = probability + word_likelihood
 
             probabilities_array.append(probability)
 
@@ -210,6 +250,10 @@ class NBayesPaperClassifier(PaperClassifier):
 
         save_confusion_matrix(fig_width=8, fig_height=6, heatmap_width=5, heatmap_height=3,
                               confusion_matrix_dataframe=cm_df, path='./data/output_data/test.png')
+
+        labels = self.studytype_paperlist_dictionary.keys()
+        results = precision_recall_fscore_support(y_true=self.array_true_labels, y_pred=self.array_predicted_labels)
+        print_metrics(results, labels)
 
     def compute_scatter_matrix_indexes(self):
         indexes = []

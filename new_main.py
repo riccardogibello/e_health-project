@@ -50,5 +50,4 @@ if __name__ == '__main__':
 
     app.exec()
 
-
     proc_man.close_application()

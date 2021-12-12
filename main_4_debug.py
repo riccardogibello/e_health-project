@@ -1,3 +1,4 @@
+from datetime import datetime
 from threading import Thread
 from selenium.common.exceptions import WebDriverException
 from DataManagers.DatabaseManager import do_query
@@ -5,12 +6,14 @@ import time
 import numpy as np
 from selenium import webdriver
 
+from DataManagers.WordsMiner import sanitize_and_tokenize
 from DataModel.Library import Library
 from DataModel.Publication import Publication
 from Utilities.Classifiers.LogRegClassifier import LogRegClassifier
 from Utilities.Classifiers.PaperClassifiers.FrequentistPaperClassifier import PaperClassifier
 from Utilities.Classifiers.PaperClassifiers.NBayesPaperClassifier import NBayesPaperClassifier
 from Utilities.Scrapers.NatureScraper import NatureScraper
+from Utilities.Scrapers.PubMedScraper import PubMedScraper
 
 
 def browse(url_to_open, how_long):
@@ -74,20 +77,28 @@ def label_apps():
 
 if __name__ == '__main__':
     # label_apps()
-    # library = Library()
-
+    library = Library()
     # p = NatureScraper(library)
-    # p = NatureScraper(library)
+    p = PubMedScraper(library)
 
-    # classifier = NBayesPaperClassifier(True)
+    '''string = 'Children with developmental disabilities may need support with motor skills such as balance improvement, cognitive skills such as vocabulary learning, or social skills such as adequate interpretation of emotional expressions. Digital interactive games could support the standard treatments. We aimed to review clinical studies which investigated the application of serious games in children with developmental disabilities.'
+    word_list = sanitize_and_tokenize(text=string, max_n_gram=2)
+    print(word_list)'''
 
-    classifier = LogRegClassifier()
+
+    '''start = time.time()
+    classifier = NBayesPaperClassifier(True)
+    end = time.time()
+
+    print(str(end - start))'''
+
+    '''classifier = LogRegClassifier()
     for i in range(10):
         classifier.train_model(final=False)
         # TODO : update
     path = classifier.train_model(final=True)
     classifier.load_model(path)
-    classifier.classify_apps()
+    classifier.classify_apps()'''
 
     # ===============================================================
     # DEBUGGING PART

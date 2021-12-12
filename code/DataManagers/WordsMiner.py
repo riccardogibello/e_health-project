@@ -1,4 +1,7 @@
-from nltk import WordNetLemmatizer, PunktSentenceTokenizer, WordPunctTokenizer, sent_tokenize
+import string
+
+import numpy as np
+from nltk import WordNetLemmatizer, PunktSentenceTokenizer, WordPunctTokenizer, sent_tokenize, ngrams
 from nltk.corpus import stopwords
 
 from WEBFunctions.web_mining_functions import *
@@ -21,7 +24,10 @@ def count_occurrences(words):
     # the returned dictionary contains an entry for each word found, and the correspondent value is the number of times
     # that word has been found
     # { key = word, value = count }
-    return occurrences
+
+    # TODO : check if the following actually work
+    sorted_dict = dict(sorted(occurrences.items(), key=lambda x: x[1], reverse=True))
+    return sorted_dict
 
 
 def split_text(text):
@@ -50,8 +56,8 @@ def split_text(text):
     return words
 
 
-def sanitize_and_tokenize(text):
-    text = text.lower()
+def sanitize_and_tokenize_sentences(entire_text):
+    text = entire_text.lower()
     new_string = str(text.encode('ascii', errors='ignore').decode())
     new_string = re.sub(r"[ ]+", " ", new_string)
     new_string = re.sub(r"[\b]+", "", new_string)
@@ -67,11 +73,32 @@ def sanitize_and_tokenize(text):
     except ValueError:
         sentences = sent_tokenize(new_string)
 
+    return sentences
+
+
+def concatenate_n_grams(n_grams_list):
+    list_ = []
+    for n_gram in n_grams_list:
+        concatenated_string = ''
+        for el in n_gram:
+            concatenated_string = concatenated_string + el + ' '
+        concatenated_string = re.sub('[ ]$', '', concatenated_string)
+        list_.append(concatenated_string)
+    return list_
+
+
+def sanitize_and_tokenize(text, max_n_gram=1):
+    sentences = sanitize_and_tokenize_sentences(text)
     # secondly, split each sentence into single words.
     word_punctuation_tokenizer = WordPunctTokenizer()
     words = []
     for sentence in sentences:
+        sentence = sentence.translate(str.maketrans('', '', string.punctuation.replace('-', '')))
         word_list = word_punctuation_tokenizer.tokenize(sentence)
+        for i in np.arange(2, max_n_gram + 1):
+            n_grams_list = list(ngrams(sentence.split(), i))
+            n_grams_list = concatenate_n_grams(n_grams_list)
+            word_list = word_list + n_grams_list
         for word in word_list:
             words.append(word)
 
@@ -81,7 +108,9 @@ def sanitize_and_tokenize(text):
     stop_words = set(stopwords.words('english'))
     for word in words:
         if word in stop_words:
+            words.remove(word)
             continue
+
         lemmatized_word = lemmatizer.lemmatize(word)
         if word != lemmatized_word:
             words.remove(word)
@@ -132,7 +161,8 @@ class WordsMiner:
             else:
                 text = find_text_from_web_page(path)
 
-            words = sanitize_and_tokenize(text)  # the method returns a list of words found in the text
+            words = sanitize_and_tokenize(text=text,
+                                          max_n_gram=1)  # the method returns a list of words found in the text
 
             occurrence_word_dictionary = count_occurrences(words)  # return value -> { key = word, value = #occurrence }
             occurrences = sorted(

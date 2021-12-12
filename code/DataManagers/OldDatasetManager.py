@@ -95,7 +95,7 @@ class OldDatasetManager:
                 continue
 
             insert_stmt = (
-                "INSERT INTO preliminary(app_id, `check`, from_dataset)"
+                "INSERT IGNORE INTO preliminary(app_id, `check`, from_dataset)"
                 "VALUES (%s, %s, %s)"
             )
             do_query((details[2], False, True), insert_stmt)

@@ -27,10 +27,10 @@ class GUIManager:
         self.window = ManualClassifierWindow(self)
         self.window.show()
 
-    def go_to_waiting_page(self, message, image_path):
+    def go_to_waiting_page(self, message, go_back_button_text, number_labels):
         if self.window:
             self.window.close()
-        self.window = WaitingWindow(self, message, image_path)
+        self.window = WaitingWindow(self, message, go_back_button_text, number_labels)
         self.window.show()
 
     def go_to_generic_page(self, message):

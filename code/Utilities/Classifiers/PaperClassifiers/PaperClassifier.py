@@ -35,6 +35,8 @@ def find_papers(id_list, is_from_pubmed_site):
             page = find_web_page(url)
             soup = BeautifulSoup(page, 'lxml')
             xml_result = soup.find('articletitle')
+            if not xml_result:
+                continue
 
             for el in xml_result:
                 if el == '\n':
@@ -44,6 +46,9 @@ def find_papers(id_list, is_from_pubmed_site):
             paper_text = paper_text + '\n'
 
             xml_result = soup.findAll('abstracttext')
+            if not xml_result:
+                continue
+
             for el in xml_result:
                 if el == '\n':
                     continue

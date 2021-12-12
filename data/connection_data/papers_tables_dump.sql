@@ -26,8 +26,16 @@ CREATE TABLE `app_paper` (
 DROP TABLE IF EXISTS `paper_keywords`;
 CREATE TABLE `paper_keywords` (
   `paper_id` varchar(100),
+  `keyword_id` varchar(200),
+  PRIMARY KEY (`paper_id`, `keyword_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `keyword`;
+CREATE TABLE `keyword` (
+  `keyword_id` integer UNIQUE NOT NULL AUTO_INCREMENT,
   `keyword` varchar(200),
-  PRIMARY KEY (`paper_id`, `keyword`)
+  `occurrences` int DEFAULT 0,
+  PRIMARY KEY (`keyword_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `author_paper`;
