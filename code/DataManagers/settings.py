@@ -37,7 +37,9 @@ DATASET_DEBUG = False
 DICTIONARY_INCREMENT = 50
 TRUE_CLASSIFIED_INCREMENT = 1
 WRONG_CLASSIFIED_INCREMENT = 2
-SMOOTHING_COEFFICIENT = 0.0001
+SMOOTHING_COEFFICIENT = 1
+TEST_SET_DIMENSION = 0.2  # fraction of training set
+NUM_MODELS = 1
 # DATABASE SETTINGS
 MAX_CONNECTION_ATTEMPTS = 20
 # APP TABLE ATTRIBUTES POSITIONS
@@ -172,5 +174,7 @@ stop_words = [
     "whence", "whenever", "where", "whereafter", "whereas", "whereby",
     "wherein", "whereupon", "wherever", "whether", "which", "while",
     "who", "whoever", "whom", "whose", "why", "will", "with",
-    "within", "without", "would", "yet", "you", "your", "yours", "yourself", "yourselves"
+    "within", "without", "would", "yet", "you", "your", "yours", "yourself", "yourselves",
+
+    "u", "b", "s", "ha", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"
 ]
