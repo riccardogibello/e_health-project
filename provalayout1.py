@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 from pandas import DataFrame
 from DataManagers.DatabaseManager import do_query
 from Utilities.Classifiers.LogRegClassifier import retrieve_columns_names_given_table
+import plotly.express as px
 
 
 def create_dataframe_from_table(table, columns):
@@ -20,7 +21,7 @@ def create_dataframe_from_table(table, columns):
     return dataframe
 
 
-def extract_categories_distribution_from_database():
+def get_selected_app_data_dataframe_from_database():
     query = "SELECT app_id, app_name, description, category_id, score, rating, installs, developer_id, " \
             "last_update, content_rating, content_rating_description, teacher_approved FROM selected_app"
     selected_app_table = do_query((), query)
@@ -30,7 +31,7 @@ def extract_categories_distribution_from_database():
     return df
 
 
-def extract_papers_data_from_database():
+def get_papers_data_as_dataframe_from_database():
     query = "SELECT paper_id, paper_title, abstract, type FROM paper"
     paper_table = do_query((), query)
     study_types_list = ["RCT", "CaseControl", "CohortStudy", "SystematicReview", "ObservationalStudy", "MetaAnalysis"]
@@ -43,7 +44,7 @@ def extract_papers_data_from_database():
 
 
 def create_pie_graph_study_type():
-    study_types_list, study_types_occurrence_list = extract_papers_data_from_database()
+    study_types_list, study_types_occurrence_list = get_papers_data_as_dataframe_from_database()
     layout1 = html.Div([html.H1("Pie Graph"),
                         dcc.Graph(
                             id="example1",
@@ -63,18 +64,44 @@ def create_pie_graph_study_type():
     return layout1
 
 
+def create_bar_plot_categories_into_selected_app():
+    # create a dataframe that contains all the selected_app data
+    dataframe_selected_app = get_selected_app_data_dataframe_from_database()
+    # create a new dataframe that contains only the interesting data (here the category_id)
+    dataframe_selected_app_filtered = DataFrame(dataframe_selected_app.loc[:, 'category_id'])
+    # add a new column to the dataframe called 'occurrence'. All the rows will contain a 1.
+    # This is used in the following the group by.
+    dataframe_selected_app_filtered['occurrence'] = '1'
+
+    # Here all the category_id are grouped and the 'occurrence' values are summed. In this way the dataframe will
+    # contain for each category_id the total number of occurrences of that category_id.
+    dataframe_selected_app_filtered = dataframe_selected_app_filtered.groupby('category_id').count().reset_index()
+
+    fig = px.bar(dataframe_selected_app_filtered, x='category_id', y='occurrence')
+
+    layout2 = html.Div([html.H1("Bar Plot"),
+                        dcc.Graph(
+                            id='example-graph',
+                            figure=fig
+                        )
+                        ])
+    return layout2
+
+
 def create_dash(app_):
     # df = pd.DataFrame(data=extract_papers_data_from_database())
     # app = dash.Dash(__name__)
     layout1 = create_pie_graph_study_type()
+
+    layout2 = create_bar_plot_categories_into_selected_app()
 
     # app.layout = html.Div([ layout1,layout2, layout1])
     app_.layout = html.Div([
         dbc.Col([
             html.H1("TITLE"),
             dbc.Row([
-                dbc.Col(layout1, width=True)
-
+                dbc.Col(layout1),
+                dbc.Col(layout2)
             ])
         ])
     ])
