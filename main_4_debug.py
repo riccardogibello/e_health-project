@@ -1,5 +1,7 @@
 from datetime import datetime
 from threading import Thread
+
+import pandas as pd
 from selenium.common.exceptions import WebDriverException
 from DataManagers.DatabaseManager import do_query
 import time
@@ -77,20 +79,20 @@ def label_apps():
 
 if __name__ == '__main__':
     # label_apps()
-    library = Library()
-    # p = NatureScraper(library)
-    p = PubMedScraper(library)
+    '''library = Library()
+    p = NatureScraper(library)'''
+    # p = PubMedScraper(library)
 
     '''string = 'Children with developmental disabilities may need support with motor skills such as balance improvement, cognitive skills such as vocabulary learning, or social skills such as adequate interpretation of emotional expressions. Digital interactive games could support the standard treatments. We aimed to review clinical studies which investigated the application of serious games in children with developmental disabilities.'
     word_list = sanitize_and_tokenize(text=string, max_n_gram=2)
     print(word_list)'''
 
-
-    '''start = time.time()
-    classifier = NBayesPaperClassifier(True)
+    start = time.time()
+    classifier = NBayesPaperClassifier(False)
+    pd.read_csv('./data/input_data/study_type_mesh_correspondence.txt')
     end = time.time()
 
-    print(str(end - start))'''
+    print(str(end - start))
 
     '''classifier = LogRegClassifier()
     for i in range(10):

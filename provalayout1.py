@@ -1,11 +1,33 @@
-import dash
-from dash import dcc
+from dash import dcc, dash
 from dash import html
-import plotly.express as px
-import pandas as pd
 import dash_bootstrap_components as dbc
-
+from pandas import DataFrame
 from DataManagers.DatabaseManager import do_query
+from Utilities.Classifiers.LogRegClassifier import retrieve_columns_names_given_table
+
+
+def create_dataframe_from_table(table, columns):
+    dictionary = {}
+    for column in columns:
+        dictionary.__setitem__(column, [])
+
+    for row in table:
+        for i in range(len(columns)):
+            column = columns[i]
+            dictionary.get(column).append(row[i])
+
+    dataframe = DataFrame.from_dict(data=dictionary)
+    return dataframe
+
+
+def extract_categories_distribution_from_database():
+    query = "SELECT app_id, app_name, description, category_id, score, rating, installs, developer_id, " \
+            "last_update, content_rating, content_rating_description, teacher_approved FROM selected_app"
+    selected_app_table = do_query((), query)
+    column_names_list = retrieve_columns_names_given_table("selected_app")
+
+    df = create_dataframe_from_table(selected_app_table, column_names_list)
+    return df
 
 
 def extract_papers_data_from_database():

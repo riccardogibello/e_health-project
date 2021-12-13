@@ -78,20 +78,21 @@ def print_metrics(results, labels):
 
 class NBayesPaperClassifier(PaperClassifier):
     def __init__(self, recompute):
-        super().__init__()
         self.prior_probabilities = {}  # { study_type : log_probability }}
         self.likelihoods = {}  # { study_type : { word : loglikelihood }}
+        self.array_predicted_labels = []
+        self.array_true_labels = []
         if recompute:
+            super().__init__()
             self.studytype__word_occurrence_dictionary__dictionary = {}
             self.compute_words_per_studytype()
             self.compute_prior_probabilities()
             self.compute_likelihoods()
             self.save_model()
+            self.test_model()
         else:
             self.load_model()
-        self.array_predicted_labels = []
-        self.array_true_labels = []
-        self.test_model()
+            self.classify_serious_games_papers()
 
     def save_model(self):
         if not os.path.exists('./data/models'):
@@ -113,7 +114,7 @@ class NBayesPaperClassifier(PaperClassifier):
                 f_out.write(word + ',' + str(sorted_dictionary.get(word)) + '\n')
 
     def load_model(self):
-        for study_type in self.studytype_paperlist_dictionary.keys():
+        for study_type in self.study_type_correspondence.keys():
             f_in = open('./data/models/NBayesPaperClassifier/prior_probabilities/' + study_type + '.txt', 'r')
             lines = f_in.readlines()
             for line in lines:
@@ -193,7 +194,7 @@ class NBayesPaperClassifier(PaperClassifier):
     def classify_paper(self, publication):
         study_type_array = []
         probabilities_array = []
-        for study_type in self.studytype_paperlist_dictionary.keys():
+        for study_type in self.study_type_correspondence.keys():
             # for each type of publication, compute the total count of
             # the occurrences of the words given in the vocabularies
             study_type_array.append(study_type)
@@ -239,6 +240,21 @@ class NBayesPaperClassifier(PaperClassifier):
             self.array_true_labels.append(true_study_type)
 
         self.print_confusion_matrix()
+
+    def classify_serious_games_papers(self):
+        query = 'SELECT paper_id, paper_title, abstract FROM paper'
+        results = do_query('', query)
+
+        for result in results:
+            paper_id = result[0]
+            title = result[1]
+            abstract = result[2]
+            text = title + abstract
+
+            predicted_study_type = self.classify_paper(Publication(title=text, abstract='', authors=''))
+
+            query = 'UPDATE paper SET type = %s WHERE paper_id = %s'
+            do_query((predicted_study_type, paper_id), query)
 
     def print_confusion_matrix(self):
         indexes = self.compute_scatter_matrix_indexes()
