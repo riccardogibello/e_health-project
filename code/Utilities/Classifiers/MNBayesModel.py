@@ -63,7 +63,7 @@ class MNBayesClassifierModel:
         #  if in the next iterations performances improves then values will be updated, if not then these values will be
         #  restored and used for classification. The number of iterations after each save are defined in settings file.
         self.__best_performance = PerformanceMetrics(0, 0, 0, 0)
-        self.__best_likelihoods = []
+        self.__best_likelihoods = [{}, {}]
         #  following lists are used for saving classification of apps from training set after each train iteration.
         self.__training_classified_serious = []
         self.__training_classified_non_serious = []
@@ -113,6 +113,8 @@ class MNBayesClassifierModel:
             self.compute_likelihoods()
             self.evaluate_model()
             self.__update_occurrences()
+            self.__training_complete = self.__after_best_iterations >= NON_IMPROVING_ITERATIONS
+        self.restore_best_model()
 
         # save_dictionary(self.non_serious_likelihoods, self.serious_likelihoods)
 
@@ -221,7 +223,6 @@ class MNBayesClassifierModel:
         self.__performance = self.__best_performance
         self.__serious_likelihoods = self.__best_likelihoods[0]
         self.__non_serious_likelihoods = self.__best_likelihoods[1]
-        self.__training_complete = True
         self.__serious_words = self.__non_serious_words = self.__vocabulary = None
 
     def calculate_performances(self, true_labels, predicted_labels):
@@ -256,7 +257,7 @@ class MNBayesClassifierModel:
         self.__training_classified_serious.clear()
         self.__training_classified_non_serious.clear()
         for app in self.__testing_set + self.__training_set:
-            if self.classify_app(app):
+            if self.classify_app(app[0]):
                 self.__training_classified_serious.append(app)
             else:
                 self.__training_classified_non_serious.append(app)
@@ -284,6 +285,12 @@ class MNBayesClassifierModel:
                                                                   if app[1] and app in self.__training_set]
 
     def evaluate_model(self):
+        """
+        Evaluation of the model performances on the validation set.
+        All applications from training and validation sets are classified using the current model and then performances
+        are computed. If the current model is better then the best among previous ones then it becomes the new best and
+        likelihood are saved.
+        """
         self.__training_classification()
         y_true, y_pred = self.__create_validation_labels()
         self.calculate_performances(y_true, y_pred)
@@ -296,11 +303,11 @@ class MNBayesClassifierModel:
         else:
             self.__after_best_iterations += 1
 
-        #self.create_global_vocabulary()
-        #self.compute_likelihoods()
-        #self.evaluate_model()
-
     def __update_occurrences(self):
+        """
+        After evaluation, if needed, the occurrences of the words are updated
+        :return:
+        """
         for app in self.__training_apps_classification_distribution['FN']:
             for word in self.__serious_words:
                 if word in app[0]:
@@ -318,19 +325,18 @@ class MNBayesClassifierModel:
         """
         return self.__performance.f1 > self.__best_performance.f1
 
-    def classify_app(self, app):
+    def classify_app(self, description):
         """
         Considering the description of the application calculates the probability of app being a serious game or not.
-        :param app: tuple containing data about application.
+        :param description: a string containing all description of the application to classify
         :return: True if the considered app is more likely to be serious game, False otherwise.
         """
         serious_probability = self.__prior_probabilities['serious']
         non_serious_probability = self.__prior_probabilities['non-serious']
-        app_description = app[0]
         for word in self.__serious_likelihoods:
-            if word in app_description:
+            if word in description:
                 serious_probability += self.__serious_likelihoods[word]
         for word in self.__non_serious_likelihoods:
-            if word in app_description:
+            if word in description:
                 non_serious_probability += self.__non_serious_likelihoods[word]
         return serious_probability > non_serious_probability

@@ -40,7 +40,7 @@ def execute_classification():
 
     classifier = MNBayesAppsClassifier()
     classifier.train_models()
-    #classifier.classify_apps()
+    classifier.classify_apps()
 
 
 
