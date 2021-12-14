@@ -237,13 +237,14 @@ class MNBayesClassifierModel:
         test_fp = len([app for app in self.__training_classified_serious if (not app[1]) and app in self.__testing_set])
         test_fn = len([app for app in self.__training_classified_non_serious if app[1] and app in self.__testing_set])
 
-        print(f'Recall : {self.__performance.recall}\tAccuracy : {self.__performance.accuracy}\t'
-              f'Precision : {self.__performance.precision}\tF1 score: {self.__performance.f1}\t '
-              f'TP {test_tp},'
-              f' TN {test_tn}, FN {test_fn}, FP {test_fp}')
+        self.__performance.print_values()
+
+        #print(f'Recall : {self.__performance.recall}\tAccuracy : {self.__performance.accuracy}\t'
+        #      f'Precision : {self.__performance.precision}\tF1 score: {self.__performance.f1}\t '
+        #      f'TP {test_tp},'
+        #      f' TN {test_tn}, FN {test_fn}, FP {test_fp}')
 
         # TODO test_distribution rewrite for better performance
-        print(str(self.__id) + str(self.__iteration_count))
         database_query((self.__id, self.__iteration_count, self.__performance.recall, self.__performance.accuracy,
                         self.__performance.precision, self.__performance.f1, test_tp, test_tn, test_fp, test_fn),
                        "INSERT INTO classification_performance(model_id, iteration, recall, accuracy, `precision`, "
