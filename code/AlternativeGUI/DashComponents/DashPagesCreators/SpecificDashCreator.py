@@ -2,20 +2,33 @@ from dash import html, dcc
 from DataManagers.DatabaseManager import do_query
 
 
-def compute_options_for_applications():
+def compute_list_of_dictionary_label_value(results):
     dictionary_label_value__list = []
-    query = 'SELECT app_id, app_name FROM selected_app'
-    results = do_query((), query)
-
     for result in results:
         dictionary = {}
-        app_id = result[0]
-        app_name = result[1]
-        dictionary.__setitem__('label', app_name)
-        dictionary.__setitem__('value', app_id)
+        id = result[0]
+        name_displayed = result[1]
+        name_len = len(name_displayed)
+        if name_len - 1 > 45:
+            name_displayed = name_displayed[:45] + '...'
+        dictionary.__setitem__('label', name_displayed)
+        dictionary.__setitem__('value', id)
         dictionary_label_value__list.append(dictionary)
 
     return dictionary_label_value__list
+
+
+def compute_options_for_applications():
+    query = 'SELECT app_id, app_name FROM selected_app'
+    results = do_query((), query)
+    return compute_list_of_dictionary_label_value(results)
+
+
+def compute_options_for_papers():
+    query = 'SELECT paper_id, paper_title FROM paper'
+    results = do_query((), query)
+
+    return compute_list_of_dictionary_label_value(results)
 
 
 def get_specific_dash_page():
@@ -26,6 +39,8 @@ def get_specific_dash_page():
 
     applications = compute_options_for_applications()  # this must be a list of dictionaries,
     # in which every dictionary is composed by { 'label' : 'app_name', 'value' : 'app_id' }
+
+    papers = compute_options_for_papers()
 
     layout = html.Div(
         children=[
@@ -47,7 +62,8 @@ def get_specific_dash_page():
                                'border-spacing': '20px',
                                'margin-top': '50px',
                                'margin-bottom': '50px',
-                               'background': '#ADD8E6'},
+                               'background': '#ADD8E6',
+                               'min-width': '500px'},
                         children=[
                             html.Header(html.Th(colSpan=2, children=['Search for a serious game application!'],
                                                 style={
@@ -95,7 +111,8 @@ def get_specific_dash_page():
                        'margin-top': '50px',
                        'margin-bottom': '50px',
                        'background': '#ADD8E6',
-                       'display': 'table'},
+                       'display': 'table',
+                       'min-width': '500px'},
                 children=[
                     html.Header(html.Th(
                         colSpan=2,
@@ -108,13 +125,14 @@ def get_specific_dash_page():
                     html.Tr(
                         children=[
                             html.Td(
-                                children=[dcc.Input(
-                                    id="input_1",
-                                    type='text',
-                                    placeholder="input here",
-                                )], style={'width': '100px'}),
-                            html.Td(
-                                children=[html.Button('Go')])
+                                children=[
+                                    dcc.Dropdown(
+                                        id='paper_dropdown',
+                                        options=papers,
+                                        placeholder="Write here the name of a paper"
+                                    ),
+                                ]
+                            )
                         ]
                     )
                 ]

@@ -19,7 +19,7 @@ def run_dash():
     ])
     # without 'position': 'fixed', "overflowY": "scroll" the page won't scroll!
 
-    app.run_server(debug=True)
+    app.run_server(debug=False)
     # TODO : set debug to False to run in finaly version
 
 
