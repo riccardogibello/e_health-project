@@ -1,3 +1,5 @@
+import os
+import signal
 from threading import Thread
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
@@ -144,7 +146,7 @@ class HomePageWindow(QMainWindow):
     def on_click_exit_button(self):
         self.gui_manager.process_manager.close_application()
         self.gui_manager.window.close()
+        os.kill(os.getpid(), signal.SIGTERM)  # this was forcefully added to stop also the dash app that is once started
 
     def on_click_show_dashboard_button(self):
-        print('clicked')
-        # TODO : serious
+        self.gui_manager.go_to_dashboard()

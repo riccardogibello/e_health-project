@@ -26,6 +26,7 @@ CREATE TABLE `selected_app` (
   `developer_id` varchar(70),
   `last_update` bigint,
   `content_rating` varchar(100),
+  `content_rating_description` varchar(100),
   `teacher_approved` boolean DEFAULT false,
   PRIMARY KEY (`app_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -1,11 +1,16 @@
+from threading import Thread
+
+from AlternativeGUI.DashComponents.DashManagerComponent import run_dash
 from AlternativeGUI.WindowComponents.GenericWindow import GenericWindow
 from AlternativeGUI.WindowComponents.HomePageWindow import HomePageWindow
 from AlternativeGUI.WindowComponents.ManualClassifierWindow import ManualClassifierWindow
+from AlternativeGUI.WindowComponents.OverviewDashboardWindow import OverviewDashboardWindow
 from AlternativeGUI.WindowComponents.WaitingWindow import WaitingWindow
 
 
 class GUIManager:
     def __init__(self, process_manager):
+        self.process = None
         self.window = None
         self.process_manager = process_manager
         self.go_to_home_page()
@@ -38,4 +43,14 @@ class GUIManager:
             self.window.close()
         self.window = GenericWindow(self, message)
         self.message = ''
+        self.window.show()
+
+    def go_to_dashboard(self):
+        if self.window:
+            self.window.close()
+
+        self.process = Thread(target=run_dash)
+        self.process.start()
+
+        self.window = OverviewDashboardWindow(self, self.process)
         self.window.show()

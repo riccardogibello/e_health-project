@@ -1,18 +1,10 @@
-import sched
 import sys
 from multiprocessing.pool import ThreadPool
-from threading import Thread
-
 from PyQt5.QtWidgets import QApplication
-from cefpython3 import cefpython as cef
-
 from AlternativeGUI.GUIManager import GUIManager
 from AlternativeGUI.ProcessHandler import ProcessHandler
 from DataManagers.OldDatasetManager import *
-from GUI.ProcessManager import ProcessManager
 from DataManagers.DataMiner import DataMiner
-import tkinter as tk
-from GUI.ApplicationGUI import ApplicationGUI
 
 
 def launch_data_miner():

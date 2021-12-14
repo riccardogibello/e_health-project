@@ -1,8 +1,11 @@
 from datetime import datetime
 from threading import Thread
-
 import pandas as pd
+import play_scraper
+from PIL import Image
 from selenium.common.exceptions import WebDriverException
+
+from AlternativeGUI.DashComponents.DashManagerComponent import run_dash
 from DataManagers.DatabaseManager import do_query
 import time
 import numpy as np
@@ -16,6 +19,7 @@ from Utilities.Classifiers.PaperClassifiers.FrequentistPaperClassifier import Pa
 from Utilities.Classifiers.PaperClassifiers.NBayesPaperClassifier import NBayesPaperClassifier
 from Utilities.Scrapers.NatureScraper import NatureScraper
 from Utilities.Scrapers.PubMedScraper import PubMedScraper
+from WEBFunctions.web_mining_functions import find_web_page
 
 
 def browse(url_to_open, how_long):
@@ -87,12 +91,14 @@ if __name__ == '__main__':
     word_list = sanitize_and_tokenize(text=string, max_n_gram=2)
     print(word_list)'''
 
-    start = time.time()
+    '''start = time.time()
     classifier = NBayesPaperClassifier(False)
     pd.read_csv('./data/input_data/study_type_mesh_correspondence.txt')
     end = time.time()
 
-    print(str(end - start))
+    print(str(end - start))'''
+
+    run_dash()
 
     '''classifier = LogRegClassifier()
     for i in range(10):
