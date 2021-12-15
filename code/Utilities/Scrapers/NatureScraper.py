@@ -21,8 +21,8 @@ class NatureScraper(Scraper):
 
         for keywords in keywords_list:
             query = 'http://api.springernature.com/metadata/json?q=keyword:' + keywords \
-                    + ' sort:date&s=' + str(start) + '&p=' + str(
-                page_length) + '&api_key=c36e401a220b60a51c236d8924aecb10'
+                    + ' sort:date language:en&s=' + str(start) + '&p=' + str(page_length) + \
+                    '&api_key=c36e401a220b60a51c236d8924aecb10'
             query = format_query(query)
             json_result = requests.get(query).json()
 
@@ -34,7 +34,7 @@ class NatureScraper(Scraper):
                 time.sleep(1)
                 start = start + page_length
                 query = 'http://api.springernature.com/metadata/json?q=keyword:' + keywords \
-                        + ' sort:date&s=' + str(start) + '&p=' + \
+                        + ' sort:date language:en&s=' + str(start) + '&p=' + \
                         str(page_length) + '&api_key=c36e401a220b60a51c236d8924aecb10'
                 query = format_query(query)
                 json_result = requests.get(query).json()
@@ -61,7 +61,9 @@ class NatureScraper(Scraper):
 
             title = publication_dictionary['title']
             abstract = publication_dictionary['abstract']
-            self.create_publication(title, abstract, authors)
+            journal = publication_dictionary['publicationName']
+            nature_type = publication_dictionary['publicationType']
+            self.create_publication(title, abstract, authors, journal, nature_type)
 
     def find_authors(self, author_list):
         authors = []

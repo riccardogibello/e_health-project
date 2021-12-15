@@ -63,6 +63,7 @@ class ProcessHandler(QObject):
         self.terminated_process = False
 
     def launch_data_miner(self):
+        self.terminated_process = False
         if self.__data_miner_process:
             return
         self.keep_on_updating = True
@@ -89,6 +90,7 @@ class ProcessHandler(QObject):
                 self.update_signal.emit('Idle.')
 
     def load_datasets(self):
+        self.terminated_process = False
         clear_table('preliminary')
         if self.__old_dataset_process or self.__dataset_process:
             return
@@ -122,6 +124,7 @@ class ProcessHandler(QObject):
         print('end update_load_data_page')
 
     def do_classification_dataset(self):
+        self.terminated_process = False
         if self.__classification_process:
             return
         self.__classification_process = multiprocessing.Process(target=execute_classification)

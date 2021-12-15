@@ -1,4 +1,4 @@
-from DataManagers.DatabaseManager import do_query, do_multiple_queries
+from DataManagers.DatabaseManager import do_query, do_multiple_queries, clear_table
 from DataModel.Author import Author
 from DataModel.GoogleScholarAuthor import GoogleScholarAuthor
 
@@ -48,10 +48,14 @@ class Library:
         self.persist_authors()
 
     def persist_publications(self):
+        clear_table('paper')
+        clear_table('app_paper')
         for publication in self.publications:
             query_par_dict = {'START TRANSACTION': '',
-                              'INSERT IGNORE INTO paper(paper_title, abstract) VALUES (%s, %s)': (
-                                  publication.title, publication.abstract),
+                              'INSERT IGNORE INTO paper(paper_title, abstract, journal, nature_type) '
+                              'VALUES (%s, %s, %s, %s)': (
+                                  publication.title, publication.abstract,
+                                  publication.journal, publication.nature_type),
                               'SELECT LAST_INSERT_ID()': '', 'COMMIT': ''}
 
             results = do_multiple_queries(query_par_dict)
@@ -63,11 +67,18 @@ class Library:
                 do_query((sql_pub_id, application.app_id), query)
 
     def persist_authors(self):
+        clear_table('author')
+        clear_table('author_paper')
         for author in self.authors:
-            query = 'INSERT IGNORE INTO author(name, surname, papers) VALUES (%s, %s, %s)'
-            do_query((author.name, author.surname, author.n_published_papers), query)
+            query_par_dict = {'START TRANSACTION': '',
+                              'INSERT IGNORE INTO author(name, surname, papers) VALUES (%s, %s, %s)': (
+                                  author.name, author.surname, author.n_published_papers),
+                              'SELECT LAST_INSERT_ID()': '', 'COMMIT': ''}
+            results = do_multiple_queries(query_par_dict)
+            sql_auth_id = int(results.get('SELECT LAST_INSERT_ID()')[0][0])
+
             publications = author.publications
             for publication in publications:
                 publication_id = publication.id
-                query = 'INSERT IGNORE INTO author_paper(author_name, author_surname, paper_id) VALUES (%s, %s, %s)'
-                do_query((str(author.name), str(author.surname), publication_id), query)
+                query = 'INSERT IGNORE INTO author_paper(author_id, paper_id) VALUES (%s, %s)'
+                do_query((sql_auth_id, publication_id), query)

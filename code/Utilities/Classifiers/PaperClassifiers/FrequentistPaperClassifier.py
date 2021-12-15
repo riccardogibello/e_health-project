@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from DataManagers.DatabaseManager import do_query
-from Utilities.Classifiers.PaperClassifiers.PaperClassifier import PaperClassifier
+from Utilities.Classifiers.PaperClassifiers.PaperClassifier import PaperClassifier, classify_serious_games_papers
 
 
 class FrequentistPaperClassifier(PaperClassifier):
@@ -16,6 +16,12 @@ class FrequentistPaperClassifier(PaperClassifier):
         self.class_words__dictionary = {}  # this is a dictionary in which for every class (key)
         # a list of the related words is provided (value)
 
+        self.initialize_class_name_word_lists()
+
+        self.test_model_()
+        self.classify_serious_games_papers_()
+
+    def initialize_class_name_word_lists(self):
         file_names_list = next(os.walk('./data/dictionaries/'))[2]
         for file_name in file_names_list:
             f_in = open('./data/dictionaries/' + str(file_name), 'r')
@@ -27,6 +33,11 @@ class FrequentistPaperClassifier(PaperClassifier):
                 words_list.append(line)
 
             self.class_words__dictionary.__setitem__(class_name, words_list)
+
+    def test_model_(self):
+        super().test_model(classification_function=self.classify_paper,
+                           path_for_confusion_matrix='./data/output_data/FrequentistConfusionMatrix.png',
+                           metrics_path='./data/output_data/FrequentistMetrics.png')
 
     def classify_paper(self, publication):
         """
@@ -59,3 +70,6 @@ class FrequentistPaperClassifier(PaperClassifier):
         do_query((class_array[index_max], publication.id), query)
 
         return class_array[index_max]
+
+    def classify_serious_games_papers_(self):
+        classify_serious_games_papers(classification_function=self.classify_paper)

@@ -1,25 +1,10 @@
-from datetime import datetime
 from threading import Thread
-import pandas as pd
-import play_scraper
-from PIL import Image
 from selenium.common.exceptions import WebDriverException
-
-from AlternativeGUI.DashComponents.DashManagerComponent import run_dash
 from DataManagers.DatabaseManager import do_query
 import time
 import numpy as np
 from selenium import webdriver
-
-from DataManagers.WordsMiner import sanitize_and_tokenize
-from DataModel.Library import Library
-from DataModel.Publication import Publication
-from Utilities.Classifiers.LogRegClassifier import LogRegClassifier
-from Utilities.Classifiers.PaperClassifiers.FrequentistPaperClassifier import PaperClassifier
 from Utilities.Classifiers.PaperClassifiers.NBayesPaperClassifier import NBayesPaperClassifier
-from Utilities.Scrapers.NatureScraper import NatureScraper
-from Utilities.Scrapers.PubMedScraper import PubMedScraper
-from WEBFunctions.web_mining_functions import find_web_page
 
 
 def browse(url_to_open, how_long):
@@ -36,23 +21,26 @@ def browse(url_to_open, how_long):
 
 
 def label_apps():
+    """
+    This was the first attempt to try to perform in a practical way the tedious task of labeling the applications.
+    """
     try:
         f_in = open('./data/input_data/last_analyzed.txt', 'r')
         last_analyzed_index = int(f_in.readlines()[0])
     except FileNotFoundError:
         last_analyzed_index = 0
-    start = int(input("Insert the starting value of your interval:\n"))
-    if start <= last_analyzed_index:
-        start = last_analyzed_index
-    end = int(input("Insert the ending value of your interval:\n"))
-    end = end + 1
+    start_ = int(input("Insert the starting value of your interval:\n"))
+    if start_ <= last_analyzed_index:
+        start_ = last_analyzed_index
+    end_ = int(input("Insert the ending value of your interval:\n"))
+    end_ = end_ + 1
     url = "https://play.google.com/store/apps/details?id="
     end_url = '&hl=en&gl=US'
 
     query = "SELECT * FROM app_features"
     list_app_features = do_query('', query)
 
-    indexes_range = np.arange(start, end)
+    indexes_range = np.arange(start_, end_)
     for i in indexes_range:
         app_features = list_app_features[i]
 
@@ -82,42 +70,14 @@ def label_apps():
 
 
 if __name__ == '__main__':
-    # label_apps()
     '''library = Library()
     p = NatureScraper(library)'''
     # p = PubMedScraper(library)
 
-    '''string = 'Children with developmental disabilities may need support with motor skills such as balance improvement, cognitive skills such as vocabulary learning, or social skills such as adequate interpretation of emotional expressions. Digital interactive games could support the standard treatments. We aimed to review clinical studies which investigated the application of serious games in children with developmental disabilities.'
-    word_list = sanitize_and_tokenize(text=string, max_n_gram=2)
-    print(word_list)'''
-
-    '''start = time.time()
-    classifier = NBayesPaperClassifier(False)
-    pd.read_csv('./data/input_data/study_type_mesh_correspondence.txt')
+    start = time.time()
+    classifier = NBayesPaperClassifier(True)
     end = time.time()
 
-    print(str(end - start))'''
+    print(str(end - start))
 
-    run_dash()
-
-    '''classifier = LogRegClassifier()
-    for i in range(10):
-        classifier.train_model(final=False)
-        # TODO : update
-    path = classifier.train_model(final=True)
-    classifier.load_model(path)
-    classifier.classify_apps()'''
-
-    # ===============================================================
-    # DEBUGGING PART
-    '''paper_classifier = PaperClassifier()
-    query = 'SELECT paper_title, abstract FROM paper LIMIT 1'
-    result = do_query('', query)
-    paper = Publication(result[0][0], result[0][1], '')
-    class_given = paper_classifier.classify_paper(paper)
-    print('The paper was classified as ' + class_given + '\n')
-    print('===============================================================\n')
-    print('TITLE : ' + str(result[0][0]) + '\n')
-    print('===============================================================\n')
-    print('ABSTRACT : ' + str(result[0][1]) + '\n')
-    print('===============================================================\n')'''
+    # run_dash()

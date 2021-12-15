@@ -2,15 +2,8 @@ import math
 import os.path
 import re
 import numpy as np
-import pandas as pd
-from pandas import DataFrame
-from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
-from DataManagers.DatabaseManager import do_query
 from DataManagers.WordsMiner import sanitize_and_tokenize, count_occurrences
-from DataModel.Publication import Publication
-from Utilities.Classifiers.PaperClassifiers.PaperClassifier import PaperClassifier
-from Utilities.ConfusionMatrixPrinter import save_confusion_matrix
-import dataframe_image as dfi
+from Utilities.Classifiers.PaperClassifiers.PaperClassifier import PaperClassifier, classify_serious_games_papers
 
 URL_PATTERN = r'[A-Za-z0-9]+://[A-Za-z0-9%-_]+(/[A-Za-z0-9%-_])*(#|\\?)[A-Za-z0-9%-_&=]*'
 
@@ -26,54 +19,11 @@ def sanitize_text(text: str, lower: bool = True, url: bool = True):
     return re.sub(r'[\s]+', ' ', text).strip()
 
 
-def format_label(label):
-    list_ = re.findall('[A-Z][^A-Z]*', label)  # this regex matches every capital letter
-    # followed by a series of lower-case letters
-    study_type = label
-    if len(list_) != len(label):
-        study_type = ''
-        for sub_word in list_:
-            study_type = study_type + sub_word + '\n'
-        study_type = study_type[:-1]
-    return study_type
-
-
 def compute_total_occurrences(occurrence_list):
     total = 0
     for occurrence in occurrence_list:
         total = total + occurrence
     return total
-
-
-def print_metrics(results, labels):
-    # results = ([precision], [recall], [f1])
-    study_type_list = []
-    results_dictionary = {'precision': [], 'recall': [], 'f1': []}
-    index = 0
-    for label in labels:
-        study_type_list.append(label)
-        precision_list = results_dictionary.get('precision')
-        recall_list = results_dictionary.get('recall')
-        f1_list = results_dictionary.get('f1')
-        precision = results[0][index]
-        precision_list.append(precision)
-        recall = results[1][index]
-        recall_list.append(recall)
-        f1 = results[2][index]
-        f1_list.append(f1)
-
-        results_dictionary = {'precision': precision_list,
-                              'recall': recall_list,
-                              'f1': f1_list}
-
-        index = index + 1
-    dataframe = DataFrame(results_dictionary, index=study_type_list)
-    dataframe = dataframe.style.set_properties(**{'background-color': 'black',
-                                                  'color': 'green'})
-
-    dfi.export(dataframe, './data/output_data/resu.png')
-
-    print(results_dictionary)
 
 
 class NBayesPaperClassifier(PaperClassifier):
@@ -89,10 +39,10 @@ class NBayesPaperClassifier(PaperClassifier):
             self.compute_prior_probabilities()
             self.compute_likelihoods()
             self.save_model()
-            self.test_model()
+            self.test_model_()
         else:
             self.load_model()
-            self.classify_serious_games_papers()
+        self.classify_serious_games_papers_()
 
     def save_model(self):
         if not os.path.exists('./data/models'):
@@ -220,60 +170,10 @@ class NBayesPaperClassifier(PaperClassifier):
 
         return study_type_array[index_max]  # this returns a string with the name of the predicted class
 
-    def test_model(self):
-        query = 'SELECT paper_id, text, true_type FROM test_paper'
-        results = do_query('', query)
-        for result in results:
-            paper_id = result[0]
-            text = result[1]
-            true_type = int(result[2])
-            true_study_type = self.retrieve_study_type_string_from_int(true_type)
-            predicted_study_type = self.classify_paper(Publication(title=text, abstract='', authors=''))
-            predicted_study_type_int = self.study_type_correspondence.get(predicted_study_type)
+    def test_model_(self):
+        super().test_model(classification_function=self.classify_paper,
+                           path_for_confusion_matrix='./data/output_data/NBayesConfusionMatrix.png',
+                           metrics_path='./data/output_data/NBayesMetrics.png')
 
-            query = 'UPDATE test_paper SET predicted_type = %s WHERE paper_id = %s'
-            do_query((predicted_study_type_int, paper_id), query)
-
-            predicted_study_type = format_label(predicted_study_type)
-            true_study_type = format_label(true_study_type)
-            self.array_predicted_labels.append(predicted_study_type)
-            self.array_true_labels.append(true_study_type)
-
-        self.print_confusion_matrix()
-
-    def classify_serious_games_papers(self):
-        query = 'SELECT paper_id, paper_title, abstract FROM paper'
-        results = do_query('', query)
-
-        for result in results:
-            paper_id = result[0]
-            title = result[1]
-            abstract = result[2]
-            text = title + abstract
-
-            predicted_study_type = self.classify_paper(Publication(title=text, abstract='', authors=''))
-
-            query = 'UPDATE paper SET type = %s WHERE paper_id = %s'
-            do_query((predicted_study_type, paper_id), query)
-
-    def print_confusion_matrix(self):
-        indexes = self.compute_scatter_matrix_indexes()
-        columns = indexes
-        cm = confusion_matrix(y_true=self.array_true_labels, y_pred=self.array_predicted_labels, labels=indexes)
-        cm_df = pd.DataFrame(cm,
-                             index=indexes,
-                             columns=columns)
-
-        save_confusion_matrix(fig_width=8, fig_height=6, heatmap_width=5, heatmap_height=3,
-                              confusion_matrix_dataframe=cm_df, path='./data/output_data/test.png')
-
-        labels = self.studytype_paperlist_dictionary.keys()
-        results = precision_recall_fscore_support(y_true=self.array_true_labels, y_pred=self.array_predicted_labels)
-        print_metrics(results, labels)
-
-    def compute_scatter_matrix_indexes(self):
-        indexes = []
-        for study_type in self.study_type_correspondence.keys():
-            study_type = format_label(study_type)
-            indexes.append(study_type)
-        return indexes
+    def classify_serious_games_papers_(self):
+        classify_serious_games_papers(classification_function=self.classify_paper)

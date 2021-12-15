@@ -40,19 +40,19 @@ CREATE TABLE `keyword` (
 
 DROP TABLE IF EXISTS `author_paper`;
 CREATE TABLE `author_paper` (
-  `author_name` varchar(100),
-  `author_surname` varchar(100),
-  `paper_id` varchar(200),
-  PRIMARY KEY (`author_name`, `author_surname`, `paper_id`)
+  `author_id` integer,
+  `paper_id` integer,
+  PRIMARY KEY (`author_id`, `paper_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `author`;
 CREATE TABLE `author` (
+  `author_id` integer NOT NULL AUTO_INCREMENT,
   `name` varchar(100),
   `surname` varchar(100),
   `quotes` integer,
   `papers` integer,
-  PRIMARY KEY (`name`, `surname`)
+  PRIMARY KEY (`author_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `paper`;
@@ -61,7 +61,8 @@ CREATE TABLE `paper` (
   `paper_title` varchar(1000),
   `abstract` varchar(10000),
   `type` varchar(100),
-  `pubmed_id` integer,
+  `journal` varchar(1000),
+  `nature_type` varchar(1000),
   PRIMARY KEY (`paper_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

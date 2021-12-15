@@ -88,19 +88,85 @@ def create_pie_graph_study_type():
 
 
 def get_overview_dash_page():
-    layout1 = create_pie_graph_study_type()
+    colors = {
+        'background': '#34568b',
+        'text': '#000000'
+    }
 
-    layout2 = create_bar_plot_categories_into_selected_app()
-
-    layout = html.Div([
-        dbc.Col([
-            dcc.Link('Go back', href='/'),
-            html.H1("TITLE"),
-            dbc.Row([
-                dbc.Col(layout1),
-                dbc.Col(layout2)
-            ])
-        ])
-    ])
+    layout = html.Div(
+        children=[
+            html.Table(
+                children=[
+                    html.Tr(html.Td(dcc.Link('Go back', href='/')))],
+                style={'border': 'solid 2px',
+                       'border-radius': '10px',
+                       'margin-right': '10px',
+                       'margin-left': 'auto',
+                       'display': 'inline-block',
+                       'background': '#ADD8E6'}
+            ),
+            html.Div(
+                children=[
+                    html.Table(
+                        style={'border': '2px solid black',
+                               'border-collapse': 'separate',
+                               'border-radius': '15px',
+                               'border-spacing': '20px',
+                               'margin-top': '50px',
+                               'margin-bottom': '50px',
+                               'background': '#ADD8E6',
+                               'min-width': '500px'},
+                        children=[]
+                    )
+                ], style={'text-align': 'center', 'display': 'flex', 'justify-content': 'center'}
+            ),
+            html.Div(
+                children=[
+                    html.Table(
+                        style={'border': '2px solid black',
+                               'border-collapse': 'separate',
+                               'border-radius': '15px',
+                               'border-spacing': '20px',
+                               'margin-left': 'auto',
+                               'margin-right': 'auto',
+                               'margin-top': '50px',
+                               'margin-bottom': '50px',
+                               'background': '#ADD8E6',
+                               'display': 'table',
+                               'min-width': '500px'
+                               },
+                        children=[],
+                    ),
+                ],
+                style={'text-align': 'center', 'display': 'flex', 'justify-content': 'center'}
+            ),
+            html.Div(
+                children=[
+                    html.Table(
+                        style={'border': '2px solid black',
+                               'border-collapse': 'separate',
+                               'border-radius': '15px',
+                               'border-spacing': '20px',
+                               'margin-left': 'auto',
+                               'margin-right': 'auto',
+                               'margin-top': '50px',
+                               'margin-bottom': '50px',
+                               'background': '#ADD8E6',
+                               'display': 'table',
+                               'min-width': '500px'
+                               },
+                        children=[],
+                    )
+                ],
+                style={'text-align': 'center', 'display': 'flex', 'justify-content': 'center'}
+            )
+        ], style={'background': '#4682B4',
+                  'margin-left': '20px',
+                  'margin-right': '20px',
+                  'margin-top': '17px',
+                  'margin-bottom': '10px',
+                  'border-radius': '20px',
+                  'padding': '20px'}
+    )
 
     return layout

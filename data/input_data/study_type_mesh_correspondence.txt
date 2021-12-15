@@ -1,6 +1,6 @@
-MetaAnalysis,&term=(Meta-Analysis[Publication Type])&sort=date&RetMax=500
-SystematicReview,&term=(Systematic Review[Publication Type])&sort=date&RetMax=500
-RCT,&term=(Randomized Controlled Trial[MeSH Major Topic] AND Randomized Controlled Trial[Publication Type])&sort=date&RetMax=500
-ObservationalStudy,&term=(Observational Study[Publication Type])&sort=date&RetMax=500
-CohortStudy,&term=(Cohort Studies[MeSH Major Topic] AND Journal Article[Publication Type])&sort=date&RetMax=500
-CaseControl,&term=(Case-Control Studies[MeSH Major Topic] AND Journal Article[Publication Type])&sort=date&RetMax=500
+MetaAnalysis,&term=(Meta-Analysis[Publication Type])&sort=date&RetMax=1000
+SystematicReview,&term=(Systematic Review[Publication Type])&sort=date&RetMax=1000
+RCT,&term=(Randomized Controlled Trial[MeSH Major Topic] AND Randomized Controlled Trial[Publication Type])&sort=date&RetMax=1000
+ObservationalStudy,&term=(Observational Study[Publication Type])&sort=date&RetMax=1000
+CohortStudy,&term=(Cohort Studies[MeSH Major Topic] AND Journal Article[Publication Type])&sort=date&RetMax=1000
+CaseControl,&term=(Case-Control Studies[MeSH Major Topic] AND Journal Article[Publication Type])&sort=date&RetMax=1000

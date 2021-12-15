@@ -34,14 +34,14 @@ class Scraper:
                     query = 'INSERT IGNORE INTO app_paper(paper_id, app_id) VALUES (%s, %s)'
                     do_query((pub_id, app_id), query)
 
-    def create_publication(self, title, abstract, authors):
+    def create_publication(self, title, abstract, authors, journal, nature_type):
         """
         This method creates a new publication (if not already existing) and then adds this publication (if not already
         present) to each author
         """
         title = sanitize_string(title)
         title = re.sub(r'"+', "", title)
-        publication = Publication(title, abstract, authors)
+        publication = Publication(title, abstract, authors, journal, nature_type)
         self.library.add_publication(publication)
         for author in authors:
             author.add_publication(publication)
