@@ -25,3 +25,11 @@ CREATE TABLE `preliminary` (
     `from_dataset` boolean DEFAULT false,
     PRIMARY KEY (`app_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `classification_errors`;
+CREATE TABLE `classification_errors` (
+    `app_id` varchar(200) UNIQUE NOT NULL,
+    `human` boolean DEFAULT false,
+    `machine` boolean DEFAULT false,
+    PRIMARY KEY (`app_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

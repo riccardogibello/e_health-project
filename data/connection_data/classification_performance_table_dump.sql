@@ -14,5 +14,6 @@ CREATE TABLE `classification_performance` (
   `true_negative` integer,
   `false_positive` integer,
   `false_negative` integer,
+  `after_last_best` integer,
   PRIMARY KEY (`model_id`, `iteration`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

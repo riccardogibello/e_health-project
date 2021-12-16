@@ -1,24 +1,22 @@
 import http
-import threading
 import time
-import urllib.error
-from concurrent.futures import ThreadPoolExecutor
-
-import google_play_scraper.exceptions
 import mysql
+import threading
 import numpy as np
 import regex as re
+import urllib.error
 from bs4 import BeautifulSoup
 from mysutils.text import clean_text
-
-from DataManagers import settings
+import google_play_scraper.exceptions
 from DataModel.Application import Application
+from concurrent.futures import ThreadPoolExecutor
 from DataManagers.DatabaseManager import do_query
-from DataManagers.DatabaseManager import insert_app_into_db, insert_id_into_preliminary_db as insert_preliminary, \
-    update_status_preliminary, delete_app_from_database, delete_app_from_labeled_app, insert_developer
 from DataManagers.DatasetManager import is_english
 from WEBFunctions.web_mining_functions import find_web_page
-from DataManagers.settings import MAX_RETRIEVE_APP_DATA_THREADS, SERIOUS_GAMES_CATEGORIES_LIST, DEBUG, ADULT_RATINGS
+from DataManagers.DatabaseManager import insert_app_into_db, insert_id_into_preliminary_db as insert_preliminary, \
+    update_status_preliminary, delete_app_from_database, delete_app_from_labeled_app, insert_developer
+from DataManagers.settings import MAX_RETRIEVE_APP_DATA_THREADS, SERIOUS_GAMES_CATEGORIES_LIST, DEBUG, ADULT_RATINGS, \
+    LAST_UPDATE
 
 
 def is_teacher_approved_app(app_id):
@@ -36,33 +34,39 @@ def is_teacher_approved_app(app_id):
 
 
 def get_app_data(app_id):
+    """
+    Getting data from Google Play Store about the application having the given id.
+    Uses google_play_scraper module returning a json object containing all data.
+    In case the app does not exists anymore it also deletes all data about it if eventually present
+    in the database. This is done to prevent from classification being done using outdated applications and also
+    from having no more existing apps in the results.
+    :param app_id: Application id of the app to search on Google Play.
+    :return: Application object. None if the app does not exist or a network error occurred.
+    """
     try:
         # Creating object Application
         application = Application(app_id, True)
     except google_play_scraper.exceptions.NotFoundError:
-        # App not found on Google Play Market meaning it does not exist anymore, so it must be deleted from
-        # labeled_app because it can not be used for training of ML model and from app table because it is
-        # useless to classify it. The id is not deleted from preliminary table in order to keep trace of checked apps
-        # and not check more than once in case the app is still given as similar of another one.
-
         update_status_preliminary(app_id)
         delete_app_from_database(app_id)
         delete_app_from_labeled_app(app_id)
-
-        if DEBUG:
-            print(f'{threading.currentThread()}  || Data Miner : APP {app_id} not found')
-        # Explicit elimination of Application object
+        # Explicit assignment of None to Application object
         application = None
-
     except (urllib.error.HTTPError, urllib.error.URLError, http.client.RemoteDisconnected, ConnectionResetError):
         # Connection errors, probably related to high number of requests to the server.
         # None is returned and a new try to retrieve data will be made later
         application = None
-
     return application
 
 
 def clean_description(description):
+    """
+    Before inserting the app in the database all unnecessary tags, links, punctuation has to be removed.
+    Non-ASCII characters and not meaningful hyphens are removed. Finally using clean_text method from mysmallutils
+    module description are already preprocessed for training and classification purposes.
+    :param description: string containing the description of the application.
+    :return: string containing the description given in input after being cleaned.
+    """
     # remove all non-ascii characters
     clear_description = str(description.encode('ascii', errors='ignore').decode())
     # remove useless hyphens (multiple hyphens, hyphens at the begging or at the end of a word)
@@ -70,17 +74,27 @@ def clean_description(description):
     clear_description = re.sub(r'( -)+', ' ', clear_description)
     clear_description = re.sub(r'(- )+', ' ', clear_description)
     # clean_text function removes punctuation, removes urls and transform lowers the string
-    # because there is no need to distinguish words between lower and upper cases
+    # because for the task there is no need to distinguish between lower and upper cases
     return clean_text(clear_description)
 
 
 def check_app(app, from_dataset):
+    """
+    Given the Application object the method checks if the application satisfies all prerequisites for being inserted in
+    the database for later processing. The checks are done ordered from the cheapest to most costly in terms of
+    performance.
+    :param app: Application object containing all data about the application considered
+    :param from_dataset: boolean value, when True indicates the app was present in one of datasets (so language check
+                         for the name has been already done)
+    :return: Couple of boolean values. The first indicates the application can be inserted in the database while the
+             second if the similar application of the considered one can be inserted in preliminary table.
+    """
     if not app or app.category not in SERIOUS_GAMES_CATEGORIES_LIST:
         return False, False
     if app.score == 0 and app.min_installs < 500:
         # print(f"score {app.app_id} - {app.score} - {app.min_installs}")
         return False, True
-    if app.updated < settings.LAST_UPDATE:
+    if app.updated < LAST_UPDATE:
         return False, True
     if app.content_rating_description:
         return False, True
@@ -137,9 +151,6 @@ class DataMiner:
     __apps_id_list = []
 
     def __init__(self):
-        threading.currentThread().name = 'Data Miner'
-        if DEBUG:
-            print(f'{threading.currentThread()}  || Data Miner : Started')
         self.__running = True
         start_attempts = 0
         self.__failed_connections = 0
@@ -148,7 +159,6 @@ class DataMiner:
         while (not len(self.__apps_id_list)) and start_attempts < 5:
             start_attempts += 1
             time.sleep(30)
-
             self.__retrieve_incomplete_data()
 
     def __reset_connection_counter(self):
@@ -162,9 +172,6 @@ class DataMiner:
         # and save their IDs in self.__apps_id_list
         query = (
             "SELECT app_id, from_dataset FROM preliminary WHERE preliminary.`check` IS FALSE"
-        )
-        test_query = (
-            "SELECT A.app_id, B.from_dataset FROM labeled_app as A, preliminary as B WHERE A.app_id = B.app_id"
         )
 
         try:
@@ -191,14 +198,13 @@ class DataMiner:
                           f'TOO MANY ATTEMPTS FAILED - Execution terminated')
 
     def fill_database(self):
-
         while self.__running:
             if not len(self.__apps_id_list):
                 self.__retrieve_incomplete_data()
             if not self.__running:
                 return
 
-            batch_size = int(len(self.__apps_id_list) * 0.05)
+            batch_size = int(len(self.__apps_id_list) / MAX_RETRIEVE_APP_DATA_THREADS)
             n_threads_max = int(len(self.__apps_id_list) // batch_size + 1)
             offset = 0
 
@@ -221,6 +227,7 @@ class DataMiner:
 
             self.__apps_id_list = []
 
+    @staticmethod
     def load_chunk(self, chunk):
         for application in chunk:
             load_app_into_database(application[0], application[1])

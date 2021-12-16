@@ -1,11 +1,13 @@
 import math
 import random
+
 from nltk import WordNetLemmatizer
 from sklearn.metrics import accuracy_score, f1_score, recall_score, precision_score
+
+from DataManagers.DatabaseManager import do_query as database_query
 from DataManagers.settings import SMOOTHING_COEFFICIENT, stop_words, TEST_SET_DIMENSION, NON_IMPROVING_ITERATIONS, \
-    ITERATION_FREQUENCY_UPDATE
+    WRONG_CLASSIFIED_INCREMENT, TRUE_CLASSIFIED_INCREMENT
 from DataModel.PerformanceMetrics import PerformanceMetrics
-from DataManagers.DatabaseManager import do_query as database_query, clear_table
 
 
 def calculate_likelihood(class_occurrences, class_size, vocabulary_size):
@@ -19,25 +21,6 @@ def count_all_word_in_dict(dictionary):
     for word in dictionary:
         count += dictionary[word]
     return count
-
-
-def order_dictionary_desc(dictionary):
-    return {k: v for k, v in sorted(dictionary.items(), key=lambda item: item[1], reverse=True)}
-
-
-def save_dictionary(dictionary1, dictionary2):
-    dict = order_dictionary_desc(dictionary1)
-    dict2 = order_dictionary_desc(dictionary2)
-
-    file = open('banana.txt', 'w')
-    for app in dict:
-        if dict[app] > dict2[app]:
-            file.write(f'{dict2[app]} | {app} | {dict[app]}\n')
-    pass
-    file.close()
-    file = open('banana2.txt', 'w')
-    for app in dict2:
-        file.write(f'{dict2[app]} | {app}\n')
 
 
 class MNBayesClassifierModel:
@@ -239,17 +222,18 @@ class MNBayesClassifierModel:
 
         self.__performance.print_values()
 
-        #print(f'Recall : {self.__performance.recall}\tAccuracy : {self.__performance.accuracy}\t'
+        # print(f'Recall : {self.__performance.recall}\tAccuracy : {self.__performance.accuracy}\t'
         #      f'Precision : {self.__performance.precision}\tF1 score: {self.__performance.f1}\t '
         #      f'TP {test_tp},'
         #      f' TN {test_tn}, FN {test_fn}, FP {test_fp}')
 
         # TODO test_distribution rewrite for better performance
         database_query((self.__id, self.__iteration_count, self.__performance.recall, self.__performance.accuracy,
-                        self.__performance.precision, self.__performance.f1, test_tp, test_tn, test_fp, test_fn),
+                        self.__performance.precision, self.__performance.f1, test_tp, test_tn, test_fp, test_fn,
+                        self.__after_best_iterations),
                        "INSERT INTO classification_performance(model_id, iteration, recall, accuracy, `precision`, "
-                       "f1_score, true_positive, true_negative, false_positive, false_negative) "
-                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+                       "f1_score, true_positive, true_negative, false_positive, false_negative, after_last_best) "
+                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
 
     def __training_classification(self):
         """
@@ -298,7 +282,7 @@ class MNBayesClassifierModel:
         self.__create_training_apps_classification_distribution()
 
         if self.has_better_performances():
-            self.__after_best_iterations = 0
+            self.__after_best_iterations = 1
             self.save_performance()
             self.save_likelihoods()
         else:
@@ -309,14 +293,40 @@ class MNBayesClassifierModel:
         After evaluation, if needed, the occurrences of the words are updated
         :return:
         """
+        false_positive_number = len(self.__training_apps_classification_distribution['FP'])
+        if not false_positive_number: false_positive_number = 1
+        false_negative_number = len(self.__training_apps_classification_distribution['FN'])
+        if not false_negative_number: false_negative_number = 1
+        total = false_negative_number + false_positive_number
+
         for app in self.__training_apps_classification_distribution['FN']:
-            for word in self.__serious_words:
-                if word in app[0]:
-                    self.__serious_words[word] += ITERATION_FREQUENCY_UPDATE
+            desc = app[0].split()
+            for word in desc:
+                try:
+                    self.__serious_words[word] += WRONG_CLASSIFIED_INCREMENT * false_negative_number/false_positive_number
+                except KeyError:
+                    pass
         for app in self.__training_apps_classification_distribution['FP']:
-            for word in self.__non_serious_words:
-                if word in app[0]:
-                    self.__non_serious_words[word] += ITERATION_FREQUENCY_UPDATE
+            desc = app[0].split()
+            for word in desc:
+                try:
+                    self.__non_serious_words[word] += 5 * WRONG_CLASSIFIED_INCREMENT * false_positive_number/false_negative_number
+                except KeyError:
+                    pass
+        for app in self.__training_apps_classification_distribution['TP']:
+            desc = app[0].split()
+            for word in desc:
+                try:
+                    self.__serious_words[word] += TRUE_CLASSIFIED_INCREMENT
+                except KeyError:
+                    pass
+        for app in self.__training_apps_classification_distribution['TN']:
+            desc = app[0].split()
+            for word in desc:
+                try:
+                    self.__non_serious_words[word] += TRUE_CLASSIFIED_INCREMENT
+                except KeyError:
+                    pass
         self.create_global_vocabulary()
 
     def has_better_performances(self):
@@ -324,7 +334,7 @@ class MNBayesClassifierModel:
         Method compares the performance of the model at a given time with the best result overall.
         :return: True if model improved the performance, False otherwise.
         """
-        return self.__performance.f1 > self.__best_performance.f1
+        return self.__performance.f1 + self.__performance.precision > self.__best_performance.f1 + self.__best_performance.precision
 
     def classify_app(self, description):
         """
@@ -334,10 +344,20 @@ class MNBayesClassifierModel:
         """
         serious_probability = self.__prior_probabilities['serious']
         non_serious_probability = self.__prior_probabilities['non-serious']
-        for word in self.__serious_likelihoods:
-            if word in description:
+        description = description.split()
+        for word in description:
+            try:
                 serious_probability += self.__serious_likelihoods[word]
-        for word in self.__non_serious_likelihoods:
-            if word in description:
+            except KeyError:
+                pass
+            try:
                 non_serious_probability += self.__non_serious_likelihoods[word]
+            except KeyError:
+                pass
+            # if word in description:
+            #    serious_probability += self.__serious_likelihoods[word]
+        # for word in self.__non_serious_likelihoods:
+        #    non_serious_probability += self.__non_serious_likelihoods[word]*description.count(word)
+        # if word in description:
+        #    non_serious_probability += self.__non_serious_likelihoods[word]
         return serious_probability > non_serious_probability
