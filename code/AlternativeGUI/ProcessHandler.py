@@ -6,7 +6,7 @@ from PyQt5.QtCore import QObject
 from AlternativeGUI.WindowComponents.WaitingWindow import WaitingWindow
 from DataManagers.DataMiner import DataMiner
 from DataManagers.DatabaseManager import do_query, clear_table
-from DataManagers.DatasetManager import DatasetManager
+from DataManagers.NewDatasetManager import DatasetManager
 from DataManagers.OldDatasetManager import OldDatasetManager
 from Utilities.Classifiers.LogRegClassifier import LogRegClassifier
 from DataManagers.settings import KAGGLE_DATASET_PATH

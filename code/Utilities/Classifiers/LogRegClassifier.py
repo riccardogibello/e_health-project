@@ -13,7 +13,6 @@ from DataManagers.DatabaseManager import do_query
 from sklearn.utils import shuffle
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, accuracy_score, f1_score, recall_score, precision_score
-from DataManagers.settings import SERIOUS_WORDS
 from DataModel.PerformanceMetrics import PerformanceMetrics
 from DataModel.Results import Results
 from Utilities.Classifiers.FeatureExtractor import FeatureExtractor, get_dictionary

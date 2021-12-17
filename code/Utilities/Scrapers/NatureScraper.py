@@ -31,7 +31,6 @@ class NatureScraper(Scraper):
             total = int(result['total'])
 
             while start <= total:
-                time.sleep(1)
                 start = start + page_length
                 query = 'http://api.springernature.com/metadata/json?q=keyword:' + keywords \
                         + ' sort:date language:en&s=' + str(start) + '&p=' + \

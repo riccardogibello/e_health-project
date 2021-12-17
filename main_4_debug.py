@@ -1,10 +1,15 @@
 from threading import Thread
 from selenium.common.exceptions import WebDriverException
+
+from AlternativeGUI.DashComponents.DashManagerComponent import run_dash
 from DataManagers.DatabaseManager import do_query
 import time
 import numpy as np
 from selenium import webdriver
+
+from DataModel.Library import Library
 from Utilities.Classifiers.PaperClassifiers.NBayesPaperClassifier import NBayesPaperClassifier
+from Utilities.Scrapers.NatureScraper import NatureScraper
 
 
 def browse(url_to_open, how_long):
@@ -75,7 +80,7 @@ if __name__ == '__main__':
     # p = PubMedScraper(library)
 
     start = time.time()
-    classifier = NBayesPaperClassifier(True)
+    classifier = NBayesPaperClassifier(False)
     end = time.time()
 
     print(str(end - start))

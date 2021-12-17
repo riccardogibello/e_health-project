@@ -1,4 +1,5 @@
 import http
+import time
 import urllib
 import io
 from urllib.request import Request
@@ -60,6 +61,7 @@ def find_web_page(path):
         print('requesting ' + str(path))
         req = Request(path, headers={'User-Agent': 'Mozilla/5.0'})
         page = io.BytesIO(urllib.request.urlopen(req).read())
+        time.sleep(0.5)
     except http.client.RemoteDisconnected:
         return io.BytesIO(urllib.request.urlopen(Request(path, headers={'User-Agent': 'Mozilla/5.0'})).read())
     return page

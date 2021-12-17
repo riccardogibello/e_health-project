@@ -1,3 +1,5 @@
+import os
+import signal
 import sys
 from multiprocessing.pool import ThreadPool
 from PyQt5.QtWidgets import QApplication
@@ -43,3 +45,4 @@ if __name__ == '__main__':
     app.exec()
 
     proc_man.close_application()
+    os.kill(os.getpid(), signal.SIGTERM)  # this was forcefully added to stop also the dash app that is once started

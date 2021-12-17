@@ -62,9 +62,10 @@ class Library:
             sql_pub_id = results.get('SELECT LAST_INSERT_ID()')[0][0]
             publication.id = sql_pub_id
 
-            for application in publication.cited_apps:
+            # TODO : delete following
+            '''for application in publication.cited_apps:
                 query = 'INSERT IGNORE INTO app_paper(paper_id, app_id) VALUES (%s, %s)'
-                do_query((sql_pub_id, application.app_id), query)
+                do_query((sql_pub_id, application.app_id), query)'''
 
     def persist_authors(self):
         clear_table('author')
