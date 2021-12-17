@@ -42,6 +42,7 @@ class NBayesPaperClassifier(PaperClassifier):
             self.test_model_()
         else:
             self.load_model()
+            self.test_model_()  # TODO : DELETE
         self.classify_serious_games_papers_()
 
     def save_model(self):

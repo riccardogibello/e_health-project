@@ -7,10 +7,13 @@ def save_confusion_matrix(fig_width, fig_height, heatmap_width, heatmap_height, 
     plt.figure(figsize=(fig_width, fig_height))
     sns.set(rc={'figure.figsize': (heatmap_width, heatmap_height)})
     # The annot_kws are used to set some properties of the content of each cell in the grid
-    sns.heatmap(confusion_matrix_dataframe, annot=True,
+    sns.heatmap(confusion_matrix_dataframe,
+                annot=True,
                 annot_kws={'multialignment': 'center', 'verticalalignment': 'center',
                            'horizontalalignment': 'center'},
-                linewidths=0.2, cbar=True)  # cbar set to True in order to have the color map legenda on the right
+                linewidths=0.2,
+                cbar=True,
+                fmt="d")  # cbar set to True in order to have the color map legenda on the right
     # linewidths used to set the spacing in the grid between cells
 
     plt.title('Confusion Matrix', fontsize='30', fontweight='bold', pad=20)

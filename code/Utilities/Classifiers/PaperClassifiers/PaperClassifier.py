@@ -217,8 +217,13 @@ class PaperClassifier:
         save_confusion_matrix(fig_width=8, fig_height=6, heatmap_width=5, heatmap_height=3,
                               confusion_matrix_dataframe=cm_df, path=path_for_confusion_matrix)
 
-        labels = self.study_type_correspondence.keys()
-        results = precision_recall_fscore_support(y_true=y_true, y_pred=y_pred)
+        labels = list(self.study_type_correspondence.keys())
+        tmp_labels = labels
+        labels = []
+        for label in tmp_labels:
+            label = format_label(label)
+            labels.append(label)
+        results = precision_recall_fscore_support(y_true=y_true, y_pred=y_pred, average=None, labels=labels)
         print_metrics(results, labels, metrics_path)
 
     def test_model(self, classification_function, path_for_confusion_matrix, metrics_path):
