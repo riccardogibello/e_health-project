@@ -79,10 +79,10 @@ if __name__ == '__main__':
     p = NatureScraper(library)'''
     # p = PubMedScraper(library)
 
-    start = time.time()
+    '''start = time.time()
     classifier = NBayesPaperClassifier(False)
     end = time.time()
 
-    print(str(end - start))
+    print(str(end - start))'''
 
-    # run_dash()
+    run_dash()

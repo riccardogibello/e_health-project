@@ -2,8 +2,7 @@ from dash import dcc, dash
 from dash import html
 import dash_bootstrap_components as dbc
 from pandas import DataFrame
-from DataManagers.DatabaseManager import do_query
-from Utilities.Classifiers.LogRegClassifier import retrieve_columns_names_given_table
+from DataManagers.DatabaseManager import do_query, retrieve_columns_names_given_table
 import plotly.express as px
 
 

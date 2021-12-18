@@ -93,8 +93,8 @@ def get_app_data(app_id, n_clicks):
                     string_to_set = 'No'
             row = html.Tr(
                 children=[
-                    html.Td(datum, style={'font-weight': 'bold'}),
-                    html.Td(string_to_set)
+                    html.Td(datum, style={'font-weight': 'bold', 'word-wrap': 'break-word'}),
+                    html.Td(string_to_set, style={'word-wrap': 'break-word'})
                 ]
             )
             table_children_rows.append(row)
@@ -108,7 +108,9 @@ def get_app_data(app_id, n_clicks):
                    'margin-left': '70px',
                    'margin-top': '50px',
                    'margin-bottom': '50px',
-                   'background': '#ADD8E6'},
+                   'background': '#ADD8E6',
+                   'width': '500px',
+                   'table-layout': 'fixed'},
             children=table_children_rows
         )
 
@@ -133,28 +135,60 @@ def get_image_data(app_id, n_clicks):
         return [html.Img()]
 
 
-@app.callback([dash.Output(component_id='paper_dropdown', component_property='placeholder'),
-               dash.Output(component_id='paper_dropdown', component_property='options')],
+@app.callback([dash.Output(component_id='paper_dropdown', component_property='options')],
               [dash.Input(component_id='app_dropdown', component_property='value'),
                dash.Input(component_id='reset-papers-button', component_property='n_clicks'),
-               dash.Input(component_id='reset-button', component_property='n_clicks')])
-def get_papers_related_to_app(app_id, n_clicks, n_clicks_2):
-    query = 'SELECT p.paper_id, p.paper_title ' \
-            'FROM paper AS p JOIN app_paper AS ap ' \
-            'ON p.paper_id = ap.paper_id ' \
-            'WHERE ap.app_id = %s'
-    results = do_query((app_id,), query)
+               dash.Input(component_id='reset-button', component_property='n_clicks'),
+               dash.Input(component_id='study_type_dropdown', component_property='value')])
+def get_papers_related_to_app(app_id, n_clicks, n_clicks_2, study_types):
+    results = []
+    if study_types and app_id:
+        query = 'SELECT p.paper_id, p.paper_title ' \
+                'FROM paper AS p JOIN app_paper AS ap ' \
+                'ON p.paper_id = ap.paper_id ' \
+                'WHERE ap.app_id = %s'
+        par_list = [app_id]
+        i = 0
+        for study_type in study_types:
+            if i == 0:
+                query = query + ' AND (p.type = %s'
+            else:
+                query = query + ' OR p.type = %s'
+            par_list.append(study_type)
+            i = i + 1
+        query = query + ')'
+        results = do_query(par_list, query)
+    elif study_types:
+        query = 'SELECT p.paper_id, p.paper_title ' \
+                'FROM paper AS p'
+        par_list = []
+        i = 0
+        for study_type in study_types:
+            if i == 0:
+                query = query + ' WHERE p.type = %s'
+            else:
+                query = query + ' OR p.type = %s'
+            par_list.append(study_type)
+            i = i + 1
+        results = do_query(par_list, query)
+    elif app_id:
+        query = 'SELECT p.paper_id, p.paper_title ' \
+                'FROM paper AS p JOIN app_paper AS ap ' \
+                'ON p.paper_id = ap.paper_id ' \
+                'WHERE ap.app_id = %s'
+        results = do_query((app_id,), query)
 
     changed_id = [p['prop_id'] for p in callback_context.triggered][0]
 
-    if 'reset-papers-button' in changed_id or 'reset-button' in changed_id or app_id is None:
+    if 'reset-papers-button' in changed_id or 'reset-button' in changed_id or (
+            app_id is None and study_types is None) or (study_types is not None and len(study_types) == 0 and app_id is None):
         papers = compute_options_for_papers()
-        return ["Write here the name of a paper", papers]
+        return [papers]
     if not results:
-        return ['Write here the name of a paper', []]
+        return [[]]
 
     papers = compute_list_of_dictionary_label_value(results)
-    return ['Write here the name of a paper', papers]
+    return [papers]
 
 
 @app.callback([dash.Output(component_id='label_author', component_property='children')],
@@ -242,8 +276,8 @@ def get_paper_data(paper_id, n_clicks, c_clicks_2):
             datum = data[i]
             row = html.Tr(
                 children=[
-                    html.Td(label, style={'font-weight': 'bold'}),
-                    html.Td(datum, style={'width': '80%'})
+                    html.Td(label, style={'font-weight': 'bold', 'word-wrap': 'break-word'}),
+                    html.Td(datum, style={'word-wrap': 'break-word'})
                 ]
             )
             table_children_rows.append(row)
@@ -257,7 +291,9 @@ def get_paper_data(paper_id, n_clicks, c_clicks_2):
                    'margin-left': '70px',
                    'margin-top': '50px',
                    'margin-bottom': '50px',
-                   'background': '#ADD8E6'},
+                   'background': '#ADD8E6',
+                   'width': '700px',
+                   'table-layout': 'fixed'},
             children=table_children_rows
         )
 

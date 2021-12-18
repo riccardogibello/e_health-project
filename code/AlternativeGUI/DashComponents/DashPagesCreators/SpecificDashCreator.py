@@ -1,5 +1,6 @@
 from dash import html, dcc
 from DataManagers.DatabaseManager import do_query
+from Utilities.Classifiers.PaperClassifiers.PaperClassifier import PaperClassifier, insert_spaces_into_label
 
 
 def compute_list_of_dictionary_label_value(results):
@@ -9,8 +10,8 @@ def compute_list_of_dictionary_label_value(results):
         identifier = result[0]
         name_displayed = result[1]
         name_len = len(name_displayed)
-        if name_len - 1 > 45:
-            name_displayed = name_displayed[:45] + '...'
+        if name_len - 1 > 20:
+            name_displayed = name_displayed[:20] + '...'
         dictionary.__setitem__('label', name_displayed)
         dictionary.__setitem__('value', identifier)
         dictionary_label_value__list.append(dictionary)
@@ -44,6 +45,18 @@ def compute_options_for_authors():
     return list_
 
 
+def compute_options_for_study_types():
+    tmp_labels = PaperClassifier.study_type_correspondence.keys()
+    labels = []
+    for label in tmp_labels:
+        labels.append(insert_spaces_into_label(label))
+    list_ = []
+    for label in labels:
+        list_.append({'label': label, 'value': label})
+
+    return list_
+
+
 def get_specific_dash_page():
     colors = {
         'background': '#34568b',
@@ -56,6 +69,8 @@ def get_specific_dash_page():
     papers = compute_options_for_papers()
 
     authors = compute_options_for_authors()
+
+    study_types = compute_options_for_study_types()
 
     layout = html.Div(
         children=[
@@ -78,13 +93,29 @@ def get_specific_dash_page():
                                'margin-top': '50px',
                                'margin-bottom': '50px',
                                'background': '#ADD8E6',
-                               'min-width': '500px'},
+                               'width': '500px',
+                               'table-layout': 'fixed'},
                         children=[
-                            html.Header(html.Th(children=['A. Search for a serious game application!'],
-                                                style={
-                                                    'textAlign': 'center',
-                                                    'color': colors['text']
-                                                })),
+                            html.Th(
+                                children=html.Div(
+                                    children=html.Label('A. Search for a serious game application!'),
+                                    style={
+                                        'textAlign': 'center',
+                                        'color': colors['text']
+                                    }
+                                )
+                            ),
+                            html.Tr(
+                                children=[
+                                    html.Td(
+                                        html.Div(
+                                            children=[
+                                                html.Button('Reset filters', id='reset-button', style={'width': '70%'})
+                                            ]
+                                        )
+                                    ),
+                                ]
+                            ),
                             html.Tr(
                                 children=[
                                     html.Td(
@@ -95,11 +126,6 @@ def get_specific_dash_page():
                                                     options=applications,
                                                     placeholder="Write here the name of an application")
                                             ]
-                                        )
-                                    ),
-                                    html.Td(
-                                        html.Div(
-                                            children=[html.Button('Reset filters', id='reset-button')]
                                         )
                                     )
                                 ]
@@ -121,8 +147,8 @@ def get_specific_dash_page():
                              children=[
                                  html.Table()
                              ])
-                ], style={'text-align': 'center', 'display': 'flex', 'justify-content': 'center'})
-            ,
+                ], style={'text-align': 'center', 'display': 'flex', 'justify-content': 'center'}
+            ),
             html.Div(
                 children=[
                     html.Table(
@@ -130,23 +156,45 @@ def get_specific_dash_page():
                                'border-collapse': 'separate',
                                'border-radius': '15px',
                                'border-spacing': '20px',
-                               'margin-left': 'auto',
-                               'margin-right': 'auto',
                                'margin-top': '50px',
                                'margin-bottom': '50px',
                                'background': '#ADD8E6',
-                               'display': 'table',
-                               'min-width': '500px'
-                               },
+                               'width': '500px',
+                               'table-layout': 'fixed'},
                         children=[
-                            html.Header(
-                                children=[html.Th(
-                                    children=['B. Search for a paper by keyword!'],
-                                    style={
-                                        'text-align': 'center',
-                                        'color': colors['text']
-                                    }
-                                )]
+                            html.Th(
+                                children=html.Div(
+                                    children=html.Label('B. Search for a paper by keyword!')
+                                ),
+                                colSpan=2
+                            ),
+                            html.Tr(
+                                children=[
+                                    html.Td(
+                                        children=html.Div(
+                                            children=[
+                                                html.Button('Reset filters on papers', id='reset-papers-button',
+                                                            style={'width': '70%'})]
+                                        ),
+                                        colSpan=2
+                                    )
+                                ]
+                            ),
+                            html.Tr(
+                                children=[
+                                    html.Td(
+                                        children=html.Div(
+                                            children=[
+                                                dcc.Dropdown(
+                                                    id='study_type_dropdown',
+                                                    options=study_types,
+                                                    multi=True
+                                                ),
+                                            ]
+                                        ),
+                                        colSpan=2
+                                    )
+                                ]
                             ),
                             html.Tr(
                                 children=[
@@ -160,12 +208,8 @@ def get_specific_dash_page():
                                                     placeholder="Write here the name of a paper",
                                                 ),
                                             ]
-                                        )
-                                    ),
-                                    html.Td(
-                                        html.Div(
-                                            children=[html.Button('Reset filters on papers', id='reset-papers-button')]
-                                        )
+                                        ),
+                                        colSpan=2
                                     )
                                 ]
                             )
@@ -193,17 +237,21 @@ def get_specific_dash_page():
                                'margin-bottom': '50px',
                                'background': '#ADD8E6',
                                'display': 'table',
-                               'min-width': '500px'
+                               'width': '500px',
+                               'table-layout': 'fixed'
                                },
                         children=[
-                            html.Header(
-                                children=[html.Th(
-                                    children=['C. Search how many publication an author has on PubMed!'],
-                                    style={
-                                        'text-align': 'center',
-                                        'color': colors['text']
-                                    }
-                                )]
+                            html.Th(
+                                children=html.Div(
+                                    children=
+                                    html.Label('C. Search how many publication an author has on PubMed!',
+                                               style={
+                                                   'text-align': 'center',
+                                                   'color': colors['text']
+                                               }
+                                               ),
+                                ),
+                                colSpan=2
                             ),
                             html.Tr(
                                 children=[
@@ -241,7 +289,7 @@ def get_specific_dash_page():
                         ],
                     )
                 ],
-                style={'text-align': 'center', 'display': 'flex', 'justify-content': 'center'}
+                style={'text-align': 'center', 'display': 'flex', 'justify-content': 'space-between'}
             )
         ], style={'background': '#4682B4',
                   'margin-left': '20px',

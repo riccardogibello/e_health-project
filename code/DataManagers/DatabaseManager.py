@@ -3,6 +3,27 @@ import re
 import mysql
 import mysql.connector
 
+def retrieve_columns_names():
+    query = "SELECT COLUMNS.COLUMN_NAME FROM information_schema.COLUMNS WHERE table_schema='projectdatabase' " \
+            "and TABLE_NAME='app_features' ORDER BY ORDINAL_POSITION"
+    result = do_query('', query)
+    col_names = []
+    for el in result:
+        name = str(el[0])
+        col_names.append(name)
+    return col_names
+
+
+def retrieve_columns_names_given_table(table_name):
+    query = "SELECT COLUMNS.COLUMN_NAME FROM information_schema.COLUMNS " \
+            "WHERE TABLE_NAME=%s AND table_schema='projectdatabase' " \
+            "ORDER BY ORDINAL_POSITION"
+    result = do_query((table_name,), query)
+    col_names = []
+    for el in result:
+        name = str(el[0])
+        col_names.append(name)
+    return col_names
 
 def create_connection():
     # retrieving from /data/connection_data/data.txt all the needed information for establishing a connection

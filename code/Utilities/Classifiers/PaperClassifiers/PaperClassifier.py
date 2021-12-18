@@ -28,6 +28,18 @@ def format_label(label):
     return study_type
 
 
+def insert_spaces_into_label(label):
+    list_ = re.findall('[A-Z][^A-Z]*', label)  # this regex matches every capital letter
+    # followed by a series of lower-case letters
+    study_type = label
+    if len(list_) != len(label):
+        study_type = ''
+        for sub_word in list_:
+            study_type = study_type + sub_word + ' '
+        study_type = study_type[:-1]
+    return study_type
+
+
 def print_metrics(results, labels, metrics_path):
     # results = ([precision], [recall], [f1])
     study_type_list = []
@@ -125,6 +137,8 @@ def classify_serious_games_papers(classification_function):
 
         predicted_study_type = classification_function(
             Publication(title=text, abstract='', authors='', journal='', nature_type=''))
+
+        predicted_study_type = insert_spaces_into_label(predicted_study_type)
 
         query = 'UPDATE paper SET type = %s WHERE paper_id = %s'
         do_query((predicted_study_type, paper_id), query)
