@@ -31,8 +31,9 @@ class HomePageWindow(QMainWindow):
 
         load_datasets_button = QPushButton('Load Data from old dataset')
         load_datasets_button.setStyleSheet(
-            "border-radius:20; border:2px solid black; background-color: #48ff48; "
-            "margin-top:2; font-size:25px; margin-top: 15px;")
+            "QPushButton {border-radius:20; border:2px solid black; background-color: #48ff48; "
+            "margin-top:2; font-size:25px; margin-top: 15px;} "
+            "QPushButton::hover { border:4px solid black}")
         load_datasets_button.setFixedSize(500, 80)
         load_datasets_button.clicked.connect(self.on_click_load_datasets_button)
         inner_layout.addWidget(load_datasets_button, alignment=Qt.AlignCenter)
@@ -40,31 +41,47 @@ class HomePageWindow(QMainWindow):
         retrieve_data_button = QPushButton('Retrieve Data from Google Play')
         retrieve_data_button.setFixedSize(500, 80)
         retrieve_data_button.setStyleSheet(
+            "QPushButton {"
             "border-radius:20; border:2px solid black; background-color: #ffd400; "
-            "margin-top:2; font-size:25px; margin-top: 15px;")
+            "margin-top:2; font-size:25px; margin-top: 15px;"
+            "} "
+            "QPushButton::hover { border:4px solid black}"
+        )
         retrieve_data_button.clicked.connect(self.on_click_retrieve_data_button)
         inner_layout.addWidget(retrieve_data_button, alignment=Qt.AlignCenter)
 
         manual_classify_button = QPushButton('Classify manually some apps')
         manual_classify_button.setFixedSize(500, 80)  # width, height
         manual_classify_button.setStyleSheet(
+            "QPushButton {"
             "border-radius:20; border:2px solid black; background-color: #ff3333; "
-            "margin-top:2; font-size:25px; margin-top: 15px;")
+            "margin-top:2; font-size:25px; margin-top: 15px;"
+            "} "
+            "QPushButton::hover { border:4px solid black}"
+        )
         manual_classify_button.clicked.connect(self.on_click_manual_classify_button)
         inner_layout.addWidget(manual_classify_button, alignment=Qt.AlignCenter)
 
         automatic_classify_button = QPushButton('Automatic Apps classification')
         automatic_classify_button.setFixedSize(500, 80)  # width, height
         automatic_classify_button.setStyleSheet(
-            "border-radius:20; border:2px solid black; background-color: #3bccff; "
-            "margin-top:2; font-size:25px; margin-top: 15px;")
+            "QPushButton {"
+            "border-radius:20; border:2px solid black; background-color: #48ff48; "
+            "margin-top:2; font-size:25px; margin-top: 15px;"
+            "} "
+            "QPushButton::hover { border:4px solid black}"
+        )
         automatic_classify_button.clicked.connect(self.on_click_automatic_classify_button)
         inner_layout.addWidget(automatic_classify_button, alignment=Qt.AlignCenter)
 
         show_dashboard_button = QPushButton('Show Dashboard')
         show_dashboard_button.setStyleSheet(
+            "QPushButton {"
             "border-radius:20; border:2px solid black; background-color: #3bccff; "
-            "margin-top:2; font-size:25px; margin-top: 15px;")
+            "margin-top:2; font-size:25px; margin-top: 15px;"
+            "} "
+            "QPushButton::hover { border:4px solid black}"
+            )
         show_dashboard_button.setFixedSize(500, 80)
         show_dashboard_button.clicked.connect(self.on_click_show_dashboard_button)
         inner_layout.addWidget(show_dashboard_button, alignment=Qt.AlignCenter)
@@ -72,8 +89,12 @@ class HomePageWindow(QMainWindow):
         exit_button = QPushButton('Exit')
         exit_button.setFixedSize(500, 90)  # width, height
         exit_button.setStyleSheet(
-            "border-radius:20; border:2px solid black; background-color: #48ff48; margin-top:2; "
-            "font-size:25px; margin-top: 15px;  margin-bottom: 15px;")
+            "QPushButton {"
+            "border-radius:20; border:2px solid black; background-color: #737373 ; margin-top:2; "
+            "font-size:25px; margin-top: 15px;  margin-bottom: 15px;"
+            "} "
+            "QPushButton::hover { border:4px solid black}"
+            )
         exit_button.clicked.connect(self.on_click_exit_button)
         inner_layout.addWidget(exit_button, alignment=Qt.AlignCenter)
         inner_widget.setLayout(inner_layout)

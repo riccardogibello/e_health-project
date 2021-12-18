@@ -52,25 +52,31 @@ class WaitingWindow(QMainWindow):
         waiting_logo_label.setStyleSheet("margin-top:15px")
         vertical_layout.addWidget(waiting_logo_label, alignment=Qt.AlignCenter)
 
+        self.labels = []
         if number_labels == 1 or number_labels == 3:
-            self.labels = []
             for i in range(number_labels):
                 label = QLabel('')
                 self.labels.append(label)
                 label.setStyleSheet("border-radius:20; border:2px solid black; font-size:20px; "
                                     "background-color: #48ff48;")
             self.update_waiting_window(number_labels)
-        for label in self.labels:
-            vertical_layout.addWidget(label, alignment=Qt.AlignCenter)
-            if not self.apps_from_dataset:
-                label.setHidden(True)
+        if self.labels:
+            for label in self.labels:
+                vertical_layout.addWidget(label, alignment=Qt.AlignCenter)
+                if not self.apps_from_dataset:
+                    label.setHidden(True)
 
         go_to_home_button = QPushButton(go_back_button_text)
         go_to_home_button.setIcon(QIcon('./resources/images/home.png'))
         go_to_home_button.setIconSize(QtCore.QSize(35, 35))
         go_to_home_button.setStyleSheet(
-            "border-radius:20; border:2px solid black; font-size:20px; "
-            "padding: 5px 5px 5px 5px; background-color: yellow; display: inline-block;")
+            "QPushButton {border-radius:20; border:2px solid black; font-size:20px; "
+            "padding: 5px 5px 5px 5px; background-color: yellow; display: inline-block;} "
+            "QPushButton::hover"
+            "{"
+            "border:4px solid black"
+            "}"
+        )
         go_to_home_button.clicked.connect(self.on_click_home_button)
         bottom_layout.addWidget(go_to_home_button, alignment=Qt.AlignCenter)
         bottom_widget.setLayout(bottom_layout)

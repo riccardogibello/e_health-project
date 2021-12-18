@@ -14,7 +14,7 @@ class OverviewDashboardWindow(QMainWindow):
         self.setWindowTitle("Serious Game Finder - Manual Classifier")
         self.left = 100
         self.top = 100
-        self.width = 1500
+        self.width = 1600
         self.height = 900
         self.setGeometry(self.left, self.top, self.width, self.height)
         main_widget = QWidget()
@@ -27,7 +27,7 @@ class OverviewDashboardWindow(QMainWindow):
         down_layout = QHBoxLayout()
         center_layout = QHBoxLayout()
 
-        center_browser_widget.setGeometry(100, 100, 1500, 800)
+        center_browser_widget.setGeometry(100, 100, 1600, 800)
         center_browser_widget.setUrl(QUrl('http://127.0.0.1:8050/'))
         center_browser_widget.setStyleSheet("border-radius:20; border:2px solid black;")
         center_layout.addWidget(center_browser_widget)
@@ -35,12 +35,18 @@ class OverviewDashboardWindow(QMainWindow):
 
         upper_widget.setLayout(upper_layout)
 
-        go_to_home_button = QPushButton()
-        go_to_home_button.setIcon(QIcon('./resources/images/home.png'))
+        go_to_home_button = QPushButton(self)
+        icon = QIcon('./resources/images/home.png')
+        go_to_home_button.setIcon(icon)
         go_to_home_button.setIconSize(QtCore.QSize(35, 35))
         go_to_home_button.setFixedSize(75, 50)  # width, height
         go_to_home_button.setStyleSheet(
-            "border-radius:20; border:2px solid black; background-color: yellow; margin-top:2")
+            "QPushButton {border-radius:20; border:2px solid black; background-color: yellow; margin-top:2;} "
+            "QPushButton::hover"
+            "{"
+            "border:4px solid black"
+            "}"
+        )
         go_to_home_button.clicked.connect(self.on_click_home_button)
         down_layout.addWidget(go_to_home_button, alignment=Qt.AlignCenter)
 

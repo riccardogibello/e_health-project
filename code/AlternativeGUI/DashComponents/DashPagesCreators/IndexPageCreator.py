@@ -9,10 +9,12 @@ def get_index_page():
                     children=[
                         html.Tr(
                             children=[
-                                html.Td(children=[dcc.Link('Go to the Overview Dash', href='/overview_dash')],
-                                        style={'padding': '20px'}),
-                                html.Td(children=[dcc.Link('Go to the Specific Dash', href='/specific_dash')],
-                                        style={'padding': '20px'})
+                                html.Td(children=[dcc.Link('Go to the Overview Dash', href='/overview_dash',
+                                                           style={'font-size': '25px'})],
+                                        style={'padding': '40px'}),
+                                html.Td(children=[dcc.Link('Go to the Specific Dash', href='/specific_dash',
+                                                           style={'font-size': '25px'})],
+                                        style={'padding': '40px'})
                             ])
                     ],
                     style={'border': '2px solid black',

@@ -4,6 +4,8 @@ from dash import html, dcc
 import dash_bootstrap_components as dbc
 from pandas import DataFrame
 import plotly.express as px
+
+from AlternativeGUI.DashComponents.DashPagesCreators.SpecificDashCreator import compute_options_for_applications
 from DataManagers.DatabaseManager import do_query, retrieve_columns_names_given_table
 
 
@@ -86,9 +88,10 @@ def get_dataframe_for_histogram_apps__sel_apps__evidence_apps():
     len_app = len(dataframe_app)
 
     df = pd.DataFrame({
-        "Type": ['App', 'Selected App', 'App with scientific evidence'],
-        "Occurrence": [len_app, len_selected_app, len_cited_apps],
-        "Legend": ["App", "Selected_App", "App_Paper"]
+        "Type": ['(a)', '(b)', '(c)'],
+        "Occurrences": [len_app, len_selected_app, len_cited_apps],
+        "Legend": ["Total games \non Play Store", "Total serious games for\nchildren on Play Store",
+                   "Total serious games with\nevidence on Play Store"]
     })
 
     return df
@@ -109,8 +112,13 @@ def create_bar_plot_categories_into_app():
 def create_fig_categories_into_app():
     dataframe_selected_app_categories_list, dataframe_selected_app_occurrence_list = create_bar_plot_categories_into_selected_app()
     dataframe_app_categories_list, dataframe_app_occurrence_list = create_bar_plot_categories_into_app()
+    color_labels = []
+
+    for el in dataframe_app_categories_list:
+        color_labels.append('Generic games on Play Store')
 
     for elem in dataframe_selected_app_categories_list:
+        color_labels.append('Serious games on Play Store')
         dataframe_app_categories_list.append(elem)
 
     for elem in dataframe_selected_app_occurrence_list:
@@ -118,17 +126,43 @@ def create_fig_categories_into_app():
 
     df = pd.DataFrame({
         "Category": dataframe_app_categories_list,
-        "Occurrence": dataframe_app_occurrence_list,
-        "Type": ["App", "App", "App", "App", "App", "App", "App", "App", "App", "App", "App", "App", "App", "App",
-                 "Selected_App", "Selected_App", "Selected_App", "Selected_App", "Selected_App", "Selected_App",
-                 "Selected_App",
-                 "Selected_App", "Selected_App", "Selected_App", "Selected_App", "Selected_App", "Selected_App",
-                 "Selected_App"]
+        "Occurrences": dataframe_app_occurrence_list,
+        "Type": color_labels
     })
 
-    fig = px.bar(df, x="Category", y="Occurrence", color="Type", barmode="group", log_y=True)
+    fig = px.bar(df, x="Category", y="Occurrences", color="Type", barmode="group", log_y=True)
 
     return fig
+
+
+def compute_evidence_graph(app_id):
+    study_type__list = []
+    study_type_values__list = []
+
+    query = 'SELECT p.type, count(*) FROM app_paper AS ap, paper AS p WHERE ap.paper_id = p.paper_id'
+    if app_id:
+        query = query + ' AND ap.app_id = %s'
+    query = query + ' GROUP BY p.type;'
+    if app_id:
+        results = do_query((app_id,), query)
+    else:
+        results = do_query((), query)
+    for result in results:
+        study_type__list.append(result[0])
+        study_type_values__list.append(result[1])
+
+    return dcc.Graph(
+        figure={
+            'data': [
+                {'values': study_type_values__list,
+                 'labels': study_type__list,
+                 'type': 'pie',
+                 'name': 'Ships'}
+            ]
+        },
+        style={"height": "80%", "width": "80%",
+               'margin-left': 'auto', 'margin-right': 'auto'}
+    )
 
 
 def get_overview_dash_page():
@@ -140,7 +174,10 @@ def get_overview_dash_page():
     # this computes a histogram containing the number of starting apps, the number of serious games selected
     # and the number of apps with evidence
     df = get_dataframe_for_histogram_apps__sel_apps__evidence_apps()
-    hist_app__sel_app__ev_apps = px.bar(df, x="Type", y="Occurrence", log_y=True, color="Legend", barmode="group")
+    hist_app__sel_app__ev_apps = px.bar(df, x="Type", y="Occurrences", log_y=True, color="Legend", barmode="group")
+    hist_app__sel_app__ev_apps.update_layout(legend=dict(x=0.5, y=1)
+                                             )
+    hist_app__sel_app__ev_apps.update_layout()
 
     # this computes the study_type distribution that is used to populate a pie graph
     study_types_list, study_types_occurrence_list = get_papers_data_as_dataframe_from_database()
@@ -148,11 +185,16 @@ def get_overview_dash_page():
     # this computes a bar plot to show the distribution of the categories of apps in the starting set of apps
     app__sel_apps__hist = create_fig_categories_into_app()
 
+    applications = compute_options_for_applications()
+
+    evidence_graph = compute_evidence_graph(None)
+
     layout = html.Div(
         children=[
             html.Table(
                 children=[
-                    html.Tr(html.Td(dcc.Link('Go back', href='/')))],
+                    html.Tr(html.Td(dcc.Link('Go back', href='/'),
+                                    style={'padding':'10px'}))],
                 style={'border': 'solid 2px',
                        'border-radius': '10px',
                        'margin-right': '10px',
@@ -169,14 +211,25 @@ def get_overview_dash_page():
                                'border-spacing': '20px',
                                'margin-top': '50px',
                                'margin-bottom': '50px',
-                               'background': '#ADD8E6'},
+                               'background': '#ADD8E6',
+                               'width': '100%'},
                         children=[
+                            html.Tr(children=[
+                                html.Td(
+                                    children='Apps vs. Serious Apps',
+                                    style={'font-weight': 'bold', 'width': '50%'}),
+                                html.Td(
+                                    children='Study type distribution',
+                                    style={'font-weight': 'bold', 'width': '50%'}),
+                            ]),
                             html.Tr(
                                 children=[
                                     html.Td(
                                         dcc.Graph(
                                             id='ase_hist',
-                                            figure=hist_app__sel_app__ev_apps
+                                            figure=hist_app__sel_app__ev_apps,
+                                            style={"height": "80%", "width": "80%",
+                                                   'margin-left': 'auto', 'margin-right': 'auto'}
                                         )
                                     ),
                                     html.Td(
@@ -188,18 +241,31 @@ def get_overview_dash_page():
                                                      'labels': study_types_list,
                                                      'type': 'pie',
                                                      'name': 'Ships'}
-                                                ],
-                                                'layout': {
-                                                    'title': 'Study type distribution',
-                                                }
-                                            }
+                                                ]
+                                            },
+                                            style={"height": "80%", "width": "80%",
+                                                   'margin-left': 'auto', 'margin-right': 'auto'}
                                         )
                                     ),
                                 ]
-                            )
+                            ),
+                            html.Tr(children=[
+                                html.Td(
+                                    children='The bar plot above resprents in (a) the quantity of generic '
+                                             'games applications retrieved from the Play Store '
+                                             'through simple filters on the genre'
+                                             'and addressed age which, in (b) the quantity of games classified'
+                                             'as serious games by a classification algorithm trained on a manually'
+                                             'classified set of applications, in (c) the number of games for which '
+                                             'literature published on Nature was found.', ),
+                                html.Td(
+                                    children='In the above pie graph it is represented '
+                                             'the distribution of the study types among '
+                                             'which evidence has been searched for.'),
+                            ]),
                         ]
                     )
-                ], style={'text-align': 'center', 'display': 'flex', 'justify-content': 'center'}
+                ], style={'text-align': 'center', 'display': 'flex', 'justify-content': 'center', 'width': '100%'}
             ),
             html.Div(
                 children=[
@@ -218,7 +284,7 @@ def get_overview_dash_page():
                                },
                         children=[
                             html.Tr(
-                                children='Dash: Categories in App and Selected_App.',
+                                children='Category distributions: Games vs Serious Games',
                                 style={'font-weight': 'bold'}
                             ),
                             html.Tr(
@@ -249,14 +315,50 @@ def get_overview_dash_page():
                                'margin-bottom': '50px',
                                'background': '#ADD8E6',
                                'display': 'table',
-                               'min-width': '500px'
+                               'width': '100%'
                                },
-                        children=[],
-                    )
+                        children=[
+                            html.Tr(
+                                html.Td(
+                                    html.Div(
+                                        children='Serious Games evidence on Play Store',
+                                        style={'font-weight': 'bold', 'text-align': 'center'}
+                                    ),
+                                    colSpan=3
+                                ),
+                            ),
+                            html.Tr(
+                                children=[
+                                    html.Td(
+                                        dcc.Dropdown(
+                                            id='app_evidence_dropdown',
+                                            options=applications,
+                                            placeholder="Write here the name of an application"),
+                                        style={'width': '60%'}
+                                    ),
+                                    html.Td(
+                                        html.Button('Filter apps with evidence', id='filter-evidence-apps-button-1')
+                                    ),
+                                    html.Td(
+                                        html.Button('Reset filter', id='reset-evidence-button')
+                                    )
+                                ]
+                            ),
+                            html.Tr(
+                                children=[
+                                    html.Td(
+                                        evidence_graph,
+                                        id="pie_graph_evidence_div",
+                                        colSpan=3
+                                    )
+                                ]
+                            )
+                        ]
+                    ),
                 ],
                 style={'text-align': 'center', 'display': 'flex', 'justify-content': 'center'}
             )
-        ], style={'background': '#4682B4',
+        ], style={'background': '#34568b',
                   'margin-left': '20px',
                   'margin-right': '20px',
                   'margin-top': '17px',

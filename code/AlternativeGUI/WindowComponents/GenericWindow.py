@@ -32,7 +32,12 @@ class GenericWindow(QMainWindow):
         go_to_home_button.setIconSize(QtCore.QSize(35, 35))
         go_to_home_button.setFixedSize(75, 50)  # width, height
         go_to_home_button.setStyleSheet(
-            "border-radius:20; border:2px solid black; background-color: yellow; margin-top:2")
+            "QPushButton {border-radius:20; border:2px solid black; background-color: yellow; margin-top:2} "
+            "QPushButton::hover"
+            "{"
+            "border:4px solid black"
+            "}"
+        )
         go_to_home_button.clicked.connect(self.on_click_home_button)
         vertical_layout.addWidget(go_to_home_button, alignment=Qt.AlignCenter)
 

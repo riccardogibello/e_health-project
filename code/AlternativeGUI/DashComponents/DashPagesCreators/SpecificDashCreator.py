@@ -10,8 +10,8 @@ def compute_list_of_dictionary_label_value(results):
         identifier = result[0]
         name_displayed = result[1]
         name_len = len(name_displayed)
-        if name_len - 1 > 20:
-            name_displayed = name_displayed[:20] + '...'
+        if name_len - 1 > 45:
+            name_displayed = name_displayed[:45] + '...'
         dictionary.__setitem__('label', name_displayed)
         dictionary.__setitem__('value', identifier)
         dictionary_label_value__list.append(dictionary)
@@ -76,7 +76,8 @@ def get_specific_dash_page():
         children=[
             html.Table(
                 children=[
-                    html.Tr(html.Td(dcc.Link('Go back', href='/')))],
+                    html.Tr(html.Td(dcc.Link('Go back', href='/'),
+                                    style={'padding':'10px'}))],
                 style={'border': 'solid 2px',
                        'border-radius': '10px',
                        'margin-right': '10px',
@@ -114,6 +115,13 @@ def get_specific_dash_page():
                                             ]
                                         )
                                     ),
+                                ]
+                            ),
+                            html.Tr(
+                                children=[
+                                    html.Td(
+                                        html.Button('Filter apps with evidence', id='filter-evidence-apps-button-2')
+                                    )
                                 ]
                             ),
                             html.Tr(
@@ -291,7 +299,7 @@ def get_specific_dash_page():
                 ],
                 style={'text-align': 'center', 'display': 'flex', 'justify-content': 'space-between'}
             )
-        ], style={'background': '#4682B4',
+        ], style={'background': '#34568b',
                   'margin-left': '20px',
                   'margin-right': '20px',
                   'margin-top': '17px',

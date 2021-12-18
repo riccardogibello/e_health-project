@@ -37,21 +37,33 @@ class ManualClassifierWindow(QMainWindow):
 
         serious_button = QPushButton('Serious')
         serious_button.setStyleSheet(
-            "border-radius:20; border:2px solid black; background-color: #11f523; font-size:20px; margin-bottom:2")
+            "QPushButton {"
+            "border-radius:20; border:2px solid black; background-color: #11f523; font-size:20px; margin-bottom:2"
+            "} "
+            "QPushButton::hover { border:4px solid black}"
+        )
         serious_button.setFixedSize(140, 50)
         serious_button.clicked.connect(self.on_click_serious_button)
         upper_layout.addWidget(serious_button, alignment=Qt.AlignLeft)
 
         start_button = QPushButton('Start')
         start_button.setStyleSheet(
-            "border-radius:20; border:2px solid black; background-color: #4169e1; font-size:20px; margin-bottom:2")
+            "QPushButton {"
+            "border-radius:20; border:2px solid black; background-color: #4169e1; font-size:20px; margin-bottom:2"
+            "} "
+            "QPushButton::hover { border:4px solid black}"
+        )
         start_button.setFixedSize(140, 50)
         start_button.clicked.connect(self.on_click_start_button)
         upper_layout.addWidget(start_button, alignment=Qt.AlignCenter)
 
         stop_button = QPushButton('Stop')
         stop_button.setStyleSheet(
-            "border-radius:20; border:2px solid black; background-color: #4169e1; font-size:20px; margin-bottom:2")
+            "QPushButton {"
+            "border-radius:20; border:2px solid black; background-color: #4169e1; font-size:20px; margin-bottom:2"
+            "} "
+            "QPushButton::hover { border:4px solid black}"
+        )
         stop_button.setFixedSize(140, 50)
         stop_button.clicked.connect(self.on_click_stop_button)
         upper_layout.addWidget(stop_button, alignment=Qt.AlignCenter)
@@ -59,7 +71,11 @@ class ManualClassifierWindow(QMainWindow):
         non_serious_button = QPushButton('Non Serious')
         non_serious_button.setFixedSize(140, 50)
         non_serious_button.setStyleSheet(
-            "border-radius:20; border:2px solid black; background-color: #ff0037; font-size:20px; margin-bottom:2")
+            "QPushButton {"
+            "border-radius:20; border:2px solid black; background-color: #ff0037; font-size:20px; margin-bottom:2"
+            "} "
+            "QPushButton::hover { border:4px solid black}"
+        )
         non_serious_button.clicked.connect(self.on_click_non_serious_button)
         upper_layout.addWidget(non_serious_button, alignment=Qt.AlignRight)
 
@@ -70,7 +86,11 @@ class ManualClassifierWindow(QMainWindow):
         go_to_home_button.setIconSize(QtCore.QSize(35, 35))
         go_to_home_button.setFixedSize(75, 50)  # width, height
         go_to_home_button.setStyleSheet(
-            "border-radius:20; border:2px solid black; background-color: yellow; margin-top:2")
+            "QPushButton {"
+            "border-radius:20; border:2px solid black; background-color: yellow; margin-top:2"
+            "} "
+            "QPushButton::hover { border:4px solid black}"
+        )
         go_to_home_button.clicked.connect(self.on_click_home_button)
         down_layout.addWidget(go_to_home_button, alignment=Qt.AlignCenter)
 
