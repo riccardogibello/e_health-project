@@ -50,7 +50,6 @@ CREATE TABLE `author` (
   `author_id` integer NOT NULL AUTO_INCREMENT,
   `name` varchar(100),
   `surname` varchar(100),
-  `quotes` integer,
   `papers` integer,
   PRIMARY KEY (`author_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
