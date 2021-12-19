@@ -196,58 +196,27 @@ class DataMiner:
             if not self.__running:
                 return
 
-            #batch_size = int(len(self.__apps_id_list) / MAX_RETRIEVE_APP_DATA_THREADS)
-            # = int(len(self.__apps_id_list) // batch_size + 1)
-            #offset = 0
+            batch_size = int(len(self.__apps_id_list) / MAX_RETRIEVE_APP_DATA_THREADS)
+            num_workers = int(len(self.__apps_id_list) // batch_size + 1)
+            offset = 0
 
-            #threads_status = []
-            #status = False
+            threads_status = []
+            status = False
             i = 0
-            with ThreadPoolExecutor(max_workers=MAX_RETRIEVE_APP_DATA_THREADS) as executor:
-                #while offset < len(self.__apps_id_list):
-                    #threads_status.append(status)
-                    #executor.submit(load_app_into_database, self.__apps_id_list, offset, batch_size,
-                                    #threads_status)
-                    #offset = offset + batch_size
-                    #print('thread ' + str(i))
-                    #i = i + 1
-                for app in self.__apps_id_list:
-                    executor.submit(self.load_appz_into_database, app[0], app[1])
+            with ThreadPoolExecutor(max_workers=num_workers) as executor:
+                while offset < len(self.__apps_id_list):
+                    threads_status.append(status)
+                    executor.submit(load_app_into_database, self.__apps_id_list, offset, batch_size,
+                                    threads_status)
+                    offset = offset + batch_size
+                    print('thread ' + str(i))
+                    i = i + 1
+                #for app in self.__apps_id_list:
+                    #executor.submit(self.load_appz_into_database, app[0], app[1])
 
-            #while False in threads_status:
-                #time.sleep(3)
-
-            #print('ended')
+            while False in threads_status:
+                time.sleep(3)
 
             self.__apps_id_list = []
 
-    def load_appz_into_database(self, app_id, from_dataset):
-        application = get_app_data(app_id)
-        if not application:
-            return
-        insert_app, insert_similar = check_app(application, from_dataset)
 
-        if insert_app:
-            application.description = clean_description(application.description)
-            application.teacher_approved = is_teacher_approved_app(app_id)
-
-            if len(application.description) > 2:
-                insert_app_into_db(application)
-                if is_english(application.developer):
-                    insert_developer(application.developer_id, application.developer)
-
-            else:
-                insert_app = False
-
-        if not insert_app:
-            delete_app_from_database(app_id)
-
-        if insert_similar:
-            if application.similar_apps:
-                for similar_id in application.similar_apps:
-                    insert_preliminary(similar_id)
-            if application.more_by_developer:
-                for developer_app in application.more_by_developer:
-                    insert_preliminary(developer_app)
-
-        update_status_preliminary(app_id)
