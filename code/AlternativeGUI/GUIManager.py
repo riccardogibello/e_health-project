@@ -4,7 +4,7 @@ from AlternativeGUI.DashComponents.DashManagerComponent import run_dash
 from AlternativeGUI.WindowComponents.GenericWindow import GenericWindow
 from AlternativeGUI.WindowComponents.HomePageWindow import HomePageWindow
 from AlternativeGUI.WindowComponents.ManualClassifierWindow import ManualClassifierWindow
-from AlternativeGUI.WindowComponents.OverviewDashboardWindow import OverviewDashboardWindow
+from AlternativeGUI.WindowComponents.DashboardWindow import OverviewDashboardWindow
 from AlternativeGUI.WindowComponents.WaitingWindow import WaitingWindow
 
 

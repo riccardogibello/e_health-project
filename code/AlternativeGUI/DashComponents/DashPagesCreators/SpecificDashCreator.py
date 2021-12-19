@@ -196,6 +196,7 @@ def get_specific_dash_page():
                                                 dcc.Dropdown(
                                                     id='study_type_dropdown',
                                                     options=study_types,
+                                                    placeholder='Filter by study type...',
                                                     multi=True
                                                 ),
                                             ]
@@ -252,7 +253,7 @@ def get_specific_dash_page():
                             html.Th(
                                 children=html.Div(
                                     children=
-                                    html.Label('C. Search how many publication an author has on PubMed!',
+                                    html.Label('C. Search how many publications an author has on PubMed!',
                                                style={
                                                    'text-align': 'center',
                                                    'color': colors['text']

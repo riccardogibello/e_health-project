@@ -160,8 +160,7 @@ def compute_evidence_graph(app_id):
                  'name': 'Ships'}
             ]
         },
-        style={"height": "80%", "width": "80%",
-               'margin-left': 'auto', 'margin-right': 'auto'}
+        style={'width': '60%', 'margin-left': 'auto', 'margin-right': 'auto'}
     )
 
 
@@ -194,7 +193,7 @@ def get_overview_dash_page():
             html.Table(
                 children=[
                     html.Tr(html.Td(dcc.Link('Go back', href='/'),
-                                    style={'padding':'10px'}))],
+                                    style={'padding': '10px'}))],
                 style={'border': 'solid 2px',
                        'border-radius': '10px',
                        'margin-right': '10px',
@@ -228,8 +227,7 @@ def get_overview_dash_page():
                                         dcc.Graph(
                                             id='ase_hist',
                                             figure=hist_app__sel_app__ev_apps,
-                                            style={"height": "80%", "width": "80%",
-                                                   'margin-left': 'auto', 'margin-right': 'auto'}
+                                            style={'width': '80%', 'margin-left': 'auto', 'margin-right': 'auto'}
                                         )
                                     ),
                                     html.Td(
@@ -243,8 +241,7 @@ def get_overview_dash_page():
                                                      'name': 'Ships'}
                                                 ]
                                             },
-                                            style={"height": "80%", "width": "80%",
-                                                   'margin-left': 'auto', 'margin-right': 'auto'}
+                                            style={'width': '80%', 'margin-left': 'auto', 'margin-right': 'auto'}
                                         )
                                     ),
                                 ]
@@ -315,7 +312,8 @@ def get_overview_dash_page():
                                'margin-bottom': '50px',
                                'background': '#ADD8E6',
                                'display': 'table',
-                               'width': '100%'
+                               'width': '100%',
+                               'table-layout': 'fixed'
                                },
                         children=[
                             html.Tr(
