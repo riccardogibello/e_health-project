@@ -1,5 +1,7 @@
 import multiprocessing
+import os
 import time
+import pickle
 import pandas as pd
 from PyQt5 import QtCore
 from PyQt5.QtCore import QObject
@@ -9,6 +11,7 @@ from DataManagers.DatabaseManager import do_query, clear_table
 from DataManagers.DatasetManager import DatasetManager
 from DataManagers.OldDatasetManager import OldDatasetManager
 from DataManagers.settings import KAGGLE_DATASET_PATH
+from Utilities.Classifiers.ApplicationsClassifier import ApplicationsClassifier
 
 
 def create_dictionary_load_data_statistics(p_apps):
@@ -31,15 +34,31 @@ def execute_old_dataset_manager():
 
 
 def execute_classification():
-    classifier = LogRegClassifier()
-    for i in range(50):
-        print(f"TRAINING {i}")
-        classifier.train_model(final=False)
-        classifier.update_dictionary()
-        # TODO : update
-    path = classifier.train_model(final=True)
-    classifier.load_model(path)
+    try:
+        model_file = open('./data/models/ApplicationClassifier/Model.pckl', 'rb')
+        classifier = pickle.load(model_file)
+        model_file.close()
+        classifier.check_validity()
+    except (FileNotFoundError, ValueError) as e:
+        #  FileNotFoundError - there is no saved model
+        #  ValueError raised by check_validity method when the model is not valid
+        classifier = ApplicationsClassifier()
+        classifier.train_models()
+        classifier.evaluate_classifier()
+        save_model(classifier)
     classifier.classify_apps()
+
+
+def save_model(model):
+    model_dir = './data/models/ApplicationClassifier'
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
+    model_file_path = './data/models/ApplicationClassifier/Model.pckl'
+    if os.path.exists(model_file_path):
+        os.remove(model_file_path)
+    file_out = open(model_file_path, 'wb')
+    pickle.dump(model, file_out)
+    file_out.close()
 
 
 def execute_data_miner():

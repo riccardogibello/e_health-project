@@ -10,6 +10,7 @@ CREATE TABLE `classification_performance` (
   `accuracy` double,
   `precision` double,
   `f1_score` double,
+  `mcc` double,
   `true_positive` integer,
   `true_negative` integer,
   `false_positive` integer,

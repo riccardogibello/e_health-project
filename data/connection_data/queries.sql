@@ -34,6 +34,8 @@ SELECT  'EXTERNAL TO CHECK', COUNT(*) FROM preliminary WHERE preliminary.`check`
     UNION
 SELECT  'TO_CLASSIFY APPS', COUNT(*) FROM app
     UNION
+SELECT 'NO MORE EXISTING', COUNT(*) FROM preliminary WHERE existing is FALSE
+    UNION
 SELECT 'TRAINING SET', COUNT(*) FROM labeled_app
     UNION
 SELECT 'TRAINING SERIOUS', COUNT(*) FROM labeled_app WHERE human_classified IS TRUE
@@ -45,7 +47,7 @@ SELECT 'DEVELOPERS', COUNT(*) FROM developer;
 
 UPDATE preliminary SET `check` = TRUE WHERE `check` IS FALSE;
 
-UPDATE preliminary SET `check` = FALSE WHERE `check` IS TRUE;
+UPDATE preliminary SET `check` = FALSE WHERE `check` IS TRUE AND preliminary.existing is TRUE;
 
 UPDATE preliminary SET `check` = FALSE WHERE app_id IN (
     SELECT app_id FROM app

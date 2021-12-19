@@ -58,7 +58,6 @@ def find_web_page(path):
     by a PDF reader or a HTML parser.
     """
     try:
-        print('requesting ' + str(path))
         req = Request(path, headers={'User-Agent': 'Mozilla/5.0'})
         page = io.BytesIO(urllib.request.urlopen(req).read())
         time.sleep(0.5)

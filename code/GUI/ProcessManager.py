@@ -1,4 +1,7 @@
+from datetime import datetime
 import multiprocessing
+import os.path
+import pickle
 
 from DataManagers.DataMiner import DataMiner
 from DataManagers.DatasetManager import DatasetManager
@@ -23,10 +26,31 @@ def execute_old_dataset_manager():
 
 
 def execute_classification():
-    classifier = ApplicationsClassifier()
-    classifier.train_models()
-    classifier.evaluate_classifier()
+    try:
+        model_file = open('./data/models/ApplicationClassifier/Model.pckl', 'rb')
+        classifier = pickle.load(model_file)
+        model_file.close()
+        classifier.check_validity()
+    except (FileNotFoundError, ValueError) as e:
+        #  FileNotFoundError - there is no saved model
+        #  ValueError raised by check_validity method when the model is not valid
+        classifier = ApplicationsClassifier()
+        classifier.train_models()
+        classifier.evaluate_classifier()
+        save_model(classifier)
     classifier.classify_apps()
+
+
+def save_model(model):
+    model_dir = './data/models/ApplicationClassifier'
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
+    model_file_path = './data/models/ApplicationClassifier/Model.pckl'
+    if os.path.exists(model_file_path):
+        os.remove(model_file_path)
+    file_out = open(model_file_path, 'wb')
+    pickle.dump(model, file_out)
+    file_out.close()
 
 
 class ProcessManager:

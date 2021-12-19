@@ -3,6 +3,7 @@ import re
 import mysql
 import mysql.connector
 
+
 def retrieve_columns_names():
     query = "SELECT COLUMNS.COLUMN_NAME FROM information_schema.COLUMNS WHERE table_schema='projectdatabase' " \
             "and TABLE_NAME='app_features' ORDER BY ORDINAL_POSITION"
@@ -24,6 +25,7 @@ def retrieve_columns_names_given_table(table_name):
         name = str(el[0])
         col_names.append(name)
     return col_names
+
 
 def create_connection():
     # retrieving from /data/connection_data/data.txt all the needed information for establishing a connection
@@ -184,6 +186,10 @@ def insert_developer(developer_id, developer_name):
             "INSERT IGNORE INTO developer(id, name) "
             "VALUES (%s, %s)"
         ))
+
+
+def mark_as_non_existing(app_id):
+    do_query((app_id,), "UPDATE preliminary SET preliminary.existing=FALSE WHERE app_id = %s")
 
 
 class DatabaseManager:

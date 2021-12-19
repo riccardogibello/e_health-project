@@ -1,7 +1,6 @@
 import http
 import time
 import mysql
-import threading
 import numpy as np
 import regex as re
 import urllib.error
@@ -14,8 +13,9 @@ from DataManagers.DatabaseManager import do_query
 from DataManagers.DatasetManager import is_english
 from WEBFunctions.web_mining_functions import find_web_page
 from DataManagers.DatabaseManager import insert_app_into_db, insert_id_into_preliminary_db as insert_preliminary, \
-    update_status_preliminary, delete_app_from_database, delete_app_from_labeled_app, insert_developer
-from DataManagers.settings import MAX_RETRIEVE_APP_DATA_THREADS, SERIOUS_GAMES_CATEGORIES_LIST, DEBUG, ADULT_RATINGS, \
+    update_status_preliminary, delete_app_from_database, delete_app_from_labeled_app, insert_developer, \
+    mark_as_non_existing
+from DataManagers.settings import MAX_RETRIEVE_APP_DATA_THREADS, SERIOUS_GAMES_CATEGORIES_LIST, ADULT_RATINGS, \
     LAST_UPDATE
 
 
@@ -47,9 +47,11 @@ def get_app_data(app_id):
         # Creating object Application
         application = Application(app_id, True)
     except google_play_scraper.exceptions.NotFoundError:
+        print(f"{app_id} - NOT FOUND")
         update_status_preliminary(app_id)
         delete_app_from_database(app_id)
         delete_app_from_labeled_app(app_id)
+        mark_as_non_existing(app_id)
         # Explicit assignment of None to Application object
         application = None
     except (urllib.error.HTTPError, urllib.error.URLError, http.client.RemoteDisconnected, ConnectionResetError):
@@ -92,7 +94,6 @@ def check_app(app, from_dataset):
     if not app or app.category not in SERIOUS_GAMES_CATEGORIES_LIST:
         return False, False
     if app.score == 0 and app.min_installs < 500:
-        # print(f"score {app.app_id} - {app.score} - {app.min_installs}")
         return False, True
     if app.updated < LAST_UPDATE:
         return False, True
@@ -112,7 +113,6 @@ def load_app_into_database(app_list, offset, batch_size, threads):
         app_data = app_list[i]
 
         app_id = app_data[0]
-        print('loading ' + str(app_id))
         from_dataset = app_data[1]
         application = get_app_data(app_id)
         if not application:
@@ -180,22 +180,14 @@ class DataMiner:
             if not len(self.__apps_id_list):
                 if not start:
                     self.__running = False
-                    if DEBUG:
-                        print(f'{threading.currentThread()}  || Data Miner : No new app found')
 
         except mysql.connector.errors.DatabaseError:
             self.__increment_connection_counter()
             if self.__failed_connections < 5:
-                if DEBUG:
-                    print(f'{threading.currentThread()} || Data Miner : Database communication error - '
-                          f'Retry in 30 seconds')
                 time.sleep(30)
                 return
             elif self.__failed_connections >= 5:
                 self.__running = False
-                if DEBUG:
-                    print(f'{threading.currentThread()} || Data Miner : Database communication error!!\n'
-                          f'TOO MANY ATTEMPTS FAILED - Execution terminated')
 
     def fill_database(self):
         while self.__running:
@@ -204,38 +196,58 @@ class DataMiner:
             if not self.__running:
                 return
 
-            batch_size = int(len(self.__apps_id_list) / MAX_RETRIEVE_APP_DATA_THREADS)
-            n_threads_max = int(len(self.__apps_id_list) // batch_size + 1)
-            offset = 0
+            #batch_size = int(len(self.__apps_id_list) / MAX_RETRIEVE_APP_DATA_THREADS)
+            # = int(len(self.__apps_id_list) // batch_size + 1)
+            #offset = 0
 
-            threads_status = []
-            status = False
+            #threads_status = []
+            #status = False
             i = 0
-            with ThreadPoolExecutor(max_workers=n_threads_max) as executor:
-                while offset < len(self.__apps_id_list):
-                    threads_status.append(status)
-                    executor.submit(load_app_into_database, self.__apps_id_list, offset, batch_size,
-                                    threads_status)
-                    offset = offset + batch_size
-                    print('thread ' + str(i))
-                    i = i + 1
+            with ThreadPoolExecutor(max_workers=MAX_RETRIEVE_APP_DATA_THREADS) as executor:
+                #while offset < len(self.__apps_id_list):
+                    #threads_status.append(status)
+                    #executor.submit(load_app_into_database, self.__apps_id_list, offset, batch_size,
+                                    #threads_status)
+                    #offset = offset + batch_size
+                    #print('thread ' + str(i))
+                    #i = i + 1
+                for app in self.__apps_id_list:
+                    executor.submit(self.load_appz_into_database, app[0], app[1])
 
-            while False in threads_status:
-                time.sleep(3)
+            #while False in threads_status:
+                #time.sleep(3)
 
-            print('ended')
+            #print('ended')
 
             self.__apps_id_list = []
 
-    @staticmethod
-    def load_chunk(self, chunk):
-        for application in chunk:
-            load_app_into_database(application[0], application[1])
+    def load_appz_into_database(self, app_id, from_dataset):
+        application = get_app_data(app_id)
+        if not application:
+            return
+        insert_app, insert_similar = check_app(application, from_dataset)
 
-    def split_list_in_chunks(self, num_chunks=MAX_RETRIEVE_APP_DATA_THREADS):
-        chunk_dim = int(len(self.__apps_id_list) / num_chunks) + 1
-        chunks = [self.__apps_id_list[x:x + chunk_dim] for x in range(0, len(self.__apps_id_list), chunk_dim)]
-        return chunks
+        if insert_app:
+            application.description = clean_description(application.description)
+            application.teacher_approved = is_teacher_approved_app(app_id)
 
-    def shutdown(self):
-        self.__running = False
+            if len(application.description) > 2:
+                insert_app_into_db(application)
+                if is_english(application.developer):
+                    insert_developer(application.developer_id, application.developer)
+
+            else:
+                insert_app = False
+
+        if not insert_app:
+            delete_app_from_database(app_id)
+
+        if insert_similar:
+            if application.similar_apps:
+                for similar_id in application.similar_apps:
+                    insert_preliminary(similar_id)
+            if application.more_by_developer:
+                for developer_app in application.more_by_developer:
+                    insert_preliminary(developer_app)
+
+        update_status_preliminary(app_id)

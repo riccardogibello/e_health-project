@@ -68,7 +68,7 @@ def find_app_related_papers(app_name):
         article_dict = article.toDict()
         article_list.append(article_dict)
 
-    # Generate list of dict records which will hold all article details that could be fetched from PUBMED API
+    # Generate list of dict records which will hold all article details that could be fetch from PUBMED API
     for article in article_list:
         # Sometimes article['pubmed_id'] contains list separated with comma - take first pubmedId in that list -
         # that's article pubmedId
