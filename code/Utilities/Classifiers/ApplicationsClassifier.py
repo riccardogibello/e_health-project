@@ -4,12 +4,12 @@ import dataframe_image as dfi
 from pandas import DataFrame
 
 from DataManagers.DatabaseManager import do_query as query, clear_table
-from Utilities.Classifiers.MNBayesModel import MNBayesClassifierModel
+from Utilities.Classifiers.MNBayesModel import MNBayesClassifierModel, calculate_app_distribution_from_labels
 from DataManagers.settings import NUM_MODELS, TEST_SET_DIMENSION, SOFT_VOTING, SMOOTHING_COEFFICIENT, \
     NON_IMPROVING_ITERATIONS, WRONG_CLASSIFIED_INCREMENT, TRUE_CLASSIFIED_INCREMENT, MAX_ITERATIONS
 from DataModel.PerformanceMetrics import PerformanceMetrics
-from sklearn.metrics import confusion_matrix, accuracy_score, f1_score, recall_score, precision_score, \
-    matthews_corrcoef
+from sklearn.metrics import confusion_matrix, accuracy_score as accuracy, f1_score as f1, recall_score as recall, \
+    precision_score as precision, matthews_corrcoef as mcc
 from Utilities.ConfusionMatrixPrinter import save_confusion_matrix
 
 
@@ -65,7 +65,7 @@ class ApplicationsClassifier:
         #  sets containing application data used for training
         self.training_serious, self.training_non_serious = get_training()
         #  performance of the classifier, by default 0 for all metrics.
-        self.__performance = PerformanceMetrics(0, 0, 0, 0, 0)
+        self.performance = PerformanceMetrics()
         #  testing set for computation of the performances. Casually picked up from all labeled apps
         self.testing_set = None
         self.select_apps_for_testing()
@@ -102,32 +102,43 @@ class ApplicationsClassifier:
     def create_single_model(self, assigned_id):
         """
         Method creating a single model and adding it to models list of the classifier.
-        :param assigned_id: integer used to identify the model
+        :param assigned_id: integer used to identify the model.
         """
-        model = MNBayesClassifierModel(assigned_id, self.create_balanced_subset())
+        model = MNBayesClassifierModel(assigned_id, self.create_subset())
         self.model_list.append(model)
 
-    def create_balanced_subset(self):
+    def create_subset(self):
+        """
+        Creates the set of applications to be used as training set for an instance of classifier.
+        :return: a set of applications.
+        """
         #  serious set is also shuffled is done to guarantee more randomized choosing of validation set for each model
         random.shuffle(self.training_serious)
         subset = self.training_serious.copy()
         random.shuffle(self.training_non_serious)
         subset += self.training_non_serious.copy()
-        # subset += random.sample(self.training_non_serious, len(self.training_non_serious))
+
         return subset
 
     def create_models(self):
-        clear_table('classification_performance')
+        """
+        Creates the instances of classifier to be used for ensemble voting during classification phase.
+        """
         for i in range(NUM_MODELS):
             self.create_single_model(i + 1)
 
     def train_models(self):
-        print("INIZIO TRAIN")
+        """
+        Coordinates the process of training of the models.
+        """
         for model in self.model_list:
             model.train_model()
 
     def classify_apps(self):
-        print("INIZIO CLASSIFICAZIONE")
+        """
+        Classifies all the apps from "app" table in the database.
+        If a game is classified as serious it will be inserted in "selected_app" table.
+        """
         description_dict = get_apps_descriptions()
         clear_table('selected_app')
         for app in description_dict:
@@ -137,26 +148,18 @@ class ApplicationsClassifier:
     def is_serious_game(self, app_description):
         """
         Method checking if an application is a serious game or not.
-        :param app_description:
-        :return:
+        :param app_description: the description of the game to classify.
+        :return: results of the voting.
         """
         results = [self.model_list[i].classify_app(app_description) for i in range(len(self.model_list))]
         return voting(results)
 
     def evaluate_classifier(self):
-        query(None, "TRUNCATE TABLE classification_errors")
+        """
+        Method evaluating the performances of the model on the validation set, saves them and
+        finally exports the confusion matrix and metrics as png files.
+        """
         classified_serious = [app for app in self.testing_set if self.is_serious_game(app[0])]
-        classified_non_serious = [app for app in self.testing_set if app not in classified_serious]
-
-        tp = [app for app in classified_serious if app[1]]
-        tn = [app for app in classified_non_serious if not app[1]]
-        fp = [app for app in classified_serious if not app[1]]
-        fn = [app for app in classified_non_serious if app[1]]
-
-        for app in fp:
-            query((app[2], False, True), "INSERT IGNORE INTO classification_errors VALUES (%s, %s ,%s)")
-        for app in fn:
-            query((app[2], True, False), "INSERT IGNORE INTO classification_errors VALUES (%s, %s ,%s)")
 
         y_true = []
         y_pred = []
@@ -164,57 +167,27 @@ class ApplicationsClassifier:
             y_true.append(app[1])
             y_pred.append(app in classified_serious)
 
-        self.__performance = PerformanceMetrics(accuracy=accuracy_score(y_true, y_pred),
-                                                recall=recall_score(y_true, y_pred),
-                                                precision=precision_score(y_true, y_pred),
-                                                f1=f1_score(y_true, y_pred),
-                                                matthews_cc=matthews_corrcoef(y_true, y_pred))
-        self.__performance.print_values()
+        tp, tn, fp, fn = calculate_app_distribution_from_labels(y_true, y_pred)
 
-        query((0, 1, self.__performance.recall, self.__performance.accuracy,
-               self.__performance.precision, self.__performance.f1, self.__performance.matthews_correlation_coefficient,
-               len(tp), len(tn), len(fp), len(fn), 0),
-              "INSERT INTO classification_performance(model_id, iteration, recall, accuracy, `precision`, f1_score, "
-              "mcc, true_positive, true_negative, false_positive, false_negative, after_last_best) "
-              "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+        self.performance = PerformanceMetrics(accuracy=accuracy(y_true, y_pred), recall=recall(y_true, y_pred),
+                                              precision=precision(y_true, y_pred), f1=f1(y_true, y_pred),
+                                              matthews_cc=mcc(y_true, y_pred), tp=tp, tn=tn, fp=fp, fn=fn)
 
-        temp_true = []
-        temp_pred = []
-        for label in y_true:
-            temp_true.append('serious' if label else 'non-serious')
-
-        for label in y_pred:
-            temp_pred.append('serious' if label else 'non-serious')
-
-        y_true = temp_true
-        y_pred = temp_pred
-
-        self.print_confusion_matrix(['serious', 'non-serious'], ['serious', 'non-serious'], y_true, y_pred,
-                                    'data/output_data/model_cf.png', 'data/output_data/model_metrics.png')
-
-    def print_confusion_matrix(self, indexes, columns, y_true, y_pred, path_for_confusion_matrix, metrics_path):
-        cm = confusion_matrix(y_true=y_true, y_pred=y_pred, labels=indexes)
-        cm_df = pd.DataFrame(cm,
-                             index=indexes,
-                             columns=columns)
-
-        save_confusion_matrix(fig_width=8, fig_height=6, heatmap_width=5, heatmap_height=3,
-                              confusion_matrix_dataframe=cm_df, path=path_for_confusion_matrix)
-
-        y_true = [True if label == 'serious' else False for label in y_true]
-        y_pred = [True if label == 'serious' else False for label in y_pred]
-
-        metrics = {
-            'accuracy': accuracy_score(y_true, y_pred),
-            'recall': recall_score(y_true, y_pred),
-            'precision': precision_score(y_true, y_pred),
-            'f1 score': f1_score(y_true, y_pred)
-        }
+        metrics = {'accuracy': self.performance.accuracy, 'recall': self.performance.recall,
+                   'precision': self.performance.precision, 'f1 score': self.performance.f1}
 
         dataframe = DataFrame(metrics, index=['metrics'])
         dataframe = dataframe.style.set_properties(**{'background-color': 'black',
                                                       'color': 'green'})
-        dfi.export(dataframe, metrics_path)
+        dfi.export(dataframe, 'data/output_data/model_metrics.png')
+
+        y_true = ['serious' if label else 'non-serious' for label in y_true]
+        y_pred = ['serious' if label else 'non-serious' for label in y_pred]
+
+        cm = confusion_matrix(y_true=y_true, y_pred=y_pred, labels=['serious', 'non-serious'])
+        cm_df = pd.DataFrame(cm, index=['serious', 'non-serious'], columns=['serious', 'non-serious'])
+        save_confusion_matrix(fig_width=8, fig_height=6, heatmap_width=5, heatmap_height=3,
+                              confusion_matrix_dataframe=cm_df, path='data/output_data/model_cf.png')
 
     def check_validity(self):
         """

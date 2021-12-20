@@ -47,7 +47,6 @@ def get_app_data(app_id):
         # Creating object Application
         application = Application(app_id, True)
     except google_play_scraper.exceptions.NotFoundError:
-        print(f"{app_id} - NOT FOUND")
         update_status_preliminary(app_id)
         delete_app_from_database(app_id)
         delete_app_from_labeled_app(app_id)

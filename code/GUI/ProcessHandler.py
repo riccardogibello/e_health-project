@@ -46,7 +46,9 @@ def execute_classification():
         classifier = pickle.load(model_file)
         model_file.close()
         classifier.check_validity()
-    except (FileNotFoundError, ValueError) as e:
+        classifier.performance.print_values()
+        save_model(classifier)
+    except (FileNotFoundError, ValueError):
         #  FileNotFoundError - there is no saved model
         #  ValueError raised by check_validity method when the model is not valid
         classifier = ApplicationsClassifier()

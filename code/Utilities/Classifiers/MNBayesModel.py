@@ -22,6 +22,14 @@ def calculate_likelihood(class_occurrences, class_size, vocabulary_size):
     return math.log2(nominator / denominator)
 
 
+def calculate_app_distribution_from_labels(true_labels, predicted_labels):
+    tp = len([true_labels[i] for i in range(len(true_labels)) if true_labels[i] and predicted_labels[i]])
+    tn = len([true_labels[i] for i in range(len(true_labels)) if not true_labels[i] and not predicted_labels[i]])
+    fp = len([true_labels[i] for i in range(len(true_labels)) if not true_labels[i] and predicted_labels[i]])
+    fn = len([true_labels[i] for i in range(len(true_labels)) if true_labels[i] and not predicted_labels[i]])
+    return tp, tn, fp, fn
+
+
 def count_all_word_in_dict(dictionary):
     """
     Function counting all words in given class.
@@ -51,13 +59,13 @@ class MNBayesClassifierModel:
         self.__serious_likelihoods = {}
         self.__non_serious_likelihoods = {}
         #  current performance of the model evaluated on the validation set
-        self.__performance = PerformanceMetrics(0, 0, 0, 0, 0)
+        self.__performance = PerformanceMetrics()
         #  prior probabilities are calculated during model creation even with balanced training.
         self.__prior_probabilities = self.__calculate_prior_probabilities()
         #  performance metrics and occurrences of the best iteration are saved
         #  if in the next iterations performances improves then values will be updated, if not then these values will be
         #  restored and used for classification. The number of iterations after each save are defined in settings file.
-        self.__best_performance = PerformanceMetrics(0, 0, 0, 0, 0)
+        self.__best_performance = PerformanceMetrics()
         self.__best_likelihoods = [{}, {}]
         #  following lists are used for saving classification of apps from training set after each train iteration.
         self.__training_classified_serious = []
@@ -224,29 +232,23 @@ class MNBayesClassifierModel:
 
         plt.figure(figsize=(15, 5))
         plt.plot(self.__f1_list, alpha=.3, color='#4D61E2', linestyle='--')
-        plt.savefig('data/output_data/models_performance/model'+str(self.__id), bbox_inches='tight')
+        plt.savefig('data/output_data/models_performance/model' + str(self.__id), bbox_inches='tight')
+        plt.close()
 
     def calculate_performances(self, true_labels, predicted_labels):
+        """
+        Method used to compute the performances of the classifier instance. Calculates
+        :param true_labels: labels with the value in test set.
+        :param predicted_labels: labels with values predicted by the classifier.
+        """
+        tp, tn, fp, fn = calculate_app_distribution_from_labels(true_labels, predicted_labels)
 
         self.__performance = PerformanceMetrics(accuracy=accuracy_score(true_labels, predicted_labels),
                                                 precision=precision_score(true_labels, predicted_labels),
                                                 recall=recall_score(true_labels, predicted_labels),
                                                 f1=f1_score(true_labels, predicted_labels),
-                                                matthews_cc=matthews_corrcoef(true_labels, predicted_labels))
-        test_tp = len([app for app in self.__training_classified_serious if app[1] and app in self.__testing_set])
-        test_tn = len(
-            [app for app in self.__training_classified_non_serious if (not app[1]) and app in self.__testing_set])
-        test_fp = len([app for app in self.__training_classified_serious if (not app[1]) and app in self.__testing_set])
-        test_fn = len([app for app in self.__training_classified_non_serious if app[1] and app in self.__testing_set])
-
-        # TODO test_distribution rewrite for better performance
-        database_query((self.__id, self.__iteration_count, self.__performance.recall, self.__performance.accuracy,
-                        self.__performance.precision, self.__performance.f1,
-                        self.__performance.matthews_correlation_coefficient, test_tp, test_tn, test_fp, test_fn,
-                        self.__after_best_iterations),
-                       "INSERT INTO classification_performance(model_id, iteration, recall, accuracy, `precision`, "
-                       "f1_score,mcc, true_positive, true_negative, false_positive, false_negative, after_last_best) "
-                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+                                                matthews_cc=matthews_corrcoef(true_labels, predicted_labels),
+                                                tp=tp, tn=tn, fp=fp, fn=fn)
 
     def __training_classification(self):
         """
@@ -327,7 +329,7 @@ class MNBayesClassifierModel:
             for word in desc:
                 try:
                     self.__non_serious_words[
-                        word] += 3*WRONG_CLASSIFIED_INCREMENT * false_positive_number / false_negative_number
+                        word] += WRONG_CLASSIFIED_INCREMENT * false_positive_number / false_negative_number
                 except KeyError:
                     pass
         for app in self.__training_apps_classification_distribution['TP']:
