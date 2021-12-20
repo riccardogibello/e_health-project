@@ -108,6 +108,14 @@ def check_app(app, from_dataset):
 
 
 def load_app_into_database(app_list, offset, batch_size, threads):
+    """
+    Method checking if a set of applications meet the requirements and inserting them in the database.
+    Also inserts in preliminary table similar apps to the one considered in that moment.
+    :param threads: list of threads that loads applications in db.
+    :param app_list: list of application.
+    :param offset: offset of the batch start.
+    :param batch_size: the size of the batch.
+    """
     for i in np.arange(offset, batch_size):
         app_data = app_list[i]
 
@@ -167,12 +175,12 @@ class DataMiner:
         self.__failed_connections += 1
 
     def __retrieve_incomplete_data(self, start=False):
-        # Looks in the preliminary table for checked apps has not been checked yet
-        # and save their IDs in self.__apps_id_list
-        query = (
-            "SELECT app_id, from_dataset FROM preliminary WHERE preliminary.`check` IS FALSE"
-        )
-
+        """
+        Looks in the preliminary table for checked apps has not been checked yet
+        and save their IDs in self.__apps_id_list.
+        :param start boolean value. True if retrieval is done for the first time after launch.
+        """
+        query = "SELECT app_id, from_dataset FROM preliminary WHERE preliminary.`check` IS FALSE"
         try:
             self.__apps_id_list = do_query((), query)
             self.__reset_connection_counter()
@@ -189,6 +197,10 @@ class DataMiner:
                 self.__running = False
 
     def fill_database(self):
+        """
+        Method coordinating the process of filling database with information about apps not yet checked from
+        "preliminary" table.
+        """
         while self.__running:
             if not len(self.__apps_id_list):
                 self.__retrieve_incomplete_data()
@@ -201,21 +213,15 @@ class DataMiner:
 
             threads_status = []
             status = False
-            i = 0
             with ThreadPoolExecutor(max_workers=num_workers) as executor:
                 while offset < len(self.__apps_id_list):
                     threads_status.append(status)
                     executor.submit(load_app_into_database, self.__apps_id_list, offset, batch_size,
                                     threads_status)
                     offset = offset + batch_size
-                    print('thread ' + str(i))
-                    i = i + 1
-                #for app in self.__apps_id_list:
-                    #executor.submit(self.load_appz_into_database, app[0], app[1])
 
             while False in threads_status:
                 time.sleep(3)
-
             self.__apps_id_list = []
 
 
