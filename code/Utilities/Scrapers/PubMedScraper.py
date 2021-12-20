@@ -135,7 +135,6 @@ def find_key_words_for_serious_games():
                 query = 'INSERT INTO keyword(keyword, occurrences) VALUES (%s, %s)'
                 do_query((word, occurrences), query)
                 cnt = cnt + 1
-        print(cnt)
 
 
 def compute_general_keywords_medical_field():

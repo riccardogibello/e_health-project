@@ -1,7 +1,5 @@
-import numpy as np
 import pandas as pd
 from dash import html, dcc
-import dash_bootstrap_components as dbc
 from pandas import DataFrame
 import plotly.express as px
 
@@ -72,7 +70,6 @@ def get_selected_app_data_dataframe_from_database():
 def get_app_data_dataframe_from_database():
     query = "SELECT app_id, app_name, description, category_id, score, rating, installs, developer_id, " \
             "last_update, content_rating, teacher_approved FROM app"
-    # TODO: add content_rating_description
     app_table = do_query((), query)
     column_names_list = retrieve_columns_names_given_table("app")
     df = create_dataframe_from_table(app_table, column_names_list)
@@ -97,6 +94,25 @@ def get_dataframe_for_histogram_apps__sel_apps__evidence_apps():
     return df
 
 
+def get_dataframe_for_histogram_teacher_approved_apps():
+    query = 'SELECT COUNT(*) from app WHERE teacher_approved = True'
+    n_apps_ta = do_query((), query)[0][0]
+    query = 'SELECT COUNT(*) from selected_app WHERE teacher_approved = True'
+    n_sel_apps_ta = do_query((), query)[0][0]
+    query = 'SELECT COUNT(*) from selected_app AS sa WHERE teacher_approved = True AND sa.app_id IN (' \
+            'SELECT ap.app_id FROM app_paper AS ap)'
+    n_evidence_ta = do_query((), query)[0][0]
+
+    df = pd.DataFrame({
+        "Type": ['(a)', '(b)', '(c)'],
+        "Occurrences": [n_apps_ta, n_sel_apps_ta, n_evidence_ta],
+        "Legend": ["Play Store games TA", "Serious games for children on Play Store TA",
+                   "TA serious games with evidence on Play Store"]
+    })
+
+    return df
+
+
 def create_bar_plot_categories_into_app():
     dataframe_app = get_app_data_dataframe_from_database()
     dataframe_app_filtered = DataFrame(dataframe_app.loc[:, 'category_id'])
@@ -110,11 +126,12 @@ def create_bar_plot_categories_into_app():
 
 
 def create_fig_categories_into_app():
-    dataframe_selected_app_categories_list, dataframe_selected_app_occurrence_list = create_bar_plot_categories_into_selected_app()
+    dataframe_selected_app_categories_list, dataframe_selected_app_occurrence_list = \
+        create_bar_plot_categories_into_selected_app()
     dataframe_app_categories_list, dataframe_app_occurrence_list = create_bar_plot_categories_into_app()
     color_labels = []
 
-    for el in dataframe_app_categories_list:
+    for i in range(len(dataframe_app_categories_list)):
         color_labels.append('Generic games on Play Store')
 
     for elem in dataframe_selected_app_categories_list:
@@ -164,19 +181,41 @@ def compute_evidence_graph(app_id):
     )
 
 
-def get_overview_dash_page():
-    colors = {
-        'background': '#34568b',
-        'text': '#000000'
+def compute_teacher_approved_hist():
+    df = get_dataframe_for_histogram_teacher_approved_apps()
+    hist_teacher_approved = px.bar(df, x="Type", y="Occurrences", log_y=True, color="Legend", barmode="group")
+    hist_teacher_approved.update_layout(legend=dict(x=0.5, y=1)
+                                        )
+    return hist_teacher_approved
+
+
+def compute_teacher_approved_pie():
+    query = 'SELECT COUNT(*) FROM app WHERE teacher_approved = True'
+    n_app_ta = int(do_query((), query)[0][0])
+    query = 'SELECT COUNT(*) FROM selected_app WHERE teacher_approved = True'
+    n_sel_ta = int(do_query((), query)[0][0])
+    n_nser_ta = n_app_ta - n_sel_ta
+
+    labels = ['TA non-serious', 'TA serious']
+    values = [n_nser_ta, n_sel_ta]
+
+    return {
+        'data': [
+            {'values': values,
+             'labels': labels,
+             'type': 'pie',
+             'name': 'Ships'}
+        ]
     }
 
+
+def get_overview_dash_page():
     # this computes a histogram containing the number of starting apps, the number of serious games selected
     # and the number of apps with evidence
     df = get_dataframe_for_histogram_apps__sel_apps__evidence_apps()
     hist_app__sel_app__ev_apps = px.bar(df, x="Type", y="Occurrences", log_y=True, color="Legend", barmode="group")
     hist_app__sel_app__ev_apps.update_layout(legend=dict(x=0.5, y=1)
                                              )
-    hist_app__sel_app__ev_apps.update_layout()
 
     # this computes the study_type distribution that is used to populate a pie graph
     study_types_list, study_types_occurrence_list = get_papers_data_as_dataframe_from_database()
@@ -187,6 +226,10 @@ def get_overview_dash_page():
     applications = compute_options_for_applications()
 
     evidence_graph = compute_evidence_graph(None)
+
+    hist_apps_sel_apps_teacherappr = compute_teacher_approved_hist()
+
+    pie_graph_teacher_approved = compute_teacher_approved_pie()
 
     layout = html.Div(
         children=[
@@ -298,6 +341,49 @@ def get_overview_dash_page():
                     ),
                 ],
                 style={'text-align': 'center', 'display': 'flex', 'justify-content': 'center'}
+            ),
+            html.Div(
+                children=[
+                    html.Table(
+                        style={'border': '2px solid black',
+                               'border-collapse': 'separate',
+                               'border-radius': '15px',
+                               'border-spacing': '20px',
+                               'margin-top': '50px',
+                               'margin-bottom': '50px',
+                               'background': '#ADD8E6',
+                               'width': '100%'},
+                        children=[
+                            html.Tr(children=[
+                                html.Td(
+                                    children='Teacher approved apps in generic games, \nnon medical '
+                                             'evidence based serious games and literature supported serious games',
+                                    style={'font-weight': 'bold', 'width': '50%'}),
+                                html.Td(
+                                    children='How many Teacher Approved apps are Serious Games?',
+                                    style={'font-weight': 'bold', 'width': '50%'}),
+                            ]),
+                            html.Tr(
+                                children=[
+                                    html.Td(
+                                        dcc.Graph(
+                                            id='apps_sel_apps_teacherappr_hist',
+                                            figure=hist_apps_sel_apps_teacherappr,
+                                            style={'width': '80%', 'margin-left': 'auto', 'margin-right': 'auto'}
+                                        )
+                                    ),
+                                    html.Td(
+                                        dcc.Graph(
+                                            id="pie_graph_teacher_approved",
+                                            figure=pie_graph_teacher_approved,
+                                            style={'width': '80%', 'margin-left': 'auto', 'margin-right': 'auto'}
+                                        )
+                                    ),
+                                ]
+                            )
+                        ]
+                    )
+                ], style={'text-align': 'center', 'display': 'flex', 'justify-content': 'center', 'width': '100%'}
             ),
             html.Div(
                 children=[

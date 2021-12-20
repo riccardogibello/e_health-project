@@ -22,7 +22,6 @@ class GoogleScholarScraper(Scraper):
                 page = find_web_page(query)
 
                 self.find_information(page)
-        print('ended')
 
     def find_information(self, page):
         soup = BeautifulSoup(page, 'html.parser')

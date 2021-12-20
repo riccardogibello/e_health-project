@@ -11,7 +11,10 @@ from DataManagers.DatabaseManager import do_query, clear_table
 from DataManagers.DatasetManager import DatasetManager
 from DataManagers.OldDatasetManager import OldDatasetManager
 from DataManagers.settings import KAGGLE_DATASET_PATH
+from DataModel.Library import Library
 from Utilities.Classifiers.ApplicationsClassifier import ApplicationsClassifier
+from Utilities.Classifiers.PaperClassifiers.NBayesPaperClassifier import NBayesPaperClassifier
+from Utilities.Scrapers.NatureScraper import NatureScraper
 
 
 def create_dictionary_load_data_statistics(p_apps):
@@ -34,6 +37,10 @@ def execute_old_dataset_manager():
 
 
 def execute_classification():
+    # All the performance metrics and confusion matrices of the following processes are saved into the folder
+    # '[PROJECT_PATH]/data/output_data'
+    # =============================================================================
+    # classification of the apps
     try:
         model_file = open('./data/models/ApplicationClassifier/Model.pckl', 'rb')
         classifier = pickle.load(model_file)
@@ -47,6 +54,20 @@ def execute_classification():
         classifier.evaluate_classifier()
         save_model(classifier)
     classifier.classify_apps()
+    # =============================================================================
+    # =============================================================================
+    # retrieval of the library of papers, creation of the classification model
+    # and labeling of the serious games papers
+    library = Library()
+    NatureScraper(library)  # this retrieves from Nature a library of publications
+
+    NBayesPaperClassifier(True)
+    # True in you want to recompute the whole library and to retrain the model.
+    # False if you only want to classify the papers in 'paper' table using a previously saved model in the folder
+    # '[PROJECT_PATH]/data/models'.
+    # This builds a train-test set from PubMed, trains the classifier and tests it.
+    # Lastly it classifies all the papers previously retrieved from Nature.
+    # =============================================================================
 
 
 def save_model(model):
@@ -158,4 +179,3 @@ class ProcessHandler(QObject):
             self.__dataset_process.terminate()
         if self.__classification_process:
             self.__classification_process.terminate()
-        print('closed')

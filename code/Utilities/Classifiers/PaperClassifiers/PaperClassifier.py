@@ -68,8 +68,6 @@ def print_metrics(results, labels, metrics_path):
 
     dfi.export(dataframe, metrics_path)
 
-    print(results_dictionary)
-
 
 def find_papers(id_list, is_from_pubmed_site):
     papers = []

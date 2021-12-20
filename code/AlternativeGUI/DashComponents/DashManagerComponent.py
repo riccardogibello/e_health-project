@@ -39,7 +39,6 @@ def display_page(pathname):
     elif pathname == '/specific_dash':
         return get_specific_dash_page()
     else:
-        print('hi')
         return get_index_page()
 
 
