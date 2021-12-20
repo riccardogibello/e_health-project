@@ -1,9 +1,10 @@
 import re
 from bs4 import BeautifulSoup
+
+from DataManagers.words_mining_functions import sanitize_string
 from DataModel.Publication import Publication
 from Scraper import Scraper, format_query
 from WEBFunctions.web_mining_functions import find_web_page, find_text_from_web_page
-from descriptions_sanitizer import sanitize_string
 
 
 class GoogleScholarScraper(Scraper):

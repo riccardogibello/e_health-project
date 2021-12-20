@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from pymed import PubMed
-from DataManagers.WordsMiner import sanitize_and_tokenize, count_occurrences
+from DataManagers.words_mining_functions import sanitize_and_tokenize, count_occurrences
 from DataModel.Application import Application
 from DataManagers.DatabaseManager import do_query, clear_table
 from Utilities.Classifiers.PaperClassifiers.NBayesPaperClassifier import sanitize_text

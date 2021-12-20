@@ -10,7 +10,7 @@ import google_play_scraper.exceptions
 from DataModel.Application import Application
 from concurrent.futures import ThreadPoolExecutor
 from DataManagers.DatabaseManager import do_query
-from DataManagers.DatasetManager import is_english
+from DataManagers.NewDatasetManager import is_english
 from WEBFunctions.web_mining_functions import find_web_page
 from DataManagers.DatabaseManager import insert_app_into_db, insert_id_into_preliminary_db as insert_preliminary, \
     update_status_preliminary, delete_app_from_database, delete_app_from_labeled_app, insert_developer, \

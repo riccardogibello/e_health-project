@@ -8,12 +8,12 @@ from pandas import DataFrame
 from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
 import dataframe_image as dfi
 from DataManagers.DatabaseManager import do_query, clear_table
+from DataManagers.words_mining_functions import sanitize_string
 from DataModel.Publication import Publication
 from Utilities.ConfusionMatrixPrinter import save_confusion_matrix
 from Utilities.Scrapers.Scraper import format_query
 from WEBFunctions.web_mining_functions import find_web_page
 import random
-from descriptions_sanitizer import sanitize_string
 
 
 def format_label(label):

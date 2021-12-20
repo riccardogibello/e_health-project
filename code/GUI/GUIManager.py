@@ -1,11 +1,11 @@
 from threading import Thread
 
-from AlternativeGUI.DashComponents.DashManagerComponent import run_dash
-from AlternativeGUI.WindowComponents.GenericWindow import GenericWindow
-from AlternativeGUI.WindowComponents.HomePageWindow import HomePageWindow
-from AlternativeGUI.WindowComponents.ManualClassifierWindow import ManualClassifierWindow
-from AlternativeGUI.WindowComponents.DashboardWindow import OverviewDashboardWindow
-from AlternativeGUI.WindowComponents.WaitingWindow import WaitingWindow
+from GUI.DashComponents.DashManagerComponent import run_dash
+from GUI.WindowComponents.GenericWindow import GenericWindow
+from GUI.WindowComponents.HomePageWindow import HomePageWindow
+from GUI.WindowComponents.ManualClassifierWindow import ManualClassifierWindow
+from GUI.WindowComponents.DashboardWindow import OverviewDashboardWindow
+from GUI.WindowComponents.WaitingWindow import WaitingWindow
 
 
 class GUIManager:

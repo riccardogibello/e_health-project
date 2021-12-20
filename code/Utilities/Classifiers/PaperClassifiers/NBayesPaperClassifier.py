@@ -2,7 +2,7 @@ import math
 import os.path
 import re
 import numpy as np
-from DataManagers.WordsMiner import sanitize_and_tokenize, count_occurrences
+from DataManagers.words_mining_functions import sanitize_and_tokenize, count_occurrences
 from Utilities.Classifiers.PaperClassifiers.PaperClassifier import PaperClassifier, classify_serious_games_papers
 
 URL_PATTERN = r'[A-Za-z0-9]+://[A-Za-z0-9%-_]+(/[A-Za-z0-9%-_])*(#|\\?)[A-Za-z0-9%-_&=]*'

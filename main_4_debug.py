@@ -1,7 +1,7 @@
 from threading import Thread
 from selenium.common.exceptions import WebDriverException
 
-from AlternativeGUI.DashComponents.DashManagerComponent import run_dash
+from GUI.DashComponents.DashManagerComponent import run_dash
 from DataManagers.DatabaseManager import do_query
 import time
 import numpy as np

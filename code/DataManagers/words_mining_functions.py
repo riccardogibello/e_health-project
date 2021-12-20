@@ -3,8 +3,18 @@ import string
 import numpy as np
 from nltk import WordNetLemmatizer, PunktSentenceTokenizer, WordPunctTokenizer, sent_tokenize, ngrams
 from nltk.corpus import stopwords
-
 from WEBFunctions.web_mining_functions import *
+
+
+def sanitize_string(string):
+    new_string = str(string.encode('ascii', errors='ignore').decode())
+    new_string = re.sub(r"[\b]+", "", new_string)
+    new_string = re.sub(r"[\t]+", "", new_string)
+    new_string = re.sub(r"[\f]+", "", new_string)
+    new_string = re.sub(r"[\r]+", "", new_string)
+    new_string = re.sub(r"[\n]+", " ", new_string)
+    new_string = re.sub(r"[ ]+", " ", new_string)
+    return new_string
 
 
 def count_occurrences(words):
@@ -133,64 +143,3 @@ def save_occurrence_word_to_file(filepath, word_occurrence_dict):
     for occurrence in sorted(occurrence_word_dict.keys()):
         for word in occurrence_word_dict.get(occurrence):
             fp.write(str(occurrence) + ' -> ' + word + '\n')
-
-
-class WordsMiner:
-    pages = {}
-    mined_pages = {}
-    """ Dictionary containing as key all the filenames related to the pages that have been analysed to extract
-    words of serious games. Each key has a dictionary in which are stored (word, # of occurrences found). """
-    global_occurrences = {}
-    """Dictionary containing as key all the words found during the analysis of different pages on the web and as 
-    value the number of occurrences of such words. """
-
-    def __init__(self, dictionary_of_pages):
-        self.pages = dictionary_of_pages
-        self.find_serious_games_words()
-        self.compute_global_occurrences()
-
-    def find_serious_games_words(self):
-        """
-        This method, given a web path, finds the occurrences of each word contained into it. The result is stored
-        into both the field 'mined_pages' and in the file with the given 'filename' (in the form of
-        (word, # of occurrences))
-        """
-        for filename, path in self.pages.items():
-            if '.pdf' in path:
-                text = find_pdf_from_web_page(path)
-            else:
-                text = find_text_from_web_page(path)
-
-            words = sanitize_and_tokenize(text=text,
-                                          max_n_gram=1)  # the method returns a list of words found in the text
-
-            occurrence_word_dictionary = count_occurrences(words)  # return value -> { key = word, value = #occurrence }
-            occurrences = sorted(
-                occurrence_word_dictionary)  # a list of the keys is returned, ordered in alphabetical order
-            new_occurrences_ordered = {}
-            for occurrence in occurrences:
-                # here the dictionary has the same structure as before, but it has the occurrences ordered in ascending
-                # alphabetical order.
-                # { key = word, value = #occurrence }
-                if len(occurrence) > 3:
-                    new_occurrences_ordered.__setitem__(occurrence, occurrence_word_dictionary.get(occurrence))
-
-            save_occurrence_word_to_file('./data/output_data/' + filename + '.txt', new_occurrences_ordered)
-
-            # save the words found for later statistics
-            self.mined_pages.__setitem__(filename, new_occurrences_ordered)
-
-    def compute_global_occurrences(self):
-        """"
-        This method computes the aggregated occurrences of every word, related to serious games, that is found
-        with the previous methods by searching on the web.
-        """
-
-        for filename in self.mined_pages.keys():
-            local_occurrences = self.mined_pages.get(filename)
-            for word in local_occurrences.keys():
-                tmp_count = self.global_occurrences.get(word)
-                if tmp_count:
-                    self.global_occurrences.__setitem__(word, tmp_count + local_occurrences.get(word))
-                else:
-                    self.global_occurrences.__setitem__(word, local_occurrences.get(word))

@@ -1,14 +1,12 @@
-from cefpython3 import cefpython as cef
+import os
+import signal
+import sys
+from multiprocessing.pool import ThreadPool
+from PyQt5.QtWidgets import QApplication
+from GUI.GUIManager import GUIManager
+from GUI.ProcessHandler import ProcessHandler
 from DataManagers.OldDatasetManager import *
-from GUI.ProcessManager import ProcessManager
 from DataManagers.DataMiner import DataMiner
-import tkinter as tk
-from GUI.ApplicationGUI import ApplicationGUI
-
-#word_miner = WordsMiner({'wikipage': 'https://en.wikipedia.org/wiki/Serious_game',
-#                         'paper_1': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5222787/pdf/fpsyt-07'
-#                                    '-00215.pdf',
-#                         'paper_2': 'https://www.hindawi.com/journals/ijcgt/2014/787968/'})
 
 
 def launch_data_miner():
@@ -32,21 +30,19 @@ def launch_words_miner():
     # word_miner.find_serious_games_words()
 
 
+def create_process_manager_thread():
+    return ProcessHandler()
+
+
 if __name__ == '__main__':
-    process_manager = ProcessManager()
-    root = tk.Tk()
-    app = ApplicationGUI(root, process_manager)
-    cef.Initialize()
-    app.mainloop()
-    cef.Shutdown()
+    pool = ThreadPool(processes=1)
+    async_result = pool.apply_async(create_process_manager_thread)
+    proc_man = async_result.get()
 
-    process_manager.close_application()
+    app = QApplication(sys.argv)
+    gui_manager = GUIManager(process_manager=proc_man)
 
-    # sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
-    # root = tk.Tk()
-    # app = MainFrame(root)
-    # Tk must be initialized before CEF otherwise fatal error (Issue #306)
-    # cef.Initialize()
-    # app.after(0, lambda: print('ciao'))
-    # app.mainloop()
-    # cef.Shutdown()
+    app.exec()
+
+    proc_man.close_application()
+    os.kill(os.getpid(), signal.SIGTERM)  # this was forcefully added to stop also the dash app that is once started

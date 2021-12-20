@@ -1,8 +1,8 @@
 import re
 from DataManagers.DatabaseManager import do_query
+from DataManagers.words_mining_functions import sanitize_string
 from DataModel.PubMedPublication import PubMedPublication
 from DataModel.Publication import Publication
-from descriptions_sanitizer import sanitize_string
 
 
 def format_query(query):

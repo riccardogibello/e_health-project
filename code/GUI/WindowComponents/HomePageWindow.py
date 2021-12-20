@@ -4,7 +4,7 @@ from threading import Thread
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QWidget, QVBoxLayout, QLabel
-from AlternativeGUI.WindowComponents.WaitingWindow import WaitingWindow
+from GUI.WindowComponents.WaitingWindow import WaitingWindow
 
 
 class HomePageWindow(QMainWindow):

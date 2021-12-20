@@ -4,10 +4,10 @@ import play_scraper
 from dash import dcc, dash, callback_context
 from dash import html
 import dash_bootstrap_components as dbc
-from AlternativeGUI.DashComponents.DashPagesCreators.IndexPageCreator import get_index_page
-from AlternativeGUI.DashComponents.DashPagesCreators.OverviewDashCreator import get_overview_dash_page, \
+from GUI.DashComponents.DashPagesCreators.IndexPageCreator import get_index_page
+from GUI.DashComponents.DashPagesCreators.OverviewDashCreator import get_overview_dash_page, \
     compute_evidence_graph
-from AlternativeGUI.DashComponents.DashPagesCreators.SpecificDashCreator import get_specific_dash_page, \
+from GUI.DashComponents.DashPagesCreators.SpecificDashCreator import get_specific_dash_page, \
     compute_options_for_papers, compute_list_of_dictionary_label_value, compute_options_for_applications, \
     compute_options_for_authors
 from DataManagers.DatabaseManager import do_query

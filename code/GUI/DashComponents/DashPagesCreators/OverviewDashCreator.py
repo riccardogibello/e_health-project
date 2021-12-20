@@ -3,7 +3,7 @@ from dash import html, dcc
 from pandas import DataFrame
 import plotly.express as px
 
-from AlternativeGUI.DashComponents.DashPagesCreators.SpecificDashCreator import compute_options_for_applications
+from GUI.DashComponents.DashPagesCreators.SpecificDashCreator import compute_options_for_applications
 from DataManagers.DatabaseManager import do_query, retrieve_columns_names_given_table
 
 

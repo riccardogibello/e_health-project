@@ -5,10 +5,10 @@ import pickle
 import pandas as pd
 from PyQt5 import QtCore
 from PyQt5.QtCore import QObject
-from AlternativeGUI.WindowComponents.WaitingWindow import WaitingWindow
+from GUI.WindowComponents.WaitingWindow import WaitingWindow
 from DataManagers.DataMiner import DataMiner
 from DataManagers.DatabaseManager import do_query, clear_table
-from DataManagers.DatasetManager import DatasetManager
+from DataManagers.NewDatasetManager import DatasetManager
 from DataManagers.OldDatasetManager import OldDatasetManager
 from DataManagers.settings import KAGGLE_DATASET_PATH
 from DataModel.Library import Library
