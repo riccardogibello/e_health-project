@@ -60,11 +60,20 @@ def get_apps_with_evidence(n_clicks):
 def get_app_data(app_id, n_clicks):
     query = 'SELECT app_id, app_name, category_id, d.name, score, rating, installs, ' \
             'last_update, content_rating, teacher_approved FROM selected_app AS sa, developer AS d WHERE ' \
-            'sa.developer_id = d.id AND app_id = %s LIMIT 1'
+            'app_id = %s AND sa.developer_id = d.id LIMIT 1'
     results = do_query((app_id,), query)
     data = ['Application Identifier : ', 'Application Name : ',
             'Category : ', 'Developer : ', 'Score : ', 'Number of reviews : ', 'Installs : ', 'Last Update : ',
             'Content Rating : ', 'Teacher Approved : ']
+
+    if not results:
+        query = 'SELECT app_id, app_name, category_id, score, rating, installs, ' \
+                'last_update, content_rating, teacher_approved FROM selected_app AS sa WHERE ' \
+                'app_id = %s LIMIT 1'
+        results = do_query((app_id,), query)
+        data = ['Application Identifier : ', 'Application Name : ',
+                'Category : ', 'Score : ', 'Number of reviews : ', 'Installs : ', 'Last Update : ',
+                'Content Rating : ', 'Teacher Approved : ']
 
     changed_id = [p['prop_id'] for p in callback_context.triggered][0]
 
