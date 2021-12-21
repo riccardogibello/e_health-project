@@ -44,14 +44,12 @@ class OldDatasetManager:
     data are already set into 'app' table.
     """
     applications = ''
-    reviews = ''
     latest_app_name_extracted = ''
     latest_app_id_extracted = ''
     app_not_found = ''
 
     def __init__(self):
         self.applications = pd.read_csv('./data/input_data/old_googleplaystore.csv')
-        self.reviews = pd.read_csv('./data/input_data/old_googleplaystore_user_reviews.csv')
 
     def load_old_dataset_into_db(self):
         # ----------------------------------------------
@@ -71,10 +69,6 @@ class OldDatasetManager:
 
         while False in threads_status:
             time.sleep(3)
-        # ----------------------------------------------
-        # ----------------------------------------------
-        # now the loading of the related reviews is handled
-        # self.load_app_reviews_into_db()
 
     def load_app_batch_into_db(self, offset, batch_size, threads_status):
         columns = ['App', 'Category']

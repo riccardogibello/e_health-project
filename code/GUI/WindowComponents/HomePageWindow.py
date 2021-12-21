@@ -25,7 +25,7 @@ class HomePageWindow(QMainWindow):
 
         label_logo = QLabel()
         pixmap = QPixmap('./resources/images/Google_Play-Logo.wine.png')
-        pixmap = pixmap.scaled(500, 500, Qt.KeepAspectRatio, Qt.FastTransformation)
+        pixmap = pixmap.scaled(575, 500, Qt.KeepAspectRatio, Qt.FastTransformation)
         label_logo.setPixmap(pixmap)
         vertical_layout.addWidget(label_logo)
 

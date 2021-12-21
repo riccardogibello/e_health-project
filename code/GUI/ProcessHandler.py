@@ -12,7 +12,7 @@ from DataManagers.NewDatasetManager import DatasetManager
 from DataManagers.OldDatasetManager import OldDatasetManager
 from DataManagers.settings import KAGGLE_DATASET_PATH
 from DataModel.Library import Library
-from Utilities.Classifiers.ApplicationsClassifier import ApplicationsClassifier
+from Utilities.Classifiers.AppsClassifier.ApplicationsClassifier import ApplicationsClassifier
 from Utilities.Classifiers.PaperClassifiers.NBayesPaperClassifier import NBayesPaperClassifier
 from Utilities.Scrapers.NatureScraper import NatureScraper
 
@@ -46,8 +46,6 @@ def execute_classification():
         classifier = pickle.load(model_file)
         model_file.close()
         classifier.check_validity()
-        classifier.performance.print_values()
-        save_model(classifier)
     except (FileNotFoundError, ValueError):
         #  FileNotFoundError - there is no saved model
         #  ValueError raised by check_validity method when the model is not valid
@@ -55,6 +53,7 @@ def execute_classification():
         classifier.train_models()
         classifier.evaluate_classifier()
         save_model(classifier)
+    classifier.performance.print_values()
     classifier.classify_apps()
     # =============================================================================
     # =============================================================================
@@ -70,6 +69,7 @@ def execute_classification():
     # This builds a train-test set from PubMed, trains the classifier and tests it.
     # Lastly it classifies all the papers previously retrieved from Nature.
     # =============================================================================
+
 
 def save_model(model):
     model_dir = './data/models/ApplicationClassifier'
@@ -131,7 +131,6 @@ class ProcessHandler(QObject):
 
     def load_datasets(self):
         self.terminated_process = False
-        clear_table('preliminary')
         if self.__old_dataset_process or self.__dataset_process:
             return
 

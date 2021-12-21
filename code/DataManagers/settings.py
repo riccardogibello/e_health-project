@@ -1,15 +1,20 @@
 import multiprocessing
 
+"""
+Settings file containing the most important parameters of the application.
+"""
+
+#  DATASET SETTINGS
 SERIOUS_GAMES_CATEGORIES_LIST = ['Adventure', 'Racing', 'Puzzle', 'Arcade', 'Education', 'Board', 'Educational',
                                  'Casual', 'Card', 'Trivia', 'Strategy', 'Action', 'Simulation', 'Role Playing']
 
 KAGGLE_KEY_COLUMNS = ['App Id', 'Category', 'App Name']
 KAGGLE_DATASET_PATH = 'data/input_data/kaggle_playstore_apps_new.csv'
 
+LAST_UPDATE = 1546300800
 # 1546300800 - Tuesday 1 January 2019 00:00:00
 # 1577836800 - Wednesday 1 January 2020 00:00:00
 # 1609459200 - Friday 1 January 2021 00:00:00
-LAST_UPDATE = 1546300800
 
 ADULT_RATINGS = ['Adult only 18+', 'Mature 17+']
 
@@ -17,14 +22,14 @@ ADULT_RATINGS = ['Adult only 18+', 'Mature 17+']
 MAX_RETRIEVE_APP_DATA_THREADS = multiprocessing.cpu_count() * 10
 
 # CLASSIFICATION SETTINGS
-SMOOTHING_COEFFICIENT = 1
-TEST_SET_DIMENSION = 0.20  # fraction of training set
 NUM_MODELS = 21
-NON_IMPROVING_ITERATIONS = 50
-MAX_ITERATIONS = 200
+SOFT_VOTING = True  # True - Soft voting. False - Hard voting
+MAX_ITERATIONS = 200  # Maximum number of training iterations made by classifier instance
+SMOOTHING_COEFFICIENT = 1
+TEST_SET_DIMENSION = 0.20  # Faction of testing set. MUST be less 0 < TEST_SET_DIMENSION < 1
+NON_IMPROVING_ITERATIONS = 50  # Number of iteration made after the last improvement in performance
 TRUE_CLASSIFIED_INCREMENT = 0.001
 WRONG_CLASSIFIED_INCREMENT = 15 * TRUE_CLASSIFIED_INCREMENT
-SOFT_VOTING = True   # True - Soft voting. False - Hard voting
 
 # DATABASE SETTINGS
 MAX_CONNECTION_ATTEMPTS = 20

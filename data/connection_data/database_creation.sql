@@ -50,33 +50,11 @@ CREATE TABLE `developer` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-DROP TABLE IF EXISTS `developer`;
-CREATE TABLE `developer` (
-  `id` varchar(100) UNIQUE NOT NULL,
-  `name` varchar (200),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 DROP TABLE IF EXISTS `app_paper`;
 CREATE TABLE `app_paper` (
   `paper_id` varchar(100),
   `app_id` varchar(200),
   PRIMARY KEY (`paper_id`, `app_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-DROP TABLE IF EXISTS `paper_keywords`;
-CREATE TABLE `paper_keywords` (
-  `paper_id` varchar(100),
-  `keyword_id` varchar(200),
-  PRIMARY KEY (`paper_id`, `keyword_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-DROP TABLE IF EXISTS `keyword`;
-CREATE TABLE `keyword` (
-  `keyword_id` integer UNIQUE NOT NULL AUTO_INCREMENT,
-  `keyword` varchar(200),
-  `occurrences` int DEFAULT 0,
-  PRIMARY KEY (`keyword_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `author_paper`;
