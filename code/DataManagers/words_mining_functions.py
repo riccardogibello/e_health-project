@@ -35,7 +35,6 @@ def count_occurrences(words):
     # that word has been found
     # { key = word, value = count }
 
-    # TODO : check if the following actually work
     sorted_dict = dict(sorted(occurrences.items(), key=lambda x: x[1], reverse=True))
     return sorted_dict
 

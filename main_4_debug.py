@@ -1,12 +1,9 @@
 from threading import Thread
 from selenium.common.exceptions import WebDriverException
-
-from GUI.DashComponents.DashManagerComponent import run_dash
 from DataManagers.DatabaseManager import do_query
 import time
 import numpy as np
 from selenium import webdriver
-
 from DataModel.Library import Library
 from Utilities.Classifiers.PaperClassifiers.NBayesPaperClassifier import NBayesPaperClassifier
 from Utilities.Scrapers.NatureScraper import NatureScraper
@@ -76,13 +73,10 @@ def label_apps():
 
 if __name__ == '__main__':
     '''library = Library()
-    p = NatureScraper(library)'''
-    # p = PubMedScraper(library)
+    p = NatureScraper(library)
 
-    '''start = time.time()
+    start = time.time()
     classifier = NBayesPaperClassifier(False)
     end = time.time()
 
     print(str(end - start))'''
-
-    run_dash()

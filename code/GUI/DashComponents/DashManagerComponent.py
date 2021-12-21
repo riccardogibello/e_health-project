@@ -27,7 +27,6 @@ def run_dash():
     # without 'position': 'fixed', "overflowY": "scroll" the page won't scroll!
 
     app.run_server(debug=False)
-    # TODO : set debug to False to run in finaly version
 
 
 # Update the index
@@ -59,13 +58,12 @@ def get_apps_with_evidence(n_clicks):
               [dash.Input(component_id='app_dropdown', component_property='value'),
                dash.Input(component_id='reset-button', component_property='n_clicks')])
 def get_app_data(app_id, n_clicks):
-    query = 'SELECT app_id, app_name, category_id, score, rating, installs, ' \
-            'last_update, content_rating, teacher_approved FROM selected_app AS sa WHERE ' \
-            'app_id = %s LIMIT 1'
-    # TODO : add sa.developer_id = d.id
+    query = 'SELECT app_id, app_name, category_id, d.name, score, rating, installs, ' \
+            'last_update, content_rating, teacher_approved FROM selected_app AS sa, developer AS d WHERE ' \
+            'sa.developer_id = d.id AND app_id = %s LIMIT 1'
     results = do_query((app_id,), query)
     data = ['Application Identifier : ', 'Application Name : ',
-            'Category : ', 'Score : ', 'Number of reviews : ', 'Installs : ', 'Last Update : ',
+            'Category : ', 'Developer : ', 'Score : ', 'Number of reviews : ', 'Installs : ', 'Last Update : ',
             'Content Rating : ', 'Teacher Approved : ']
 
     changed_id = [p['prop_id'] for p in callback_context.triggered][0]

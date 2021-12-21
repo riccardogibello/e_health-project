@@ -148,9 +148,8 @@ class PaperClassifier:
 
     def __init__(self):
         self.studytype_paperlist_dictionary = {}
-        # TODO : removed only to run after NBayes with same papers
-        '''self.retrieve_papers()
-        self.split_train_test_papers(test_percentage=0.2)'''
+        self.retrieve_papers()
+        self.split_train_test_papers(test_percentage=0.2)
 
     def retrieve_papers(self):
         f_in = open('./data/input_data/study_type_mesh_correspondence.txt')

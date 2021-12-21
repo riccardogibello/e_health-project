@@ -3,12 +3,12 @@ from pymed import PubMed
 from DataManagers.words_mining_functions import sanitize_and_tokenize, count_occurrences
 from DataModel.Application import Application
 from DataManagers.DatabaseManager import do_query, clear_table
-from Utilities.Classifiers.PaperClassifiers.NBayesPaperClassifier import sanitize_text
 from Utilities.Classifiers.PaperClassifiers.PaperClassifier import find_papers
 from Utilities.Scrapers.Scraper import Scraper, format_query
 from WEBFunctions.web_mining_functions import find_web_page
 
-mesh_terms = ['Video Games']  # TODO : , 'Child', 'Models, Educational']
+mesh_terms = ['Video Games']  # the followind are other MESH terms not used in the final version:
+# 'Child', 'Models, Educational'
 
 queries = ['((serious games) AND (Video Games[MeSH Major Topic])) AND (Child[MeSH Terms])',
            '(serious games) AND (Video Games[MeSH Major Topic])']
@@ -23,10 +23,8 @@ def find_author_n_publications(author):
     query = '(' + author.name + ' ' + author.surname + '[Author])'
     for mesh_term in mesh_terms:
         query = '(' + query + ' AND (' + mesh_term + '[MeSH Major Topic]))'
-        # TODO : very unlikely that some results will be found with this further constraint given by MESH tokens
         url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=' + query \
               + '&sort=date'
-        # TODO : in previous query &sort=date set in place of &usehistory=y
 
         url = format_query(url)
         page = find_web_page(url)
