@@ -1,5 +1,4 @@
 import re
-
 import mysql
 import mysql.connector
 
@@ -193,6 +192,11 @@ def mark_as_non_existing(app_id):
 
 
 class DatabaseManager:
+    """
+    This class is mainly intended to handle the communication between the python code and the MySQL database.
+    The functions defined above are some utilities used, for example, to retrieve the names of the columns of some
+    specific tables in the database, to clear some specified tables or to perform single / multiple queries.
+    """
     __connection_data = []
 
     def get_connection_data(self):

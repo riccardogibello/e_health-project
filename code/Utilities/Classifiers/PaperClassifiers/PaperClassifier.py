@@ -143,6 +143,11 @@ def classify_serious_games_papers(classification_function):
 
 
 class PaperClassifier:
+    """
+    This is the superclass of all the paper classifiers implemented (Frequentist and Naive Bayes) and it is intended
+    to retrieve a training set (used by the Naive Bayes) and a test set (saved in 'test' table) that is used to
+    evaluate the classification performances for both the models.
+    """
     study_type_correspondence = {'CaseControl': 0, 'CohortStudy': 1, 'MetaAnalysis': 2, 'ObservationalStudy': 3,
                                  'RCT': 4, 'SystematicReview': 5}
 
@@ -181,6 +186,8 @@ class PaperClassifier:
         self.balance_papers()
 
     def balance_papers(self):
+        # this method is used in order to balance all the study type categories retrieved, in case one of them
+        # returned a number smaller than 1000 (the one requested). In this way the test and train sets are balanced.
         min_n_papers = -1
         for study_type in self.studytype_paperlist_dictionary.keys():
             n_papers = len(self.studytype_paperlist_dictionary.get(study_type))
@@ -197,7 +204,8 @@ class PaperClassifier:
             self.studytype_paperlist_dictionary.__setitem__(study_type, paper_list)
 
     def split_train_test_papers(self, test_percentage):
-        # firstly clear all previous data already present in the table
+        # firstly clear all previous data already present in the table used to save the gold-standard labeling of the
+        # papers used to test the models.
         clear_table('test_paper')
 
         for study_type in self.studytype_paperlist_dictionary.keys():

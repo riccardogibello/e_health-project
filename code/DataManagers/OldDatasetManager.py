@@ -34,6 +34,15 @@ def extract_app_details(df, i, columns, interesting_categories):
 
 
 class OldDatasetManager:
+    """
+    This is the class implemented in order to load the first dataset given of Google Play apps. In particular,
+    as seen at line 90, it adds all the app ids in the 'preliminary' table, the other data will be fetched
+    later by the DataMiner.py.
+    'from_dataset' flag used to check if an application in 'preliminary' was added from the initial datasets
+    or was retrieved thanks to the 'similar' functionality provided by the APIs.
+    'check' is a flag used by DataMiner.py in order to check if a given app has already been checked and the related
+    data are already set into 'app' table.
+    """
     applications = ''
     reviews = ''
     latest_app_name_extracted = ''
@@ -41,21 +50,8 @@ class OldDatasetManager:
     app_not_found = ''
 
     def __init__(self):
-        # The following are rendering improvements to be used in order to print the data in the console
-        # pd.set_option('display.max_rows', None)
-        # pd.set_option('display.max_columns', None)
-        # pd.set_option('display.width', None)
-        # pd.set_option('display.max_colwidth', None)
-
         self.applications = pd.read_csv('./data/input_data/old_googleplaystore.csv')
         self.reviews = pd.read_csv('./data/input_data/old_googleplaystore_user_reviews.csv')
-
-        # print(df.loc[[i], ['App']])   # here an object is still extracted, containing the index
-        # of the element, the column name and the value stored in the column
-
-        # print(df.at[i, 'App']) # this is the way to extract specific values stored in a table in a specific
-        # (row,col) position
-        # print(df.loc[i])
 
     def load_old_dataset_into_db(self):
         # ----------------------------------------------

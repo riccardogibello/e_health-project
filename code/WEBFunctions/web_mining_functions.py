@@ -4,27 +4,7 @@ import urllib
 import io
 from urllib.request import Request
 import PyPDF2
-import play_scraper
 from bs4 import BeautifulSoup
-from DataManagers.DatabaseManager import *
-
-
-def find_available_categories():
-    clear_table('category')
-    categories = play_scraper.categories()
-
-    i = 1
-    for first_key, category in categories.items():
-        data = []
-        for second_key, category_datum in category.items():
-            if second_key != 'url':
-                data.append(category_datum)
-        query = (
-            "INSERT INTO category(id, category_id)"
-            "VALUES (%s, %s)"
-        )
-        do_query([str(i), category.get('category_id')], query)
-        i = i + 1
 
 
 def find_text_from_web_page(path):

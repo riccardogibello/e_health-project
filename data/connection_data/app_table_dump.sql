@@ -23,6 +23,7 @@ CREATE TABLE `preliminary` (
     `app_id` varchar(100) UNIQUE NOT NULL,
     `check` boolean DEFAULT false,
     `from_dataset` boolean DEFAULT false,
+    `existing` boolean DEFAULT True,
     PRIMARY KEY (`app_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

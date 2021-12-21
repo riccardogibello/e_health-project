@@ -1,13 +1,12 @@
 import string
-
 import numpy as np
 from nltk import WordNetLemmatizer, PunktSentenceTokenizer, WordPunctTokenizer, sent_tokenize, ngrams
 from nltk.corpus import stopwords
 from WEBFunctions.web_mining_functions import *
 
 
-def sanitize_string(string):
-    new_string = str(string.encode('ascii', errors='ignore').decode())
+def sanitize_string(string_):
+    new_string = str(string_.encode('ascii', errors='ignore').decode())
     new_string = re.sub(r"[\b]+", "", new_string)
     new_string = re.sub(r"[\t]+", "", new_string)
     new_string = re.sub(r"[\f]+", "", new_string)
@@ -18,6 +17,10 @@ def sanitize_string(string):
 
 
 def count_occurrences(words):
+    """
+    This method, given a list of words (for example a set of tokenized sentences and words), returns a dictionary
+    with all the words contained and the related occurrences.
+    """
     occurrences = {}
     i = 0
     for word in words:
@@ -36,6 +39,7 @@ def count_occurrences(words):
     # { key = word, value = count }
 
     sorted_dict = dict(sorted(occurrences.items(), key=lambda x: x[1], reverse=True))
+    # the dictionary is returned in descending by value of the occurrences
     return sorted_dict
 
 
