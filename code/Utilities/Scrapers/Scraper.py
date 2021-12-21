@@ -10,6 +10,10 @@ def format_query(query):
 
 
 class Scraper:
+    """
+    This is a superclass of all the possible scrapers implemented in this project. In particular, it is intended to
+    find possible citations of the applications into the papers retrieved.
+    """
     library = ''
 
     def __init__(self, library):
@@ -35,16 +39,14 @@ class Scraper:
                     do_query((pub_id, app_id), query)
 
     def create_publication(self, title, abstract, authors, journal, nature_type):
-        """
-        This method creates a new publication (if not already existing) and then adds this publication (if not already
-        present) to each author
-        """
         title = sanitize_string(title)
         title = re.sub(r'"+', "", title)
         publication = Publication(title, abstract, authors, journal, nature_type)
-        self.library.add_publication(publication)
+        self.library.add_publication(publication)  # this method adds the publication to the library if not already
+        # existing
         for author in authors:
-            author.add_publication(publication)
+            author.add_publication(publication)  # the publication is added to all of his authors in order to keep
+            # the correspondence also into the database
 
     def create_pubmed_publication(self, title, abstract, authors, pubmed_id):
         title = sanitize_string(title)

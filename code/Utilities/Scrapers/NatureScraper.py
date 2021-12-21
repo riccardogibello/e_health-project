@@ -1,4 +1,3 @@
-import time
 import requests
 from Utilities.Scrapers.Scraper import Scraper
 
@@ -8,6 +7,12 @@ def format_query(query):
 
 
 class NatureScraper(Scraper):
+    """
+    This class is a scraping class intended to retrieve publications data from Nature starting from general keywords
+    such as 'serious games children'. In this way the publication data and the related authors' data are retrieved
+    and stored in the database. Finally, this set of papers is searched for citations of the names of the applications
+    selected as serious games.
+    """
     def __init__(self, library):
         super().__init__(library)
         self.find_serious_games_papers()
@@ -15,7 +20,8 @@ class NatureScraper(Scraper):
 
     def find_serious_games_papers(self):
         keywords_list = [
-            'serious games children']  # TODO: , 'gamification children applications', 'mobile children applications']
+            'serious games children']  # other keywords could have been
+        # 'gamification children applications', 'mobile children applications'
         page_length = 50
         start = 1
 

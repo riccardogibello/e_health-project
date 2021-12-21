@@ -27,6 +27,16 @@ def compute_total_occurrences(occurrence_list):
 
 
 class NBayesPaperClassifier(PaperClassifier):
+    """
+    This is the last and adopted version of the Paper Classifier. This class adapts the Naive Bayes Text Classifier
+    to the given problem. In particular, it retrieves a large set of papers related to general medicine from PubMed
+    and splits them into a train and test set.
+    In this way, the train set is used to create a vocabulary of words and, for each word, it is computed the number
+    of occurrences that word has for a specific study type. Then the likelihoods and the priors can be calculated
+    and the model is tested on an unseen set of papers (with a gold-standard label given by PubMed and used to evaluate
+    the classifying performances of the model.
+    Lastly it also classifies all the serious games related papers stored in the 'paper' table.
+    """
     def __init__(self, recompute):
         self.prior_probabilities = {}  # { study_type : log_probability }}
         self.likelihoods = {}  # { study_type : { word : loglikelihood }}
@@ -42,7 +52,6 @@ class NBayesPaperClassifier(PaperClassifier):
             self.test_model_()
         else:
             self.load_model()
-            self.test_model_()  # TODO : DELETE
         self.classify_serious_games_papers_()
 
     def save_model(self):

@@ -71,7 +71,6 @@ def execute_classification():
     # Lastly it classifies all the papers previously retrieved from Nature.
     # =============================================================================
 
-
 def save_model(model):
     model_dir = './data/models/ApplicationClassifier'
     if not os.path.exists(model_dir):
@@ -162,14 +161,23 @@ class ProcessHandler(QObject):
                 apps_from_dataset = do_query((), query)
                 window.apps_from_dataset = apps_from_dataset
                 self.update_signal.emit('Idle.')
-        print('end update_load_data_page')
 
     def do_classification_dataset(self):
         self.terminated_process = False
+        if self.__data_miner_process:
+            return
+        self.keep_on_updating = True
+
         if self.__classification_process:
             return
         self.__classification_process = multiprocessing.Process(target=execute_classification)
         self.__classification_process.start()
+        self.__classification_process.join()
+
+        self.keep_on_updating = False
+        if not self.terminated_process:
+            self.signal.emit('Idle.')
+        self.terminated_process = False
 
     def close_application(self):
         self.terminated_process = True
