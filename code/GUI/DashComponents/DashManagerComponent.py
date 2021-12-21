@@ -42,8 +42,9 @@ def display_page(pathname):
 
 
 @app.callback([dash.Output(component_id='app_dropdown', component_property='options')],
-              [dash.Input(component_id='filter-evidence-apps-button-2', component_property='n_clicks')])
-def get_apps_with_evidence(n_clicks):
+              [dash.Input(component_id='filter-evidence-apps-button-2', component_property='n_clicks')],
+              dash.Input(component_id='reset-button', component_property='n_clicks'))
+def get_apps_with_evidence(n_clicks, n_clicks2):
     changed_id = [p['prop_id'] for p in callback_context.triggered][0]
 
     if 'filter-evidence-apps-button-2' in changed_id:
